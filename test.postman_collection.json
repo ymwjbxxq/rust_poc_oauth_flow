@@ -1,0 +1,329 @@
+{
+	"info": {
+		"_postman_id": "c7d14ad7-77eb-40a9-8135-befcc264b0b9",
+		"name": "oauth - test",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Load Signup",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"email\": \"{{int}}\",\n    \"password\":\"{{int}}\",\n    \"family_name\":\"{{int}}\",\n    \"given_name\": \"{{int}}\",\n    \"is_consent\": true,\n    \"is_optin\": true\n}"
+				},
+				"url": {
+					"raw": "https://[your-oauth-domain].execute-api.eu-central-1.amazonaws.com/v2/signup?client_id=myApp",
+					"protocol": "https",
+					"host": [
+						"[your-oauth-domain]",
+						"execute-api",
+						"eu-central-1",
+						"amazonaws",
+						"com"
+					],
+					"path": [
+						"v2",
+						"signup"
+					],
+					"query": [
+						{
+							"key": "client_id",
+							"value": "myApp"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Signup",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"var uuid = require(\"uuid\");",
+							"pm.globals.set(\"int\", uuid.v4())",
+							"const jar = pm.cookies.jar();",
+							"jar.clear(pm.request.url, function (error) {",
+							"  // error - <Error>",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"console.log(pm.request.body)"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"email\": \"{{int}}\",\n    \"password\":\"{{int}}\",\n    \"family_name\":\"{{int}}\",\n    \"given_name\": \"{{int}}\",\n    \"is_consent\": true,\n    \"is_optin\": true\n}"
+				},
+				"url": {
+					"raw": "https://[your-oauth-domain].execute-api.eu-central-1.amazonaws.com/v2/signup?client_id=myApp",
+					"protocol": "https",
+					"host": [
+						"[your-oauth-domain]",
+						"execute-api",
+						"eu-central-1",
+						"amazonaws",
+						"com"
+					],
+					"path": [
+						"v2",
+						"signup"
+					],
+					"query": [
+						{
+							"key": "client_id",
+							"value": "myApp"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "login - app",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var statusCode = pm.response.code;",
+							"if(statusCode === 302){",
+							"    console.log(\"setting location_auth_1 \", pm.response.headers.get(\"location\"))",
+							"    pm.globals.set(\"location_auth_1\", pm.response.headers.get(\"location\"))",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://[your-app-domain].execute-api.eu-central-1.amazonaws.com/login?client_id=myApp",
+					"protocol": "https",
+					"host": [
+						"[your-app-domain]",
+						"execute-api",
+						"eu-central-1",
+						"amazonaws",
+						"com"
+					],
+					"path": [
+						"login"
+					],
+					"query": [
+						{
+							"key": "client_id",
+							"value": "myApp"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "oauth-auth-first-rq",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var statusCode = pm.response.code;",
+							"if(statusCode === 302){",
+							"    console.log(\"setting location_login \", pm.response.headers.get(\"location\"))",
+							"    pm.globals.set(\"location_login\", pm.response.headers.get(\"location\"))",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{location_auth_1}}",
+					"host": [
+						"{{location_auth_1}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "load login",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{location_login}}",
+					"host": [
+						"{{location_login}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "login",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var statusCode = pm.response.code;",
+							"console.log(pm.request.body)",
+							"if(statusCode === 302){",
+							"    console.log(\"setting location_auth_2 \", pm.response.headers.get(\"location\"))",
+							"    pm.globals.set(\"location_auth_2\", pm.response.headers.get(\"location\"))",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"//setTimeout(function(){}, 1000);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"email\":\"{{int}}\",\n    \"password\":\"{{int}}\"\n}"
+				},
+				"url": {
+					"raw": "{{location_login}}",
+					"host": [
+						"{{location_login}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "oauth-auth-second-rq",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var statusCode = pm.response.code;",
+							"if(statusCode === 302){",
+							"    console.log(\"setting location_auth_3 \", pm.response.headers.get(\"location\"))",
+							"    pm.globals.set(\"location_auth_3\", pm.response.headers.get(\"location\"))",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{location_auth_2}}",
+					"host": [
+						"{{location_auth_2}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "oauth-auth-third-rq",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{location_auth_3}}",
+					"host": [
+						"{{location_auth_3}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "token",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{token}}",
+					"host": [
+						"{{token}}"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
