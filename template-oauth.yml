@@ -260,6 +260,3 @@ Outputs:
     Export:
       Name: 
         Fn::Sub: ${AWS::StackName}-OAuthUrl
-  # DynamodbTable:
-  #   Description: "DynamoDB table ARN"
-  #   Value: !GetAtt Table.Arn
