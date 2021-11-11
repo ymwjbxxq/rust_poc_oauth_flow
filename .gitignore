@@ -1,0 +1,10 @@
+debug/
+target/
+**/.DS_Store
+**/*.rs.bk
+*.lock
+deploy.sh
+.vscode/settings.json
+.aws-sam
+build
+samconfig.toml
