@@ -47,7 +47,7 @@ pub async fn execute(event: Request, _ctx: Context) -> Result<impl IntoResponse,
 
   let redirect_path       = std::env::var("REDIRECT_PATH").expect("REDIRECT_PATH must be set");
   let host                = event.headers().get("Host").unwrap().to_str().unwrap();
-  let redirect_uri        = format!("https://{}/{}", host, redirect_path);
+  let redirect_uri        = format!("https://{}{}", host, redirect_path);
   let oauth_authorize_uri = std::env::var("OAUTH_AUTHORIZE_URL").expect("OAUTH_AUTHORIZE_URL must be set");
 
   let state = Uuid::new_v4().to_string();
