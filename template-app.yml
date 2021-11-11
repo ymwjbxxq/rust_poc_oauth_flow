@@ -1,0 +1,119 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: sam-app
+
+Globals:
+  Function:
+    MemorySize: 1024
+    Architectures: ["arm64"]
+    Handler: bootstrap
+    Runtime: provided.al2
+    Timeout: 29
+    Environment:
+      Variables:
+        RUST_BACKTRACE: 1
+        RUST_LOG: info
+        #TABLE_NAME: !Ref Table
+
+Resources:
+  # Table:
+  #   Type: AWS::DynamoDB::Table
+  #   Properties:
+  #     AttributeDefinitions:
+  #       - AttributeName: pk
+  #         AttributeType: S
+  #     BillingMode: PAY_PER_REQUEST
+  #     KeySchema:
+  #       - AttributeName: pk
+  #         KeyType: HASH
+
+  MyProtectedApi:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      StageName: test
+      Auth:
+        DefaultAuthorizer: MyLambdaRequestAuthorizer
+        Authorizers:
+          MyLambdaRequestAuthorizer:
+            FunctionArn: !GetAtt AppLambdaAuthorizerFunction.Arn
+            FunctionInvokeRole: !GetAtt AppLambdaAuthorizerFunctionRole.Arn
+            Identity:
+              Headers:
+                - Authorization
+            AuthorizerPayloadFormatVersion: 2.0
+            EnableSimpleResponses: true
+
+  AppApiFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: build/app-random-api/
+      Policies:
+        - AWSLambdaBasicExecutionRole
+      Events:
+        Api:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref MyProtectedApi
+            Path: /random-api
+            Method: GET
+            PayloadFormatVersion: "2.0"
+    Metadata:
+      BuildMethod: makefile
+
+  AppLambdaAuthorizerFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: build/app-lambda-authorizer/
+      Policies:
+        - AWSLambdaBasicExecutionRole
+
+  AppAuthFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: build/app-auth/
+      Policies:
+        - AWSLambdaBasicExecutionRole
+      Environment:
+        Variables:
+           OAUTH_TOKEN_URL: !Sub ['${filename}token', filename: !ImportValue rust-oautflow-oauth-OAuthUrl]
+      Events:
+        Api:
+          Type: HttpApi
+          Properties:
+            Path: /auth
+            Method: GET
+    Metadata:
+      BuildMethod: makefile
+  
+  AppLoginFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: build/app-login/
+      Policies:
+        - AWSLambdaBasicExecutionRole
+      Environment:
+        Variables:
+          REDIRECT_PATH: "/auth"
+          OAUTH_AUTHORIZE_URL: !Sub ['${filename}authorize', filename: !ImportValue rust-oautflow-oauth-OAuthUrl]
+      Events:
+        Api:
+          Type: HttpApi
+          Properties:
+            Path: /login
+            Method: GET
+    Metadata:
+      BuildMethod: makefile
+
+Outputs:
+  ProtectedEndpoint:
+    Description: The default endpoint for the HTTP API.
+    Value: !GetAtt MyProtectedApi.ApiEndpoint
+  AppUrl:
+    Description: "API Gateway endpoint URL"
+    Value: !Sub "https://${ServerlessHttpApi}.execute-api.${AWS::Region}.amazonaws.com/"
+    Export:
+      Name: 
+        Fn::Sub: ${AWS::StackName}-AppUrl
+  # DynamodbTable:
+  #   Description: "DynamoDB table ARN"
+  #   Value: !GetAtt Table.Arn

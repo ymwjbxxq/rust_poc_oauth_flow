@@ -1,0 +1,265 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: sam-app
+
+
+Globals:
+  Function:
+    MemorySize: 1024
+    Architectures: ["arm64"]
+    Handler: bootstrap
+    Runtime: provided.al2
+    Timeout: 29
+    Environment:
+      Variables:
+        RUST_BACKTRACE: 1
+        RUST_LOG: info
+
+Resources:
+  ## S3 bucket
+  SourceBucket:
+    Type: AWS::S3::Bucket
+
+  ## DynamoDB   
+  OAuthServiceTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      KeySchema:
+        - AttributeName: client_id
+          KeyType: HASH
+        - AttributeName: email
+          KeyType: RANGE
+      AttributeDefinitions:
+        - AttributeName: client_id
+          AttributeType: S
+        - AttributeName: email
+          AttributeType: S
+      BillingMode: PAY_PER_REQUEST
+
+  ##GENERAL
+  OauthAuthorizeFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: build/oauth-authorize/
+      Policies:
+        - AWSLambdaBasicExecutionRole
+      Environment:
+        Variables:
+          OAUTH_AUTHORIZE_LOGIN_PATH: "/v2/login"
+          OAUTH_CUSTOM_OPTIN_PATH: "/custom/optin"
+          OAUTH_CUSTOM_CONSENT_PATH: "/custom/consent"
+      Events:
+        Api:
+          Type: HttpApi
+          Properties:
+            Path: /authorize
+            Method: GET
+    Metadata:
+      BuildMethod: makefile
+  
+  OauthTokenFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: build/oauth-token/
+      Policies:
+        - AWSLambdaBasicExecutionRole
+      Events:
+        Api:
+          Type: HttpApi
+          Properties:
+            Path: /token
+            Method: ANY #IT SHOULD BE A POST BUT FOR THE PoC is fine
+    Metadata:
+      BuildMethod: makefile
+  
+  ##GET 
+  OauthOptinFGETunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: build/oauth-optin-get/
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - S3ReadPolicy:
+            BucketName: !Ref SourceBucket
+      Environment:
+        Variables:
+          CONFIG_BUCKETNAME: !Ref SourceBucket
+      Events:
+        Api:
+          Type: HttpApi
+          Properties:
+            Path: /custom/optin
+            Method: GET
+    Metadata:
+      BuildMethod: makefile
+  
+  OauthConsentGETFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: build/oauth-consent-get/
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - S3ReadPolicy:
+            BucketName: !Ref SourceBucket
+      Environment:
+        Variables:
+          CONFIG_BUCKETNAME: !Ref SourceBucket
+      Events:
+        Api:
+          Type: HttpApi
+          Properties:
+            Path: /custom/consent
+            Method: GET
+    Metadata:
+      BuildMethod: makefile
+
+  OauthLoginGETFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: build/oauth-login-get/
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - S3ReadPolicy:
+            BucketName: !Ref SourceBucket
+      Environment:
+        Variables:
+          CONFIG_BUCKETNAME: !Ref SourceBucket
+      Events:
+        Api:
+          Type: HttpApi
+          Properties:
+            Path: /v2/login
+            Method: GET
+    Metadata:
+      BuildMethod: makefile
+  
+  OauthSignupGETFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: build/oauth-signup-get/
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - S3ReadPolicy:
+            BucketName: !Ref SourceBucket
+      Environment:
+        Variables:
+          CONFIG_BUCKETNAME: !Ref SourceBucket 
+      Events:
+        Api:
+          Type: HttpApi
+          Properties:
+            Path: /v2/signup
+            Method: GET
+    Metadata:
+      BuildMethod: makefile
+
+  ##POST 
+  OauthOptinPOSTFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: build/oauth-optin-post/
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - Version: "2012-10-17"
+          Statement:
+            - Effect: Allow
+              Action: 
+                - dynamodb:UpdateItem
+              Resource: !GetAtt OAuthServiceTable.Arn
+      Environment:
+        Variables:
+          TABLE_NAME: !Ref OAuthServiceTable
+          OAUTH_AUTHORIZE_PATH: "/authorize"
+      Events:
+        Api:
+          Type: HttpApi
+          Properties:
+            Path: /custom/optin
+            Method: POST
+    Metadata:
+      BuildMethod: makefile
+  
+  OauthConsentPOSTFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: build/oauth-consent-post/
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - Version: "2012-10-17"
+          Statement:
+            - Effect: Allow
+              Action: 
+                - dynamodb:UpdateItem
+              Resource: !GetAtt OAuthServiceTable.Arn
+      Environment:
+        Variables:
+          TABLE_NAME: !Ref OAuthServiceTable
+          OAUTH_AUTHORIZE_PATH: "/authorize"
+      Events:
+        Api:
+          Type: HttpApi
+          Properties:
+            Path: /custom/consent
+            Method: POST
+    Metadata:
+      BuildMethod: makefile
+
+  OauthLoginPOSTFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: build/oauth-login-post/
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - Version: "2012-10-17"
+          Statement:
+            - Effect: Allow
+              Action: 
+                - dynamodb:GetItem
+              Resource: !GetAtt OAuthServiceTable.Arn
+      Environment:
+        Variables:
+          TABLE_NAME: !Ref OAuthServiceTable
+          OAUTH_AUTHORIZE_PATH: "/authorize"
+      Events:
+        Api:
+          Type: HttpApi
+          Properties:
+            Path: /v2/login
+            Method: POST
+    Metadata:
+      BuildMethod: makefile
+  
+  OauthSignupPOSTFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: build/oauth-signup-post/
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - Version: "2012-10-17"
+          Statement:
+            - Effect: Allow
+              Action: 
+                - dynamodb:PutItem
+              Resource: !GetAtt OAuthServiceTable.Arn
+      Environment:
+        Variables:
+          TABLE_NAME: !Ref OAuthServiceTable
+      Events:
+        Api:
+          Type: HttpApi
+          Properties:
+            Path: /v2/signup
+            Method: POST
+    Metadata:
+      BuildMethod: makefile
+
+Outputs:
+  OAuthUrl:
+    Description: "API Gateway endpoint URL"
+    Value: !Sub "https://${ServerlessHttpApi}.execute-api.${AWS::Region}.amazonaws.com/"
+    Export:
+      Name: 
+        Fn::Sub: ${AWS::StackName}-OAuthUrl
+  # DynamodbTable:
+  #   Description: "DynamoDB table ARN"
+  #   Value: !GetAtt Table.Arn
