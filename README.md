@@ -38,6 +38,13 @@ To reduce the exposure in clear of sensitive data, you can combine AWS CloudFron
 
 You can find more details [here](https://github.com/ymwjbxxq/protect-sensitive-data-with-aws-lambda-edge)
 
+### What I have Learnt ###
+
+* [Error handling](https://www.sheshbabu.com/posts/rust-error-handling/)
+* [Safe JSON representations with Rust](https://n14n.dev/articles/2021/safe-json-representations-with-rust/)
+* [Implementing a Trait on a Type](https://doc.rust-lang.org/book/ch10-02-traits.html#implementing-a-trait-on-a-type)
+* ["Type-Driven API Design in Rust" by Will Crichton](https://www.youtube.com/watch?v=bnnacleqg6k)
+
 ### MANUAL TEST WITH POSTMAN: ###
 
 1. Register a user at - https://[your-oauth-domain].execute-api.eu-central-1.amazonaws.com/
@@ -48,6 +55,20 @@ You can find more details [here](https://github.com/ymwjbxxq/protect-sensitive-d
 6. Authorization code - https://[your-app-domain].execute-api.eu-central-1.amazonaws.com/auth?redirect_uri=https%3A%2F%2F[your-app-domain].execute-api.eu-central-1.amazonaws.com%2F%2Fauth&code=0128cf82-808d-4949-bb77-a71fe2213750&state=e7761619-867d-4591-ab8f-f516afebc1aa&code_challenge=E6eArpYbPr7JJ12opY7fQ6r6fD-KfZcadk6VQIgeDls&client_id=myApp
 7. Request token - https://[your-oauth-domain].execute-api.eu-central-1.amazonaws.com/token?grant_type=authorization_code&code_verifier=bSsHtJBHWBSduNeZ-LA03w1LtKQTTGRVWN76YH5uE4l92e5j6_ijnqASPobIwsNNBqyxlVa9aGbTFvwSVDBqfRa7efsgF25to1M0UzYNUtoNft0rUD3QSbvTYYFEUcOsSLePXLKZXbvbVPMArKt-sqyYRiazeCXReCjIfOKLRdg&redirect_uri=https%3A%2F%2F[your-app-domain].execute-api.eu-central-1.amazonaws.com%2F%2Fauth&client_id=myApp&code=0128cf82-808d-4949-bb77-a71fe2213750
 8. Now with the token we can call our protected API - eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJiQGIuY29tIiwiY29tcGFueSI6IkFDTUUiLCJleHAiOjEwMDAwMDAwMDAwfQ.TXdR1GMY_5nqQLDTk3uSZlRjt7JeVdK8HUuTRo44-OU
+
+### LOAD TEST WITH POSTMAN: ###
+
+As I am not the most excellent automation tester, I could not find a better and easier way. So, I created a collection of steps in POSTMAN, simulating the registration and login for each user generating 5K registration and 5K login. 
+I run the same collection in an iteration setting the iteration and in parallel. 
+Each Lambda has some latency. For example, the GET for login and signup requests are loading a page from S3 while the POST is doing a query to DynamoDB. 
+
+In the graph below, you can see:
+
+* Average
+* P99
+* P90
+
+![picture](https://github.com/ymwjbxxq/rust_poc_oauth_flow/blob/main/readme/first-test.png)
 
 ### WHAT IS MISSING: ###
 Many things :)
