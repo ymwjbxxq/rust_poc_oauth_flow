@@ -9,7 +9,7 @@ It is just a PoC and so take it for what it is.
 
 ### HOW IT WORKS ###
 
-![picture](https://github.com/ymwjbxxq/rust_poc_oauth_flow/blob/master/readme/auth-sequence-auth-code-pkce.png)
+![picture](https://github.com/ymwjbxxq/rust_poc_oauth_flow/blob/main/readme/auth-sequence-auth-code-pkce.png)
 
 I have created 3 APIs:
 
