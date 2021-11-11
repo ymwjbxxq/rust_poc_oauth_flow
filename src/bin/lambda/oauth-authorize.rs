@@ -75,7 +75,7 @@ pub async fn execute(event: Request, _ctx: Context) -> Result<impl IntoResponse,
     cookie.insert("code_challenge".to_owned(),  query_params.get("code_challenge").expect("code_challenge is not in query string").to_owned());
     headers.insert(http::header::SET_COOKIE,    Cookie::to_cookie_string(String::from("myOAuth"), cookie));
     headers.insert(http::header::LOCATION,      ApiHelper::build_url_from_hashmap(
-                                                  query_params.get("redirect_uri").expect("code_challenge is not in query string").to_owned(),
+                                                  query_params.get("redirect_uri").expect("redirect_uri is not in query string").to_owned(),
                                                   HashMap::from([
                                                     ("client_id",       query_params.get("client_id").expect("client_id is not in query string")),
                                                     ("code",            &Uuid::new_v4().to_string()),
