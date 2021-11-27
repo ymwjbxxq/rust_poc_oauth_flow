@@ -22,7 +22,7 @@ async fn main() -> Result<(), E> {
     .init()
     .unwrap();
 
-  lambda_runtime::run(handler(|event: Request, ctx: Context| execute(event, ctx))).await?;
+  lambda_runtime::run(handler(execute)).await?;
   Ok(())
 }
 
@@ -36,7 +36,7 @@ pub async fn execute(event: Request, _ctx: Context) -> Result<impl IntoResponse,
   let cookie = CookieHelper::from_http_header(event.headers());
   if cookie.is_ok() {
     let mut cookie = cookie.unwrap();
-    if let None = cookie.get("is_optin") {
+    if cookie.get("is_optin").is_none() {
       let redirect_path =
         std::env::var("OAUTH_CUSTOM_OPTIN_PATH").expect("OAUTH_CUSTOM_OPTIN_PATH must be set");
 
@@ -54,7 +54,7 @@ pub async fn execute(event: Request, _ctx: Context) -> Result<impl IntoResponse,
       }));
     }
 
-    if let None = cookie.get("is_consent") {
+    if cookie.get("is_consent").is_none() {
       let redirect_path =
         std::env::var("OAUTH_CUSTOM_CONSENT_PATH").expect("OAUTH_CUSTOM_CONSENT_PATH must be set");
 
@@ -95,9 +95,9 @@ pub async fn execute(event: Request, _ctx: Context) -> Result<impl IntoResponse,
     );
   }
 
-  return Ok(ApiHelper::response(ApiResponse {
-        status_code: HttpStatusCode::Found,
-        body: None,
-        headers: Some(headers),
-      }));
+  Ok(ApiHelper::response(ApiResponse {
+    status_code: HttpStatusCode::Found,
+    body: None,
+    headers: Some(headers),
+  }))
 }

@@ -68,16 +68,16 @@ pub async fn execute(event: Request, _ctx: Context) -> Result<impl IntoResponse,
                       ("client_id", client_id),
                       ("response_type", "code"),
                       ("state", &state),
-                      ("code_challenge", &CriptoHelper::to_sha256_string(code_verifier.to_owned())),
+                      ("code_challenge", &CriptoHelper::to_sha256_string(code_verifier)),
                       ("code_challenge_method", "S256"),
                       ("redirect_uri", &redirect_uri),
                     ]),
                   ),
   );
 
-  return Ok(ApiHelper::response(ApiResponse {
-        status_code: HttpStatusCode::Found,
-        body: None,
-        headers: Some(headers),
-      }));
+   Ok(ApiHelper::response(ApiResponse {
+      status_code: HttpStatusCode::Found,
+      body: None,
+      headers: Some(headers),
+    }))
 }

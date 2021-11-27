@@ -22,7 +22,7 @@ impl ApiHelper {
       headers.insert(http::header::CONTENT_TYPE, String::from("application/json").parse().unwrap());
     }
 
-    return res.body(api_response.body.unwrap_or_default()).unwrap();
+    res.body(api_response.body.unwrap_or_default()).unwrap()
   }
 
   pub fn build_url_from_hashmap(url: String, query_string: HashMap<&str, &str>) -> String {
@@ -36,7 +36,7 @@ impl ApiHelper {
         query_string_dic.insert(key, value);
       });
 
-    return ApiHelper::build_url_from_hashmap(url, query_string_dic);
+    ApiHelper::build_url_from_hashmap(url, query_string_dic)
   }
 }
 
@@ -79,7 +79,7 @@ impl BodyExt for Request {
   let body_res: Result<T, serde_json::Error> = match self.body() {
     Body::Text(body) => serde_json::from_str(body),
     Body::Binary(body) => {
-      let result = str::from_utf8(&body).unwrap(); //"email=a%40a.it&password=password&remember=on"
+      let result = str::from_utf8(body).unwrap(); //"email=a%40a.it&password=password&remember=on"
       let my_object = serde_urlencoded::from_str(result).unwrap();
       return Ok(Some(my_object));
     },
@@ -95,6 +95,6 @@ impl BodyExt for Request {
       return Ok(None);
     },
   };
-  return Ok(Some(my_object));
+  Ok(Some(my_object))
  }
 }

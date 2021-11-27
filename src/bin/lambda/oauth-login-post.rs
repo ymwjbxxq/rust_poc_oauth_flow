@@ -44,7 +44,7 @@ async fn main() -> Result<(), E> {
 
 pub async fn execute(aws_client: &AWSClient, event: Request, _ctx: Context) -> Result<impl IntoResponse, E> {
   log::info!("EVENT {:?}", event);
-  let result = login(&aws_client, &event).await?;
+  let result = login(aws_client, &event).await?;
   return Ok(match result {
     Some(user) => {
       let redirect_path = std::env::var("OAUTH_AUTHORIZE_PATH").expect("OAUTH_AUTHORIZE_PATH must be set");
@@ -58,7 +58,7 @@ pub async fn execute(aws_client: &AWSClient, event: Request, _ctx: Context) -> R
       let mut headers = HashMap::new();
       headers.insert(http::header::SET_COOKIE, 
         Cookie::to_cookie_string(String::from("myOAuth"), HashMap::from([
-          (String::from("email"), user.email.unwrap().to_owned()),
+          (String::from("email"), user.email.unwrap()),
           (String::from("is_consent"), user.is_consent.unwrap().to_string()),
           (String::from("is_optin"), user.is_optin.unwrap().to_string()),
         ])
@@ -87,7 +87,7 @@ async fn login(aws_client: &AWSClient, event: &Request) -> Result<Option<User>, 
   let query_params  = event.query_string_parameters();
   let client_id     = query_params.get("client_id").expect("client_id not found");
 
-  let user = LoginQuery::new(&aws_client.dynamo_db_client.as_ref().unwrap())
+  let user = LoginQuery::new(aws_client.dynamo_db_client.as_ref().unwrap())
       .execute(client_id, &user.unwrap().email.unwrap())
       .await?;
 

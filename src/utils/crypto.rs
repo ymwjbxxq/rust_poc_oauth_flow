@@ -15,19 +15,19 @@ impl CriptoHelper {
   }
 
   pub fn to_base64<T: AsRef<[u8]>>(input: T) -> String {
-    return base64_url::encode(&input);
+    base64_url::encode(&input)
   }
 
   pub fn to_sha256_string<T: AsRef<[u8]>>(input: T) -> String {
     let mut hasher = Sha256::new();
     hasher.update(input);
     let result = hasher.finalize();
-    return CriptoHelper::to_base64(result);
+    CriptoHelper::to_base64(result)
   }
 
   pub fn random_bytes(length: usize) -> Vec<u8> {
     let random_bytes: Vec<u8> = (0..length).map(|_| { rand::random::<u8>() }).collect();
-    return random_bytes;
+    random_bytes
   }
 
   // pub fn rsa_decrypt(data: &Vec<u8>, private_key: String) -> Vec<u8> {

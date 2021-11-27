@@ -41,7 +41,7 @@ async fn main() -> Result<(), E> {
 pub async fn execute(aws_client: &AWSClient, event: Request, _ctx: Context) -> Result<impl IntoResponse, E> {
   log::info!("EVENT {:?}", event);
 
-  let result = load_ui(&aws_client, &event).await?;
+  let result = load_ui(aws_client, &event).await?;
   return Ok(match result {
     Some(result) => {
       let url = format!("{}://{}{}", 
@@ -83,7 +83,7 @@ async fn load_ui(aws_client: &AWSClient, event: &Request) -> Result<Option<Strin
 
   let bytes     = result.body.collect().await?.into_bytes();
   let response  = std::str::from_utf8(&bytes)?;
-  let ui: UI    = serde_json::from_str(&response).unwrap();
+  let ui: UI    = serde_json::from_str(response).unwrap();
 
   Ok(Some(ui.consent))
 }

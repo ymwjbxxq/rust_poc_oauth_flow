@@ -20,7 +20,7 @@ async fn main() -> Result<(), E> {
     .init()
     .unwrap();
 
-  lambda_runtime::run(handler(|event: Request, ctx: Context| execute(event, ctx))).await?;
+  lambda_runtime::run(handler(execute)).await?;
   Ok(())
 }
 
@@ -58,9 +58,9 @@ pub async fn execute(event: Request, _ctx: Context) -> Result<impl IntoResponse,
     }));
   }
 
-  return Ok(ApiHelper::response(ApiResponse {
+  Ok(ApiHelper::response(ApiResponse {
     status_code: HttpStatusCode::Unauthorized,
     body: Some(json!({ "message": "Unauthorized" }).to_string()),
     headers: None,
-  }));
+  }))
 }

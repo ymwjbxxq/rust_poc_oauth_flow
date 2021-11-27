@@ -47,7 +47,7 @@ pub async fn execute(aws_client: &AWSClient, event: Request, _ctx: Context) -> R
   let query_params  = event.query_string_parameters();
   let client_id     = query_params.get("client_id").expect("client_id not found");
 
-  UpdateOptInQuery::new(&aws_client.dynamo_db_client.as_ref().unwrap())
+  UpdateOptInQuery::new(aws_client.dynamo_db_client.as_ref().unwrap())
       .execute(UpdateOptInCommand {
       client_id: client_id.to_owned(),
       email: email.to_owned(),
@@ -73,9 +73,9 @@ pub async fn execute(aws_client: &AWSClient, event: Request, _ctx: Context) -> R
     headers.insert(http::header::CONTENT_TYPE, "application/json".to_string());
     headers.insert(http::header::LOCATION, ApiHelper::build_url_from_querystring(format!("https://{}{}", host, redirect_path), query_params));
 
-  return Ok(ApiHelper::response(ApiResponse {
+  Ok(ApiHelper::response(ApiResponse {
     status_code: HttpStatusCode::Found,
     body: None,
     headers: Some(headers),
-  }));
+  }))
 }

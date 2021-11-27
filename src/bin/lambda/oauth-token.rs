@@ -54,11 +54,11 @@ pub async fn execute(event: Request, _ctx: Context) -> Result<impl IntoResponse,
   }
 
   log::info!("token Unauthorized");
-  return Ok(ApiHelper::response(ApiResponse {
+  Ok(ApiHelper::response(ApiResponse {
     status_code: HttpStatusCode::Unauthorized,
     body: Some(json!({ "message": "Unauthorized" }).to_string()),
     headers: None,
-  }));
+  }))
 }
 
 #[derive(Debug, Serialize, Deserialize)]

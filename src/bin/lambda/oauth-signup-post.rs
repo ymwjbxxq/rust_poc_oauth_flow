@@ -43,8 +43,8 @@ async fn main() -> Result<(), E> {
 pub async fn execute(aws_client: &AWSClient, event: Request, _ctx: Context) -> Result<impl IntoResponse, E> {
   log::info!("EVENT {:?}", event);
   //register
-  let result = register_user(&aws_client, &event).await?;
-  return Ok(match result {
+  let result = register_user(aws_client, &event).await?;
+  Ok(match result {
     Some(_) => {
       ApiHelper::response(ApiResponse {
         status_code: HttpStatusCode::Created,
@@ -59,7 +59,7 @@ pub async fn execute(aws_client: &AWSClient, event: Request, _ctx: Context) -> R
         headers: None,
       })
     }
-  });
+  })
 }
 
 async fn register_user(aws_client: &AWSClient, event: &Request) -> Result<Option<bool>, E> {
@@ -71,7 +71,7 @@ async fn register_user(aws_client: &AWSClient, event: &Request) -> Result<Option
   user.email        = Some(CriptoHelper::to_sha256_string(&user.email.unwrap().as_bytes()));
   user.password     = Some(CriptoHelper::to_sha256_string(&user.password.unwrap().as_bytes()));
 
-  AddUser::new(&aws_client.dynamo_db_client.as_ref().unwrap())
+  AddUser::new(aws_client.dynamo_db_client.as_ref().unwrap())
     .execute(&user)
     .await?;
 
