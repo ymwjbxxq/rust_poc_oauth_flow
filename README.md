@@ -1,92 +1,90 @@
-# Build a native module for NodeJs with Rust
+# PoC - RUST Authorization Code Flow with Proof Key for Code Exchange (PKCE) #
+Usually, my hello version of a serverless example combines services like SQS, DynamoDB etc. 
+This time I wanted to build something where the flow is a bit more complex, and this is why I used the [Authorization Code Flow with Proof Key for Code Exchange (PKCE)](https://auth0.com/docs/flows/authorization-code-flow-with-proof-key-for-code-exchange-pkce)
 
-## What is Neon
+### VERY IMPORTANT ###
+This code is not for production and contains security issues. However, some choice is there just to make the flow easier. 
+For example, some GET should be a POST, and some elements should not be saved in the cookie.
+It is just a PoC and so take it for what it is.
 
-[Neon](https://neon-bindings.com/) is a library and toolchain for embedding Rust in your Node.js apps and libraries. Neon allows you to write type-safe and memory-safe, crash-free native Node modules, guaranteeing Rust’s parallelism with thread safety.
+### HOW IT WORKS ###
 
-Neon has a few types https://neon-bindings.com/docs/primitive-types:
+![picture](https://github.com/ymwjbxxq/rust_poc_oauth_flow/blob/main/readme/auth-sequence-auth-code-pkce.png)
 
-* JsValue
-* subject
-* And primitives like JsNumber
+I have created 3 APIs:
 
-The key is to map your JS input to Rust and return an output mapping Rust to JS.
+App endpoint protected by Lambda Authorizer
+App endpoints not protected
+OAuth endpoints
 
+If, for example, you need to add extra steps at the original flow, you can, and this is why I have added two more:
 
-## How
+* Consent page
+* Optin page
 
-The basic hello world is like this
-```Rust
-#[neon::main]
-fn main(mut cx: ModuleContext) -> NeonResult<()> {
-    cx.export_function("hello", hello)?;
-    Ok(())
-}
-fn hello(mut cx: FunctionContext) -> JsResult<JsString> {
-    Ok(cx.string("hello node"))
-}
+At the end of the flow, we should be able to see the JWT token:
+```App
+Authorization: eyJhbGciOiJIUzI1NiJ9.T0RBVUxDQVk0V0k1S1ZQU01DUkZCTExBOEs3QURNUEQzWUM4WFdUNVQ1UDRVUElRREw.956xdJUWC4mfDJlohbqP2kqFUNoAPlZ8nRRJCfzo1KI
 ```
-And you can call from JS point to the export_function key.
+To add more latency and authenticity, I load some UI from a configuration file hosted in S3. This file could be custom made for each clientId that the OAuth provider is supporting. You can find an example on the file myApp.json  (you should upload manually on the S3).
 
-```node
-node
-> require('.').hello()
-hello node
-```
+### EXTRA: ###
 
-While you will find just hello world or Fibonacci examples, I tried to do something more tangible. I tried to implement an HTTP client with [reqwest](https://github.com/seanmonstar/reqwest)
+To reduce the exposure in clear of sensitive data, you can combine AWS CloudFront with Lambda@Edge to:
 
-## How to Run
+* Intercept data
+* Encrypt at the edge
+* Pass it through before the application can process it, reducing exposure.
 
-Change the URL that you want to HIT inside index.ts
+You can find more details [here](https://github.com/ymwjbxxq/protect-sensitive-data-with-aws-lambda-edge)
 
-1. npm install
-2. build the native module under native folder running cargo build --release
-3. from the root compile TypeScript with tsc
-4. node index.js
+### What I have Learnt ###
 
-You should be able to see something like this.
+* [Error handling](https://www.sheshbabu.com/posts/rust-error-handling/)
+* [Safe JSON representations with Rust](https://n14n.dev/articles/2021/safe-json-representations-with-rust/)
+* [Implementing a Trait on a Type](https://doc.rust-lang.org/book/ch10-02-traits.html#implementing-a-trait-on-a-type)
+* ["Type-Driven API Design in Rust" by Will Crichton](https://www.youtube.com/watch?v=bnnacleqg6k)
+
+### MANUAL TEST WITH POSTMAN: ###
+
+1. Register a user at - https://[your-oauth-domain].execute-api.eu-central-1.amazonaws.com/
+2. User click login link:  https://[your-app-domain].execute-api.eu-central-1.amazonaws.com/login?client_id=myApp
+3. Authorization code quest + code challange to Oauth provider - https://[your-oauth-domain].execute-api.eu-central-1.amazonaws.com/authorize?response_type=code&state=e7761619-867d-4591-ab8f-f516afebc1aa&code_challenge_method=S256&client_id=myApp&code_challenge=E6eArpYbPr7JJ12opY7fQ6r6fD-KfZcadk6VQIgeDls&redirect_uri=https%3A%2F%2F[your-app-domain].execute-api.eu-central-1.amazonaws.com%2F%2Fauth
+4. Redirec to login page - https://[your-oauth-domain].execute-api.eu-central-1.amazonaws.com/v2/login?code_challenge=E6eArpYbPr7JJ12opY7fQ6r6fD-KfZcadk6VQIgeDls&redirect_uri=https%3A%2F%2F[your-app-domain].execute-api.eu-central-1.amazonaws.com%2F%2Fauth&code_challenge_method=S256&client_id=myApp&response_type=code&state=e7761619-867d-4591-ab8f-f516afebc1aa
+5. Authenticate and consent/optin - https://[your-oauth-domain].execute-api.eu-central-1.amazonaws.com/authorize?code_challenge=E6eArpYbPr7JJ12opY7fQ6r6fD-KfZcadk6VQIgeDls&response_type=code&state=e7761619-867d-4591-ab8f-f516afebc1aa&code_challenge_method=S256&client_id=myApp&redirect_uri=https%3A%2F%2F[your-app-domain].execute-api.eu-central-1.amazonaws.com%2F%2Fauth
+6. Authorization code - https://[your-app-domain].execute-api.eu-central-1.amazonaws.com/auth?redirect_uri=https%3A%2F%2F[your-app-domain].execute-api.eu-central-1.amazonaws.com%2F%2Fauth&code=0128cf82-808d-4949-bb77-a71fe2213750&state=e7761619-867d-4591-ab8f-f516afebc1aa&code_challenge=E6eArpYbPr7JJ12opY7fQ6r6fD-KfZcadk6VQIgeDls&client_id=myApp
+7. Request token - https://[your-oauth-domain].execute-api.eu-central-1.amazonaws.com/token?grant_type=authorization_code&code_verifier=bSsHtJBHWBSduNeZ-LA03w1LtKQTTGRVWN76YH5uE4l92e5j6_ijnqASPobIwsNNBqyxlVa9aGbTFvwSVDBqfRa7efsgF25to1M0UzYNUtoNft0rUD3QSbvTYYFEUcOsSLePXLKZXbvbVPMArKt-sqyYRiazeCXReCjIfOKLRdg&redirect_uri=https%3A%2F%2F[your-app-domain].execute-api.eu-central-1.amazonaws.com%2F%2Fauth&client_id=myApp&code=0128cf82-808d-4949-bb77-a71fe2213750
+8. Now with the token we can call our protected API - eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJiQGIuY29tIiwiY29tcGFueSI6IkFDTUUiLCJleHAiOjEwMDAwMDAwMDAwfQ.TXdR1GMY_5nqQLDTk3uSZlRjt7JeVdK8HUuTRo44-OU
+
+### LOAD TEST WITH POSTMAN: ###
+
+As I am not the most excellent automation tester, I could not find a better and easier way. So, I created a collection of steps in POSTMAN, simulating the registration and login for each user generating 5K registration and 5K login. 
+I run the same collection in an iteration setting the iteration and in parallel. 
+Each Lambda has some latency. For example, the GET for login and signup requests are loading a page from S3 while the POST is doing a query to DynamoDB. 
+
+In the graph below, you can see:
+
+* Average
+* P99
+* P90
+
+![picture](https://github.com/ymwjbxxq/rust_poc_oauth_flow/blob/main/readme/first-test.png)
+
+### WHAT IS MISSING: ###
+Many things :)
+
+### Deploy ###
 
 ```bash
-START native 2021-12-08T15:37:13.670Z
-{ message: 'Go ahead without me' }
-{ message: 'Go ahead without me' }
-{ message: 'Go ahead without me' }
-{ message: 'Go ahead without me' }
-{ message: 'Go ahead without me' }
-{ message: 'Go ahead without me' }
-{ message: 'Go ahead without me' }
-{ message: 'Go ahead without me' }
-{ message: 'Go ahead without me' }
-{ message: 'Go ahead without me' }
-END*********1543ms
-START node-fetch 2021-12-08T15:37:15.213Z
-{ message: 'Go ahead without me' }
-{ message: 'Go ahead without me' }
-{ message: 'Go ahead without me' }
-{ message: 'Go ahead without me' }
-{ message: 'Go ahead without me' }
-{ message: 'Go ahead without me' }
-{ message: 'Go ahead without me' }
-{ message: 'Go ahead without me' }
-{ message: 'Go ahead without me' }
-{ message: 'Go ahead without me' }
-END*********138ms
+# Compile and prepare Lambda functions
+make build
+
+# Deploy the functions on AWS
+make deploy
+
 ```
 
-As you can see, Rust took 1543ms vs pure Node 138ms
-
-I think I have a problem with this code [Bridging with sync code](https://tokio.rs/tokio/topics/bridging)
-
-```Rust
-let http_response = tokio::runtime::Builder::new_multi_thread()
-        .enable_all()
-        .build()
-        .unwrap()
-        .block_on(async {
-            let res = fetch_url(&shared_request.url).await;
-            res
-        });
+### Cleanup ###
 ```
-
-I am still working on this.
+make delete
+```
