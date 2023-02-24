@@ -76,7 +76,7 @@ Resources:
   OauthOptinGETFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: build/oauth/optin-get/
+      CodeUri: build/oauth/optin/get/
       Policies:
         - AWSLambdaBasicExecutionRole
         - S3ReadPolicy:
@@ -157,7 +157,7 @@ Resources:
   OauthOptinPOSTFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: build/oauth/optin-post/
+      CodeUri: build/oauth/optin/post/
       Policies:
         - AWSLambdaBasicExecutionRole
         - Version: "2012-10-17"

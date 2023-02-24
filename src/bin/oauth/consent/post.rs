@@ -62,7 +62,11 @@ pub async fn execute(
 
     app_client.query(&request).await?;
 
-    let host = event.headers().get("Host").unwrap().to_str().unwrap();
+    let host = event
+        .headers()
+        .get("Host")
+        .expect("Cannot find host in the Request")
+        .to_str()?;
 
     let mut headers = HashMap::new();
     headers.insert(
