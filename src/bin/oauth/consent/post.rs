@@ -21,7 +21,7 @@ async fn main() -> Result<(), Error> {
     let table_name = std::env::var("TABLE_NAME").expect("TABLE_NAME must be set");
     let query = UpdateConsent::builder()
         .table_name(table_name)
-        .client(dynamodb_client.clone())
+        .client(dynamodb_client)
         .build();
 
     let redirect_path =
@@ -52,7 +52,7 @@ pub async fn execute(
     let query_params = event.query_string_parameters();
     let client_id = query_params
         .first("client_id")
-        .expect("client_id not found");
+        .expect("client_id not found in query string");
 
     let request = UpdateConsentRequest::builder()
         .client_id(client_id)
