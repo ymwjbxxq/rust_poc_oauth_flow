@@ -6,86 +6,89 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-cookie = "0.15.1"
-futures = "0.3.17"
-http = "0.2.5"
-lambda_http = "0.4.1"
-lambda_runtime = "0.4.1"
-aws-config = "0.0.24-alpha"
-aws-sdk-dynamodb = "0.0.24-alpha"
-aws-sdk-s3 = "0.0.24-alpha"
-aws-types = "0.0.24-alpha"
+cookie = "0.17"
+futures = "0.3"
+http = "0.2"
+lambda_http = { version = "0.7", default-features = false, features = ["apigw_http"] }
+lambda_runtime = "0.7.3"
+aws-sdk-dynamodb = "0.24.0"
+aws-sdk-s3 = "0.24.0"
+aws-types = "0.54.1"
+aws-config = "0.54.1"
 log = "0.4.14"
-rand = "0.8.4"
+rand = "0.8"
 serde = {version = "1.0", features = ["derive"] }
-serde_json = "1.0.68"
-serde_qs = "0.8.5"
-sha2 = "0.9.8"
-simple_logger = "1.13.0"
-tokio = "1.13.0"
-uuid = { version = "0.8", features = ["v4"] }
-async-trait = "0.1.51"
-base64-url = "1.4.10"
-base64 = "0.13.0"
-jsonwebtoken = "7"
-serde_urlencoded = "0.7.0"
+serde_json = "1"
+serde_qs = "0.11"
+sha2 = "0.10"
+tracing-subscriber = { version = "0.3", features = ["fmt", "json"] }
+tokio = { version = "1", features = ["macros"] }
+uuid = { version = "1", features = ["v4"] }
+async-trait = "0.1"
+base64-url = "1.4"
+base64 = "0.21"
+jsonwebtoken = "8"
+serde_urlencoded = "0.7"
+crypto = "0.4.0"
+rsa = "0.8"
+typed-builder = "0.12"
 
 # APP
 [[bin]]
 name = "app-random-api"
-path = "src/bin/lambda/app-random-api.rs"
+path = "src/bin/app/random-api.rs"
 
 [[bin]]
 name = "app-lambda-authorizer"
-path = "src/bin/lambda/app-lambda-authorizer.rs"
+path = "src/bin/app/authorizer.rs"
 
 [[bin]]
 name = "app-auth"
-path = "src/bin/lambda/app-auth.rs"
+path = "src/bin/app/auth.rs"
 
 [[bin]]
 name = "app-login"
-path = "src/bin/lambda/app-login.rs"
+path = "src/bin/app/login.rs"
 
 # OAUTH POST
 [[bin]]
 name = "oauth-consent-post"
-path = "src/bin/lambda/oauth-consent-post.rs"
+path = "src/bin/oauth/consent/post.rs"
 
 [[bin]]
 name = "oauth-optin-post"
-path = "src/bin/lambda/oauth-optin-post.rs"
+path = "src/bin/oauth/optin-post.rs"
 
 [[bin]]
 name = "oauth-login-post"
-path = "src/bin/lambda/oauth-login-post.rs"
+path = "src/bin/oauth/login-post.rs"
 
 [[bin]]
 name = "oauth-signup-post"
-path = "src/bin/lambda/oauth-signup-post.rs"
+path = "src/bin/oauth/signup-post.rs"
 
 #OAUTH GET
 [[bin]]
 name = "oauth-consent-get"
-path = "src/bin/lambda/oauth-consent-get.rs"
+path = "src/bin/oauth/consent/get.rs"
 
 [[bin]]
 name = "oauth-optin-get"
-path = "src/bin/lambda/oauth-optin-get.rs"
+path = "src/bin/oauth/optin-get.rs"
 
 [[bin]]
 name = "oauth-login-get"
-path = "src/bin/lambda/oauth-login-get.rs"
+path = "src/bin/oauth/login-get.rs"
 
 [[bin]]
 name = "oauth-signup-get"
-path = "src/bin/lambda/oauth-signup-get.rs"
+path = "src/bin/oauth/signup-get.rs"
 
 #OAUTH GENERAL
 [[bin]]
 name = "oauth-authorize"
-path = "src/bin/lambda/oauth-authorize.rs"
+path = "src/bin/oauth/authorize.rs"
 
 [[bin]]
 name = "oauth-token"
-path = "src/bin/lambda/oauth-token.rs"
+path = "src/bin/oauth/token.rs"
