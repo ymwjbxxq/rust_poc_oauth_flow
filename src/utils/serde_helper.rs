@@ -5,7 +5,7 @@ pub trait SerdeExt {
 impl SerdeExt for serde_json::Value {
     #[inline]
     fn value_to_string(self) -> String {
-      serde_json::from_value(self).unwrap()
+        serde_json::from_value(self).unwrap()
     }
 }
 
@@ -16,7 +16,7 @@ impl SerdeExt for serde_json::Value {
 //     }
 // }
 
-// impl<T, E> SerdeExt for Result<T, E> {
+// impl<T, Error> SerdeExt for Result<T, Error> {
 //     #[inline]
 //     fn value_to_string(self) -> std::string::String {
 //         self.is_ok().to_string()

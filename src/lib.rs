@@ -1,5 +1,14 @@
-pub mod utils;
 pub mod aws;
+pub mod error;
 pub mod models;
 pub mod queries;
-pub mod error;
+pub mod utils;
+pub mod services;
+
+pub fn setup_tracing() {
+    tracing_subscriber::fmt()
+        .with_ansi(false)
+        .without_time()
+        .with_max_level(tracing_subscriber::filter::LevelFilter::INFO)
+        .init();
+}

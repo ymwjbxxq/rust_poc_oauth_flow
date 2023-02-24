@@ -3,3 +3,4 @@ pub mod cookie;
 pub mod crypto;
 pub mod dynamodb;
 pub mod serde_helper;
+pub mod injections;
