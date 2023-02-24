@@ -4,7 +4,7 @@ Description: sam-app
 
 Globals:
   Function:
-    MemorySize: 1024
+    MemorySize: 256
     Architectures: ["arm64"]
     Handler: bootstrap
     Runtime: provided.al2
@@ -34,7 +34,7 @@ Resources:
   AppApiFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: build/app-random-api/
+      CodeUri: build/app/random-api/
       Policies:
         - AWSLambdaBasicExecutionRole
       Events:
@@ -51,14 +51,14 @@ Resources:
   AppLambdaAuthorizerFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: build/app-lambda-authorizer/
+      CodeUri: build/app/lambda-authorizer/
       Policies:
         - AWSLambdaBasicExecutionRole
 
   AppAuthFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: build/app-auth/
+      CodeUri: build/app/auth/
       Policies:
         - AWSLambdaBasicExecutionRole
       Environment:
@@ -76,7 +76,7 @@ Resources:
   AppLoginFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: build/app-login/
+      CodeUri: build/app/login/
       Policies:
         - AWSLambdaBasicExecutionRole
       Environment:
