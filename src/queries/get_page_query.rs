@@ -8,9 +8,6 @@ use typed_builder::TypedBuilder as Builder;
 pub struct PageRequest {
     #[builder(setter(into))]
     pub client_id: String,
-
-    #[builder(setter(into))]
-    pub section: String,
 }
 
 #[async_trait]
@@ -24,6 +21,9 @@ pub struct Page {
     bucket_name: String,
 
     #[builder(setter(into))]
+    pub page_name: String,
+
+    #[builder(setter(into))]
     client: Client,
 }
 
@@ -35,7 +35,7 @@ impl PageQuery for Page {
             .client
             .get_object()
             .bucket(&self.bucket_name)
-            .key(format!("{}/{}.json", request.client_id, request.section))
+            .key(format!("{}/{}.json", request.client_id, &self.page_name))
             .response_content_type("application/json")
             .send()
             .await;

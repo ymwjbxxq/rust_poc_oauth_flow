@@ -6,18 +6,18 @@ use async_trait::async_trait;
 use typed_builder::TypedBuilder as Builder;
 
 #[async_trait]
-pub trait GetAppInitialisation: Send + Sync {
+pub trait GetPageAppInitialisation: Send + Sync {
     async fn query(&self, request: &PageRequest) -> Result<Option<String>, ApplicationError>;
 }
 
 #[derive(Debug, Builder)]
-pub struct GetAppClient {
+pub struct GetPageAppClient {
     #[builder(setter(into))]
     pub query: Page,
 }
 
 #[async_trait]
-impl GetAppInitialisation for GetAppClient {
+impl GetPageAppInitialisation for GetPageAppClient {
     async fn query(&self, request: &PageRequest) -> Result<Option<String>, ApplicationError> {
         self.query.execute(request).await
     }

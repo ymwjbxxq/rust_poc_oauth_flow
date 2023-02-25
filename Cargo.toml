@@ -69,20 +69,8 @@ path = "src/bin/oauth/signup/post.rs"
 
 #OAUTH GET
 [[bin]]
-name = "oauth-consent-get"
-path = "src/bin/oauth/consent/get.rs"
-
-[[bin]]
-name = "oauth-optin-get"
-path = "src/bin/oauth/optin/get.rs"
-
-[[bin]]
-name = "oauth-login-get"
-path = "src/bin/oauth/login/get.rs"
-
-[[bin]]
-name = "oauth-signup-get"
-path = "src/bin/oauth/signup/get.rs"
+name = "oauth-get-page"
+path = "src/bin/oauth/get_page.rs"
 
 #OAUTH GENERAL
 [[bin]]

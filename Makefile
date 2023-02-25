@@ -1,4 +1,4 @@
-FUNCTIONS := app-random-api app-lambda-authorizer app-auth app-login oauth-consent-post oauth-login-post oauth-optin-post oauth-signup-post oauth-consent-get oauth-login-get oauth-optin-get oauth-signup-get oauth-token oauth-authorize
+FUNCTIONS := app-random-api app-lambda-authorizer app-auth app-login oauth-consent-post oauth-login-post oauth-optin-post oauth-signup-post oauth-get-page oauth-token oauth-authorize
 
 ARCH := aarch64-unknown-linux-gnu
 

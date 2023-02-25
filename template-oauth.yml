@@ -76,7 +76,7 @@ Resources:
   OauthOptinGETFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: build/oauth/optin/get/
+      CodeUri: build/oauth/get-page/
       Policies:
         - AWSLambdaBasicExecutionRole
         - S3ReadPolicy:
@@ -84,6 +84,7 @@ Resources:
       Environment:
         Variables:
           CONFIG_BUCKETNAME: !Ref SourceBucket
+          PAGE_NAME: optin
       Events:
         Api:
           Type: HttpApi
@@ -96,7 +97,7 @@ Resources:
   OauthConsentGETFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: build/oauth/consent/get/
+      CodeUri: build/oauth/get-page/
       Policies:
         - AWSLambdaBasicExecutionRole
         - S3ReadPolicy:
@@ -104,6 +105,7 @@ Resources:
       Environment:
         Variables:
           CONFIG_BUCKETNAME: !Ref SourceBucket
+          PAGE_NAME: consent
       Events:
         Api:
           Type: HttpApi
@@ -116,7 +118,7 @@ Resources:
   OauthLoginGETFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: build/oauth/login/get/
+      CodeUri: build/oauth/get-page/
       Policies:
         - AWSLambdaBasicExecutionRole
         - S3ReadPolicy:
@@ -124,6 +126,7 @@ Resources:
       Environment:
         Variables:
           CONFIG_BUCKETNAME: !Ref SourceBucket
+          PAGE_NAME: login
       Events:
         Api:
           Type: HttpApi
@@ -136,14 +139,15 @@ Resources:
   OauthSignupGETFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: build/oauth/signup/get/
+      CodeUri: build/oauth/get-page/
       Policies:
         - AWSLambdaBasicExecutionRole
         - S3ReadPolicy:
             BucketName: !Ref SourceBucket
       Environment:
         Variables:
-          CONFIG_BUCKETNAME: !Ref SourceBucket 
+          CONFIG_BUCKETNAME: !Ref SourceBucket
+          PAGE_NAME: signup
       Events:
         Api:
           Type: HttpApi

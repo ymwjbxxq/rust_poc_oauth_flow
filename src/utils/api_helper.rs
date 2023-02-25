@@ -1,6 +1,5 @@
 use http::header::HeaderName;
-use lambda_http::{Body, Request, Response, aws_lambda_events::query_map::QueryMap};
-use serde::{Deserialize, Serialize};
+use lambda_http::{Response, aws_lambda_events::query_map::QueryMap};
 use std::collections::HashMap;
 
 use serde_urlencoded;
