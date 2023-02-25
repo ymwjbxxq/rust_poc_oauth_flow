@@ -5,36 +5,35 @@ use async_trait::async_trait;
 use aws_sdk_dynamodb::model::AttributeValue;
 use aws_sdk_dynamodb::Client;
 use std::collections::HashMap;
+use typed_builder::TypedBuilder as Builder;
 
-#[async_trait]
-pub trait GetUserQuery {
-    fn new(client: &Client) -> Self;
-    async fn execute(&self, client_id: &str, email: &str)
-        -> Result<Option<User>, ApplicationError>;
+#[derive(Debug, Builder)]
+pub struct GetUserRequest {
+    #[builder(setter(into))]
+    pub client_id: String,
+
+    #[builder(setter(into))]
+    pub email: String,
 }
 
-#[derive(Debug)]
-pub struct LoginQuery {
+#[derive(Debug, Builder)]
+pub struct GetUser {
+    #[builder(setter(into))]
     table_name: String,
+
+    #[builder(setter(into))]
     client: Client,
 }
 
 #[async_trait]
-impl GetUserQuery for LoginQuery {
-    fn new(client: &Client) -> Self {
-        let table_name = std::env::var("TABLE_NAME").expect("TABLE_NAME must be set");
-        Self {
-            table_name,
-            client: client.clone(),
-        }
-    }
+pub trait GetUserQuery {
+    async fn execute(&self, request: &GetUserRequest) -> Result<Option<User>, ApplicationError>;
+}
 
-    async fn execute(
-        &self,
-        client_id: &str,
-        email: &str,
-    ) -> Result<Option<User>, ApplicationError> {
-        println!("Fetching user for app {client_id} with {email}");
+#[async_trait]
+impl GetUserQuery for GetUser {
+    async fn  execute(&self, request: &GetUserRequest) -> Result<Option<User>, ApplicationError> {
+        println!("Fetching user {:#?}", &request);
         let res = self
             .client
             .get_item()
@@ -42,11 +41,11 @@ impl GetUserQuery for LoginQuery {
             .set_key(Some(HashMap::from([
                 (
                     "client_id".to_owned(),
-                    AttributeValue::S(client_id.to_owned()),
+                    AttributeValue::S(request.client_id.to_lowercase()),
                 ),
                 (
                     "email".to_owned(),
-                    AttributeValue::S(CriptoHelper::to_sha256_string(email)),
+                    AttributeValue::S(CriptoHelper::to_sha256_string(request.email.to_lowercase())),
                 ),
             ])))
             //.projection_expression("email, is_consent, is_optin")

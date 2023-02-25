@@ -1,13 +1,11 @@
 use cookie::Cookie;
 use lambda_http::{run, service_fn, Error, IntoResponse, Request, RequestExt};
-use oauth_flow::aws::client::AWSClient;
-use oauth_flow::aws::client::AWSConfig;
 use oauth_flow::models::user::User;
-use oauth_flow::queries::get_user_query::GetUserQuery;
-use oauth_flow::queries::get_user_query::LoginQuery;
+use oauth_flow::queries::get_user_query::{GetUser, GetUserRequest};
 use oauth_flow::setup_tracing;
 use oauth_flow::utils::api_helper::{ApiHelper, ApiResponse, HttpStatusCode};
 use oauth_flow::utils::cookie::CookieExt;
+use oauth_flow::utils::injections::oauth::login::post_di::{PostAppClient, PostAppInitialisation};
 use serde_json::json;
 use std::collections::HashMap;
 
@@ -16,31 +14,42 @@ async fn main() -> Result<(), Error> {
     setup_tracing();
 
     let config = aws_config::load_from_env().await;
-    let aws_client = AWSConfig::set_config(config);
-    let dynamo_db_client = aws_client.dynamo_client();
-    let aws_client = AWSClient {
-        dynamo_db_client: Some(dynamo_db_client),
-        s3_client: None,
-    };
+    let dynamodb_client = aws_sdk_dynamodb::Client::new(&config);
 
-    run(service_fn(|event: Request| {
-        execute(&aws_client, event)
-    }))
-    .await
+    let table_name = std::env::var("TABLE_NAME").expect("TABLE_NAME must be set");
+    let query = GetUser::builder()
+        .table_name(table_name)
+        .client(dynamodb_client)
+        .build();
+
+    let redirect_path =
+        std::env::var("OAUTH_AUTHORIZE_PATH").expect("OAUTH_AUTHORIZE_PATH must be set");
+    let app_client = PostAppClient::builder()
+        .query(query)
+        .redirect_path(redirect_path)
+        .build();
+
+    run(service_fn(|event: Request| execute(&app_client, event))).await
 }
 
 pub async fn execute(
-    aws_client: &AWSClient,
+    app_client: &dyn PostAppInitialisation,
     event: Request,
 ) -> Result<impl IntoResponse, Error> {
     println!("{event:?}");
-    let result = login(aws_client, &event).await?;
+    let result = login(app_client, &event)
+        .await
+        .ok()
+        .and_then(|result| result);
+    
+    let query_params = event.query_string_parameters();
     return Ok(match result {
         Some(user) => {
-            let redirect_path =
-                std::env::var("OAUTH_AUTHORIZE_PATH").expect("OAUTH_AUTHORIZE_PATH must be set");
-            let query_params = event.query_string_parameters();
-            let host = event.headers().get("Host").unwrap().to_str().unwrap();
+            let host = event
+                .headers()
+                .get("Host")
+                .expect("Cannot find host in the Request")
+                .to_str()?;
 
             let mut headers = HashMap::new();
             headers.insert(
@@ -61,7 +70,7 @@ pub async fn execute(
             headers.insert(
                 http::header::LOCATION,
                 ApiHelper::build_url_from_querystring(
-                    format!("https://{host}{redirect_path}"),
+                    format!("https://{host}{}", app_client.redirect_path()),
                     query_params,
                 ),
             );
@@ -80,14 +89,22 @@ pub async fn execute(
     });
 }
 
-async fn login(aws_client: &AWSClient, event: &Request) -> Result<Option<User>, Error> {
+async fn login(
+    app_client: &dyn PostAppInitialisation,
+    event: &Request,
+) -> Result<Option<User>, Error> {
     let user = event.payload::<User>()?.unwrap();
     let query_params = event.query_string_parameters();
-    let client_id = query_params.first("client_id").expect("client_id not found");
+    let client_id = query_params
+        .first("client_id")
+        .expect("client_id not found");
 
-    let user = LoginQuery::new(aws_client.dynamo_db_client.as_ref().unwrap())
-        .execute(client_id, &user.email.unwrap())
-        .await?;
+    let request = GetUserRequest::builder()
+        .client_id(client_id)
+        .email(user.email.unwrap())
+        .build();
+
+    let user = app_client.query(&request).await?;
 
     Ok(user)
 }

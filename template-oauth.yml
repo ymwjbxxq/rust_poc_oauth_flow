@@ -116,7 +116,7 @@ Resources:
   OauthLoginGETFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: build/oauth/login-get/
+      CodeUri: build/oauth/login/get/
       Policies:
         - AWSLambdaBasicExecutionRole
         - S3ReadPolicy:
@@ -207,7 +207,7 @@ Resources:
   OauthLoginPOSTFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: build/oauth/login-post/
+      CodeUri: build/oauth/login/post/
       Policies:
         - AWSLambdaBasicExecutionRole
         - Version: "2012-10-17"

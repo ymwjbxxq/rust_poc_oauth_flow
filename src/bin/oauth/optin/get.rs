@@ -44,7 +44,6 @@ pub async fn execute(
         )
         .await?;
 
-
     if let Some(optin_page) = optin_page {
         let url = format!(
             "{}://{}{}",
