@@ -1,9 +1,8 @@
-use lambda_http::{run, service_fn, Error, IntoResponse, Request, RequestExt};
-use oauth_flow::models::user::User;
+use lambda_http::{run, service_fn, Error, IntoResponse, Request};
+use oauth_flow::dtos::signup::singup_request::SignUpRequest;
 use oauth_flow::queries::add_user_query::AddUser;
 use oauth_flow::setup_tracing;
 use oauth_flow::utils::api_helper::{ApiResponseType, IsCors};
-use oauth_flow::utils::crypto::CriptoHelper;
 use oauth_flow::utils::injections::oauth::signup::post_di::{PostAppClient, PostAppInitialisation};
 use serde_json::json;
 
@@ -31,17 +30,17 @@ pub async fn handler(
 ) -> Result<impl IntoResponse, Error> {
     println!("{event:?}");
 
-    let is_registred = register_user(app_client, &event)
-        .await
-        .ok()
-        .map(|result| result.is_some());
-
-    if is_registred.is_some() {
-        return Ok(ApiResponseType::Created(
-            json!({ "message": ["We sent you an email please confirm your email."] }).to_string(),
-            IsCors::No,
-        )
-        .to_response());
+    let request = SignUpRequest::validate(&event);
+    if let Some(request) = request {
+        let is_registred = app_client.query(&request).await.is_ok();
+        if is_registred {
+            return Ok(ApiResponseType::Created(
+                json!({ "message": ["We sent you an email please confirm your email."] })
+                    .to_string(),
+                IsCors::No,
+            )
+            .to_response());
+        }
     }
 
     Ok(ApiResponseType::BadRequest(
@@ -49,28 +48,4 @@ pub async fn handler(
         IsCors::No,
     )
     .to_response())
-}
-
-async fn register_user(
-    app_client: &dyn PostAppInitialisation,
-    event: &Request,
-) -> Result<Option<bool>, Error> {
-    let query_params = event.query_string_parameters();
-    let client_id = query_params
-        .first("client_id")
-        .expect("client_id not found");
-
-    let mut user = event.payload::<User>()?.unwrap();
-
-    user.client_id = Some(client_id.to_owned());
-    user.email = Some(CriptoHelper::to_sha256_string(
-        user.email.unwrap().as_bytes(),
-    ));
-    user.password = Some(CriptoHelper::to_sha256_string(
-        user.password.unwrap().as_bytes(),
-    ));
-
-    app_client.query(&user).await?;
-
-    Ok(Some(true))
 }

@@ -50,7 +50,7 @@ pub async fn handler(
             let cookie = Cookie::to_cookie_string(
                 String::from("myOAuth"),
                 HashMap::from([
-                    (String::from("email"), request.email.to_owned()),
+                    (String::from("user"), request.user.to_owned()),
                     (String::from("is_consent"), "true".to_owned()),
                     (String::from("is_optin"), request.is_optin),
                 ]),

@@ -1,4 +1,4 @@
-use crate::dtos::optin::update_optIn_request::UpdateOptInRequest;
+use crate::dtos::optin::update_optin_request::UpdateOptInRequest;
 use crate::error::ApplicationError;
 use async_trait::async_trait;
 use aws_sdk_dynamodb::model::AttributeValue;
@@ -33,8 +33,8 @@ impl UpdateOptInQuery for UpdateOptIn {
                     AttributeValue::S(request.client_id.to_lowercase()),
                 ),
                 (
-                    "email".to_owned(),
-                    AttributeValue::S(request.email.to_lowercase()),
+                    "user".to_owned(),
+                    AttributeValue::S(request.user.to_lowercase()),
                 ),
             ])))
             .update_expression("set is_optin = :is_optin")

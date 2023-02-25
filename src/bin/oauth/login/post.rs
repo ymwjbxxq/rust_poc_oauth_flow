@@ -45,12 +45,12 @@ pub async fn handler(
             let cookie = Cookie::to_cookie_string(
                 String::from("myOAuth"),
                 HashMap::from([
-                    (String::from("email"), user.email.unwrap()),
+                    (String::from("user"), user.user),
                     (
                         String::from("is_consent"),
-                        user.is_consent.unwrap().to_string(),
+                        user.is_consent.to_string(),
                     ),
-                    (String::from("is_optin"), user.is_optin.unwrap().to_string()),
+                    (String::from("is_optin"), user.is_optin.to_string()),
                 ]),
             );
             let mut headers = HeaderMap::new();

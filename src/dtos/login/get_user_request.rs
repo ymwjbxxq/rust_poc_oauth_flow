@@ -1,6 +1,13 @@
 use lambda_http::{Body, RequestExt};
 use typed_builder::TypedBuilder as Builder;
-use crate::models::user::User;
+use serde::{Deserialize, Serialize};
+
+#[derive(Debug, Deserialize, Serialize)]
+pub struct LoginRequest {
+    pub email: String,
+
+    pub password: String,
+}
 
 #[derive(Debug, Builder)]
 pub struct GetUserRequest {
@@ -19,7 +26,7 @@ pub struct GetUserRequest {
 
 impl GetUserRequest {
     pub fn validate(event: &http::Request<Body>) -> Option<GetUserRequest> {
-        let user = event.payload::<User>().ok().and_then(|user| user);
+        let user = event.payload::<LoginRequest>().ok().and_then(|user| user);
 
         if let Some(user) = user {
             let query_params = event.query_string_parameters();
@@ -29,8 +36,8 @@ impl GetUserRequest {
             if let (Some(client_id), Some(host)) = (client_id, host) {
                 return Some(
                     Self::builder()
-                        .email(user.email.unwrap())
-                        .password(user.password.unwrap())
+                        .email(user.email)
+                        .password(user.password)
                         .client_id(client_id)
                         .host(host.to_str().unwrap())
                         .build(),

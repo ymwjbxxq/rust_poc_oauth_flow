@@ -1,14 +1,13 @@
 use crate::{
     error::ApplicationError,
-    models::user::User,
-    queries::add_user_query::{AddQuery, AddUser},
+    queries::add_user_query::{AddQuery, AddUser}, dtos::signup::singup_request::SignUpRequest,
 };
 use async_trait::async_trait;
 use typed_builder::TypedBuilder as Builder;
 
 #[async_trait]
 pub trait PostAppInitialisation: Send + Sync {
-    async fn query(&self, request: &User) -> Result<(), ApplicationError>;
+    async fn query(&self, request: &SignUpRequest) -> Result<(), ApplicationError>;
 }
 
 #[derive(Debug, Builder)]
@@ -19,7 +18,7 @@ pub struct PostAppClient {
 
 #[async_trait]
 impl PostAppInitialisation for PostAppClient {
-    async fn query(&self, request: &User) -> Result<(), ApplicationError> {
+    async fn query(&self, request: &SignUpRequest) -> Result<(), ApplicationError> {
         self.query.execute(request).await
     }
 }

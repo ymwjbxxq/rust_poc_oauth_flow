@@ -1,7 +1,7 @@
 use cookie::Cookie;
 use http::{HeaderMap, HeaderValue};
 use lambda_http::{run, service_fn, Error, IntoResponse, Request, RequestExt};
-use oauth_flow::dtos::optin::update_optIn_request::UpdateOptInRequest;
+use oauth_flow::dtos::optin::update_optin_request::UpdateOptInRequest;
 use oauth_flow::queries::update_optin_query::UpdateOptIn;
 use oauth_flow::setup_tracing;
 use oauth_flow::utils::api_helper::{ApiResponseType, IsCors};
@@ -46,7 +46,7 @@ pub async fn handler(
             let cookie = Cookie::to_cookie_string(
                 String::from("myOAuth"),
                 HashMap::from([
-                    (String::from("email"), request.email.to_owned()),
+                    (String::from("user"), request.user.to_owned()),
                     (String::from("is_consent"), request.is_consent),
                     (String::from("is_optin"), "true".to_owned()),
                 ]),

@@ -27,6 +27,11 @@ pub trait GetUserQuery {
 impl GetUserQuery for GetUser {
     async fn execute(&self, request: &GetUserRequest) -> Result<Option<User>, ApplicationError> {
         println!("Fetching user {:#?}", &request);
+        let user = format!(
+            "{}#{}",
+            CriptoHelper::to_sha256_string(request.email.to_lowercase()),
+            CriptoHelper::to_sha256_string(request.password.to_lowercase())
+        );
         let res = self
             .client
             .get_item()
@@ -36,12 +41,9 @@ impl GetUserQuery for GetUser {
                     "client_id".to_owned(),
                     AttributeValue::S(request.client_id.to_lowercase()),
                 ),
-                (
-                    "email".to_owned(),
-                    AttributeValue::S(CriptoHelper::to_sha256_string(request.email.to_lowercase())),
-                ),
+                ("user".to_owned(), AttributeValue::S(user)),
             ])))
-            //.projection_expression("email, is_consent, is_optin")
+            .projection_expression("client_id, user, is_consent, is_optin")
             .send()
             .await?;
 

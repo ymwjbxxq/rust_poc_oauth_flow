@@ -27,12 +27,12 @@ Resources:
       KeySchema:
         - AttributeName: client_id
           KeyType: HASH
-        - AttributeName: email
+        - AttributeName: user
           KeyType: RANGE
       AttributeDefinitions:
         - AttributeName: client_id
           AttributeType: S
-        - AttributeName: email
+        - AttributeName: user
           AttributeType: S
       BillingMode: PAY_PER_REQUEST
 

@@ -34,8 +34,8 @@ impl UpdateConsentQuery for UpdateConsent {
                     AttributeValue::S(request.client_id.to_lowercase()),
                 ),
                 (
-                    "email".to_owned(),
-                    AttributeValue::S(request.email.to_lowercase()),
+                    "user".to_owned(),
+                    AttributeValue::S(request.user.to_lowercase()),
                 ),
             ])))
             .update_expression("set is_consent = :is_consent")
