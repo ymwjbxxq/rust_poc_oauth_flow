@@ -41,10 +41,7 @@ pub async fn execute(event: Request) -> Result<impl IntoResponse, Error> {
             ]),
         );
         let mut headers = HeaderMap::new();
-        headers.insert(
-            http::header::SET_COOKIE,
-            HeaderValue::from_str(&cookie)?,
-        );
+        headers.insert(http::header::SET_COOKIE, HeaderValue::from_str(&cookie)?);
         let target = ApiResponseType::build_url_from_hashmap(
             oauth_authorize_uri,
             HashMap::from([
@@ -60,7 +57,9 @@ pub async fn execute(event: Request) -> Result<impl IntoResponse, Error> {
             ]),
         );
 
-        return Ok(ApiResponseType::FoundWithCustomHeaders(target, IsCors::No, headers).to_response());
+        return Ok(
+            ApiResponseType::FoundWithCustomHeaders(target, IsCors::No, headers).to_response(),
+        );
     }
 
     Ok(ApiResponseType::Conflict(

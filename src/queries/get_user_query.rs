@@ -32,7 +32,7 @@ pub trait GetUserQuery {
 
 #[async_trait]
 impl GetUserQuery for GetUser {
-    async fn  execute(&self, request: &GetUserRequest) -> Result<Option<User>, ApplicationError> {
+    async fn execute(&self, request: &GetUserRequest) -> Result<Option<User>, ApplicationError> {
         println!("Fetching user {:#?}", &request);
         let res = self
             .client

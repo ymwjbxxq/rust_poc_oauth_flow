@@ -1,6 +1,7 @@
 use crate::{
-    error::ApplicationError, queries::get_user_query::{GetUser, GetUserRequest, GetUserQuery}, models::user::User,
-   
+    error::ApplicationError,
+    models::user::User,
+    queries::get_user_query::{GetUser, GetUserQuery, GetUserRequest},
 };
 use async_trait::async_trait;
 use typed_builder::TypedBuilder as Builder;

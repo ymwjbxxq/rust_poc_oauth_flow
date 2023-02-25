@@ -1,6 +1,6 @@
 use crate::error::ApplicationError;
-use base64::Engine;
 use base64::engine::general_purpose;
+use base64::Engine;
 use base64_url;
 use sha2::{Digest, Sha256};
 use std::str;

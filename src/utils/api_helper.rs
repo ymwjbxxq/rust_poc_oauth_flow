@@ -96,7 +96,7 @@ impl ApiResponseType {
                     HeaderValue::from_str(target).unwrap(),
                 );
                 response
-            } 
+            }
             ApiResponseType::FoundWithCustomHeaders(target, is_cors, custom_headers) => {
                 let mut response = Self::build_response("", StatusCode::FOUND, is_cors);
                 let headers = response.headers_mut();

@@ -79,5 +79,5 @@ pub async fn execute(
         query_params,
     );
 
-   Ok(ApiResponseType::FoundWithCustomHeaders(target, IsCors::No, headers).to_response())
+    Ok(ApiResponseType::FoundWithCustomHeaders(target, IsCors::No, headers).to_response())
 }

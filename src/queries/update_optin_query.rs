@@ -39,8 +39,14 @@ impl UpdateOptInQuery for UpdateOptIn {
             .update_item()
             .table_name(self.table_name.to_owned())
             .set_key(Some(HashMap::from([
-                ("client_id".to_owned(), AttributeValue::S(request.client_id.to_lowercase())),
-                ("email".to_owned(), AttributeValue::S(request.email.to_lowercase())),
+                (
+                    "client_id".to_owned(),
+                    AttributeValue::S(request.client_id.to_lowercase()),
+                ),
+                (
+                    "email".to_owned(),
+                    AttributeValue::S(request.email.to_lowercase()),
+                ),
             ])))
             .update_expression("set is_optin = :is_optin")
             .expression_attribute_values(":is_optin", AttributeValue::Bool(request.is_optin))

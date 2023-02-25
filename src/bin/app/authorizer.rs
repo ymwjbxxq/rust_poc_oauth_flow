@@ -10,10 +10,7 @@ use serde_json::Value;
 async fn main() -> Result<(), Error> {
     setup_tracing();
 
-    run(service_fn(|event: LambdaEvent<Value>| {
-        execute(event)
-    }))
-    .await
+    run(service_fn(|event: LambdaEvent<Value>| execute(event))).await
 }
 
 pub async fn execute(event: LambdaEvent<Value>) -> Result<AuthorizerResponse, Error> {

@@ -58,8 +58,9 @@ pub async fn execute(event: Request) -> Result<impl IntoResponse, Error> {
         return Ok(ApiResponseType::Found(target, IsCors::No).to_response());
     }
 
-    Ok(
-        ApiResponseType::Forbidden(json!({ "errors": ["Unauthorized"] }).to_string(), IsCors::No)
-            .to_response(),
+    Ok(ApiResponseType::Forbidden(
+        json!({ "errors": ["Unauthorized"] }).to_string(),
+        IsCors::No,
     )
+    .to_response())
 }
