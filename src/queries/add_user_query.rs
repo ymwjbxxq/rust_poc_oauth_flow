@@ -1,4 +1,4 @@
-use crate::dtos::signup::singup_request::SignUpRequest;
+use crate::dtos::oauth::signup::singup_request::SignUpRequest;
 use crate::error::ApplicationError;
 use async_trait::async_trait;
 use aws_sdk_dynamodb::Client;

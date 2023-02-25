@@ -1,5 +1,5 @@
 use lambda_http::{run, service_fn, Error, IntoResponse, Request};
-use oauth_flow::dtos::signup::singup_request::SignUpRequest;
+use oauth_flow::dtos::oauth::signup::singup_request::SignUpRequest;
 use oauth_flow::queries::add_user_query::AddUser;
 use oauth_flow::setup_tracing;
 use oauth_flow::utils::api_helper::{ApiResponseType, IsCors};

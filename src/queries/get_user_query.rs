@@ -1,4 +1,4 @@
-use crate::dtos::login::get_user_request::GetUserRequest;
+use crate::dtos::oauth::login::get_user_request::GetUserRequest;
 use crate::error::ApplicationError;
 use crate::models::user::User;
 use crate::utils::crypto::CriptoHelper;

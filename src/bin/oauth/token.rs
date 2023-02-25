@@ -1,7 +1,6 @@
 use chrono::{Duration, Utc};
-use jsonwebtoken::{encode, EncodingKey, Header};
 use lambda_http::{run, service_fn, Error, IntoResponse, Request};
-use oauth_flow::dtos::token::toekn_request::TokenRequest;
+use oauth_flow::dtos::oauth::token::toekn_request::TokenRequest;
 use oauth_flow::utils::api_helper::{ContentType, IsCors};
 use oauth_flow::utils::crypto::CriptoHelper;
 use oauth_flow::utils::jwt::{Claims, Jwt};

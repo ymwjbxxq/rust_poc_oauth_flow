@@ -1,4 +1,4 @@
-use crate::dtos::consent::update_consent_request::UpdateConsentRequest;
+use crate::dtos::oauth::consent::update_consent_request::UpdateConsentRequest;
 use crate::error::ApplicationError;
 use async_trait::async_trait;
 use aws_sdk_dynamodb::model::AttributeValue;

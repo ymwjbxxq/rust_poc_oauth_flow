@@ -1,7 +1,7 @@
 use cookie::Cookie;
 use http::{HeaderMap, HeaderValue};
 use lambda_http::{run, service_fn, Error, IntoResponse, Request, RequestExt};
-use oauth_flow::dtos::login::get_user_request::GetUserRequest;
+use oauth_flow::dtos::oauth::login::get_user_request::GetUserRequest;
 use oauth_flow::queries::get_user_query::GetUser;
 use oauth_flow::setup_tracing;
 use oauth_flow::utils::api_helper::{ApiResponseType, IsCors};
