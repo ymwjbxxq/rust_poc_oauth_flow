@@ -1,10 +1,11 @@
+use chrono::{Duration, Utc};
 use jsonwebtoken::{encode, EncodingKey, Header};
-use lambda_http::{run, service_fn, Error, IntoResponse, Request, RequestExt};
+use lambda_http::{run, service_fn, Error, IntoResponse, Request};
+use oauth_flow::dtos::token::toekn_request::TokenRequest;
 use oauth_flow::utils::api_helper::{ContentType, IsCors};
-use oauth_flow::utils::cookie::CookieHelper;
 use oauth_flow::utils::crypto::CriptoHelper;
+use oauth_flow::utils::jwt::{Claims, Jwt};
 use oauth_flow::{setup_tracing, utils::api_helper::ApiResponseType};
-use serde::{Deserialize, Serialize};
 use serde_json::json;
 
 #[tokio::main]
@@ -17,34 +18,31 @@ async fn main() -> Result<(), Error> {
 pub async fn handler(event: Request) -> Result<impl IntoResponse, Error> {
     println!("{event:?}");
 
-    let cookie = CookieHelper::from_http_header(event.headers())?;
-    let query_params = event.query_string_parameters();
-    let code_verifier = query_params
-        .first("code_verifier")
-        .expect("code_verifier not found in query string");
-    let code_challenge = cookie
-        .get("code_challenge")
-        .expect("code_challenge not found in cookie");
-    let base64_digest = CriptoHelper::to_sha256_string(code_verifier);
+    let request = TokenRequest::validate(&event);
+    if let Some(request) = request {
+        let base64_digest = CriptoHelper::to_sha256_string(request.code_verifier);
 
-    if code_challenge.eq(&base64_digest) {
-        let my_claims = Claims {
-            sub: "b@b.com".to_owned(),
-            company: "ACME".to_owned(),
-            exp: 10000000000,
-        };
-        let token = encode(
-            &Header::default(),
-            &my_claims,
-            &EncodingKey::from_secret("privateKey".as_bytes()),
-        )?;
+        if request.code_challenge.eq(&base64_digest) {
+            let claims = Claims::builder()
+                .sub(request.user)
+                .company(request.client_id)
+                .exp((Utc::now() + Duration::minutes(60)).timestamp())
+                .build();
 
-        return Ok(ApiResponseType::Ok(
-            json!({ "message": token }).to_string(),
-            ContentType::Json,
-            IsCors::No,
-        )
-        .to_response());
+            let token = Jwt::new("private_key")
+                .encode(&claims)
+                .ok()
+                .and_then(|token| token);
+
+            if let Some(token) = token {
+                return Ok(ApiResponseType::Ok(
+                    json!({ "token": token }).to_string(),
+                    ContentType::Json,
+                    IsCors::No,
+                )
+                .to_response());
+            }
+        }
     }
 
     println!("token Unauthorized");
@@ -53,11 +51,4 @@ pub async fn handler(event: Request) -> Result<impl IntoResponse, Error> {
         IsCors::No,
     )
     .to_response())
-}
-
-#[derive(Debug, Serialize, Deserialize)]
-struct Claims {
-    sub: String,
-    company: String,
-    exp: usize,
 }
