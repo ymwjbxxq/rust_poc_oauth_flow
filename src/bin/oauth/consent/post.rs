@@ -2,7 +2,7 @@ use cookie::Cookie;
 use http::HeaderMap;
 use http::HeaderValue;
 use lambda_http::{run, service_fn, Error, IntoResponse, Request, RequestExt};
-use oauth_flow::dtos::consent::page_request::UpdateConsentRequest;
+use oauth_flow::dtos::consent::update_consent_request::UpdateConsentRequest;
 use oauth_flow::queries::update_consent_query::UpdateConsent;
 use oauth_flow::setup_tracing;
 use oauth_flow::utils::api_helper::ApiResponseType;

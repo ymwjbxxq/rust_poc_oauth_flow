@@ -30,7 +30,7 @@ pub async fn handler(
     event: Request,
 ) -> Result<impl IntoResponse, Error> {
     println!("{event:?}");
-    //register
+
     let is_registred = register_user(app_client, &event)
         .await
         .ok()

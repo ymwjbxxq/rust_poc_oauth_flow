@@ -1,1 +1,1 @@
-pub mod page_request;
+pub mod update_consent_request;

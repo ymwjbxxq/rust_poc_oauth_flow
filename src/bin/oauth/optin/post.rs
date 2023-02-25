@@ -1,7 +1,7 @@
 use cookie::Cookie;
 use http::{HeaderMap, HeaderValue};
 use lambda_http::{run, service_fn, Error, IntoResponse, Request, RequestExt};
-use oauth_flow::dtos::optin::page_request::UpdateOptInRequest;
+use oauth_flow::dtos::optin::update_optIn_request::UpdateOptInRequest;
 use oauth_flow::queries::update_optin_query::UpdateOptIn;
 use oauth_flow::setup_tracing;
 use oauth_flow::utils::api_helper::{ApiResponseType, IsCors};

@@ -1,3 +1,4 @@
+use crate::dtos::login::get_user_request::GetUserRequest;
 use crate::error::ApplicationError;
 use crate::models::user::User;
 use crate::utils::crypto::CriptoHelper;
@@ -6,15 +7,6 @@ use aws_sdk_dynamodb::model::AttributeValue;
 use aws_sdk_dynamodb::Client;
 use std::collections::HashMap;
 use typed_builder::TypedBuilder as Builder;
-
-#[derive(Debug, Builder)]
-pub struct GetUserRequest {
-    #[builder(setter(into))]
-    pub client_id: String,
-
-    #[builder(setter(into))]
-    pub email: String,
-}
 
 #[derive(Debug, Builder)]
 pub struct GetUser {
@@ -30,6 +22,7 @@ pub trait GetUserQuery {
     async fn execute(&self, request: &GetUserRequest) -> Result<Option<User>, ApplicationError>;
 }
 
+//TODO use password to login
 #[async_trait]
 impl GetUserQuery for GetUser {
     async fn execute(&self, request: &GetUserRequest) -> Result<Option<User>, ApplicationError> {

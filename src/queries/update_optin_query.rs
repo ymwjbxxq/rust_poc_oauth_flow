@@ -1,4 +1,4 @@
-use crate::dtos::optin::page_request::UpdateOptInRequest;
+use crate::dtos::optin::update_optIn_request::UpdateOptInRequest;
 use crate::error::ApplicationError;
 use async_trait::async_trait;
 use aws_sdk_dynamodb::model::AttributeValue;

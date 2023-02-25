@@ -1,7 +1,7 @@
 use crate::{
     error::ApplicationError,
     models::user::User,
-    queries::get_user_query::{GetUser, GetUserQuery, GetUserRequest},
+    queries::get_user_query::{GetUser, GetUserQuery}, dtos::login::get_user_request::GetUserRequest,
 };
 use async_trait::async_trait;
 use typed_builder::TypedBuilder as Builder;
