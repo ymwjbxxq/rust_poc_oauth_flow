@@ -1,6 +1,7 @@
 use cookie::Cookie;
 use http::{HeaderMap, HeaderValue};
-use lambda_http::{run, service_fn, Error, IntoResponse, Request, RequestExt};
+use lambda_http::{run, service_fn, Error, IntoResponse, Request};
+use oauth_flow::dtos::app::login::login_request::LoginRequest;
 use oauth_flow::setup_tracing;
 use oauth_flow::utils::api_helper::{ApiResponseType, IsCors};
 use oauth_flow::utils::cookie::CookieExt;
@@ -30,13 +31,9 @@ pub async fn handler(
     event: Request,
 ) -> Result<impl IntoResponse, Error> {
     println!("{event:?}");
-    if let Some(client_id) = event.query_string_parameters().first("client_id") {
-        let host = event
-            .headers()
-            .get("Host")
-            .expect("Cannot find host in the Request")
-            .to_str()?;
 
+    let request = LoginRequest::validate(&event);
+    if let Some(request) = request {
         let state = Uuid::new_v4().to_string();
         let code_verifier = CriptoHelper::to_base64(CriptoHelper::random_bytes(128));
 
@@ -52,7 +49,7 @@ pub async fn handler(
         let target = ApiResponseType::build_url_from_hashmap(
             app_client.oauth_authorize_uri().to_owned(),
             HashMap::from([
-                ("client_id", client_id),
+                ("client_id", request.client_id.as_ref()),
                 ("response_type", "code"),
                 ("state", &state),
                 (
@@ -62,7 +59,7 @@ pub async fn handler(
                 ("code_challenge_method", "S256"),
                 (
                     "redirect_uri",
-                    &format!("https://{host}{}", app_client.redirect_path()),
+                    &format!("https://{}{}", request.host, app_client.redirect_path()),
                 ),
             ]),
         );
@@ -73,7 +70,7 @@ pub async fn handler(
     }
 
     Ok(ApiResponseType::Conflict(
-        json!({ "errors": ["Missing 'client_id' parameter in path"] }).to_string(),
+        json!({ "errors": ["Request is missing parameters"] }).to_string(),
         IsCors::No,
     )
     .to_response())
