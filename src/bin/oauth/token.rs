@@ -11,7 +11,7 @@ use serde_json::json;
 async fn main() -> Result<(), Error> {
     setup_tracing();
 
-    run(service_fn(handler(event))).await
+    run(service_fn(handler)).await
 }
 
 pub async fn handler(event: Request) -> Result<impl IntoResponse, Error> {
