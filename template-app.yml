@@ -1,7 +1,18 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: sam-app
+Description: PoC client for the Oauth Service
 
+##########################################################################
+#  Parameters                                                            #
+##########################################################################
+Parameters:
+  StageName:
+    Type: String
+    Default: test
+
+##########################################################################
+#  Global values that are applied to all resources                       #
+##########################################################################
 Globals:
   Function:
     MemorySize: 256
@@ -26,6 +37,9 @@ Resources:
             FunctionArn: !GetAtt AppLambdaAuthorizerFunction.Arn
             FunctionInvokeRole: !GetAtt AppLambdaAuthorizerFunctionRole.Arn
             Identity:
+              Context:
+                - httpMethod
+                - resourceId
               Headers:
                 - Authorization
             AuthorizerPayloadFormatVersion: 2.0
@@ -34,7 +48,7 @@ Resources:
   AppApiFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: build/app/random-api/
+      CodeUri: ./build/app-random-api
       Policies:
         - AWSLambdaBasicExecutionRole
       Events:
@@ -45,52 +59,86 @@ Resources:
             Path: /random-api
             Method: GET
             PayloadFormatVersion: "2.0"
-    Metadata:
-      BuildMethod: makefile
+      Tags:
+        Name: random-api
+        env: !Ref StageName
+        service: app
+  
+  AppApiFunctionLogs:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      RetentionInDays: 1
+      LogGroupName: !Sub "/aws/lambda/${AppApiFunction}"
 
   AppLambdaAuthorizerFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: build/app/lambda-authorizer/
+      CodeUri: build/app-lambda-authorizer
       Policies:
         - AWSLambdaBasicExecutionRole
+      Tags:
+        Name: jwt-authorizer
+        env: !Ref StageName
+        service: app
+  
+  AppLambdaAuthorizerFunctionLogs:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      RetentionInDays: 1
+      LogGroupName: !Sub "/aws/lambda/${AppLambdaAuthorizerFunction}"
 
   AppAuthFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: build/app/auth/
+      CodeUri: build/app-auth
       Policies:
         - AWSLambdaBasicExecutionRole
       Environment:
         Variables:
-           OAUTH_TOKEN_URL: !Sub ['${filename}token', filename: !ImportValue rust-oautflow-oauth-OAuthUrl]
+           OAUTH_TOKEN_URL: !Sub ['${filename}token', filename: !ImportValue oauth-AuthUrl]
       Events:
         Api:
           Type: HttpApi
           Properties:
             Path: /auth
             Method: GET
-    Metadata:
-      BuildMethod: makefile
+      Tags:
+        Name: auth
+        env: !Ref StageName
+        service: app
+  
+  AppAuthFunctionLogs:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      RetentionInDays: 1
+      LogGroupName: !Sub "/aws/lambda/${AppAuthFunction}"
   
   AppLoginFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: build/app/login/
+      CodeUri: build/app-login
       Policies:
         - AWSLambdaBasicExecutionRole
       Environment:
         Variables:
           REDIRECT_PATH: "/auth"
-          OAUTH_AUTHORIZE_URL: !Sub ['${filename}authorize', filename: !ImportValue rust-oautflow-oauth-OAuthUrl]
+          OAUTH_AUTHORIZE_URL: !Sub ['${filename}authorize', filename: !ImportValue oauth-AuthUrl]
       Events:
         Api:
           Type: HttpApi
           Properties:
             Path: /login
             Method: GET
-    Metadata:
-      BuildMethod: makefile
+      Tags:
+        Name: login
+        env: !Ref StageName
+        service: app
+
+  AppLoginFunctionLogs:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      RetentionInDays: 1
+      LogGroupName: !Sub "/aws/lambda/${AppLoginFunction}"
 
 Outputs:
   ProtectedEndpoint:

@@ -19,10 +19,11 @@ endif
 build-%:
 	mkdir -p ./build/$*
 	cp -v ./target/$(ARCH)/release/$* ./build/$*/bootstrap
+
 deploy:
-	sam deploy --guided --no-fail-on-empty-changeset --no-confirm-changeset --profile test --stack-name rust-oautflow-oauth --template-file template-oauth.yml  
-	sam deploy --guided --no-fail-on-empty-changeset --no-confirm-changeset --profile test --stack-name rust-oautflow-app   --template-file template-app.yml
+	sam deploy --guided --no-fail-on-empty-changeset --no-confirm-changeset --profile test --stack-name oauth --template-file template-oauth.yml  
+	sam deploy --guided --no-fail-on-empty-changeset --no-confirm-changeset --profile test --stack-name app   --template-file template-app.yml
 
 delete:
-	sam delete --profile test --stack-name rust-oautflow-app
-	sam delete --profile test --stack-name rust-oautflow-oauth
+	sam delete --profile test --stack-name app
+	sam delete --profile test --stack-name oauth

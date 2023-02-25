@@ -1,8 +1,18 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: sam-app
+Description: PoC Oauth Service
 
+##########################################################################
+#  Parameters                                                            #
+##########################################################################
+Parameters:
+  StageName:
+    Type: String
+    Default: test
 
+##########################################################################
+#  Global values that are applied to all resources                       #
+##########################################################################
 Globals:
   Function:
     MemorySize: 256
@@ -16,11 +26,15 @@ Globals:
         RUST_LOG: info
 
 Resources:
-  ## S3 bucket
+##########################################################################
+#  S3 bucket where config page are stored                                #
+##########################################################################
   SourceBucket:
     Type: AWS::S3::Bucket
 
-  ## DynamoDB   
+##########################################################################
+#  DynamoDB table for login                                              #
+##########################################################################
   OAuthServiceTable:
     Type: AWS::DynamoDB::Table
     Properties:
@@ -36,11 +50,13 @@ Resources:
           AttributeType: S
       BillingMode: PAY_PER_REQUEST
 
-  ##GENERAL
+##########################################################################
+# Lambda                                                                 #
+##########################################################################
   OauthAuthorizeFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: build/oauth/authorize/
+      CodeUri: build/oauth-authorize
       Policies:
         - AWSLambdaBasicExecutionRole
       Environment:
@@ -54,13 +70,21 @@ Resources:
           Properties:
             Path: /authorize
             Method: GET
-    Metadata:
-      BuildMethod: makefile
+      Tags:
+        Name: authorize
+        env: !Ref StageName
+        service: oauth
+
+  OauthAuthorizeFunctionLogs:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      RetentionInDays: 1
+      LogGroupName: !Sub "/aws/lambda/${OauthAuthorizeFunction}"
   
   OauthTokenFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: build/oauth/token/
+      CodeUri: build/oauth-token
       Policies:
         - AWSLambdaBasicExecutionRole
       Events:
@@ -69,14 +93,24 @@ Resources:
           Properties:
             Path: /token
             Method: ANY #IT SHOULD BE A POST BUT FOR THE PoC is fine
-    Metadata:
-      BuildMethod: makefile
+      Tags:
+        Name: token
+        env: !Ref StageName
+        service: oauth
+
+  OauthTokenFunctionLogs:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      RetentionInDays: 1
+      LogGroupName: !Sub "/aws/lambda/${OauthTokenFunction}"
   
-  ##GET 
+##########################################################################
+# Lambda -  load UI                                                      #
+##########################################################################
   OauthOptinGETFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: build/oauth/get-page/
+      CodeUri: build/oauth-get-page
       Policies:
         - AWSLambdaBasicExecutionRole
         - S3ReadPolicy:
@@ -91,13 +125,21 @@ Resources:
           Properties:
             Path: /custom/optin
             Method: GET
-    Metadata:
-      BuildMethod: makefile
+      Tags:
+        Name: optin-load-page
+        env: !Ref StageName
+        service: oauth
+
+  OauthOptinGETFunctionLogs:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      RetentionInDays: 1
+      LogGroupName: !Sub "/aws/lambda/${OauthOptinGETFunction}"
   
   OauthConsentGETFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: build/oauth/get-page/
+      CodeUri: build/oauth-get-page
       Policies:
         - AWSLambdaBasicExecutionRole
         - S3ReadPolicy:
@@ -112,13 +154,21 @@ Resources:
           Properties:
             Path: /custom/consent
             Method: GET
-    Metadata:
-      BuildMethod: makefile
+      Tags:
+        Name: consent-load-page
+        env: !Ref StageName
+        service: oauth
+
+  OauthConsentGETFunctionLogs:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      RetentionInDays: 1
+      LogGroupName: !Sub "/aws/lambda/${OauthConsentGETFunction}"
 
   OauthLoginGETFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: build/oauth/get-page/
+      CodeUri: build/oauth-get-page
       Policies:
         - AWSLambdaBasicExecutionRole
         - S3ReadPolicy:
@@ -133,13 +183,21 @@ Resources:
           Properties:
             Path: /v2/login
             Method: GET
-    Metadata:
-      BuildMethod: makefile
+      Tags:
+        Name: login-load-page
+        env: !Ref StageName
+        service: oauth
   
+  OauthLoginGETFunctionLogs:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      RetentionInDays: 1
+      LogGroupName: !Sub "/aws/lambda/${OauthLoginGETFunction}"
+
   OauthSignupGETFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: build/oauth/get-page/
+      CodeUri: build/oauth-get-page
       Policies:
         - AWSLambdaBasicExecutionRole
         - S3ReadPolicy:
@@ -154,14 +212,24 @@ Resources:
           Properties:
             Path: /v2/signup
             Method: GET
-    Metadata:
-      BuildMethod: makefile
+      Tags:
+        Name: signup-load-page
+        env: !Ref StageName
+        service: oauth
+  
+  OauthSignupGETFunctionLogs:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      RetentionInDays: 1
+      LogGroupName: !Sub "/aws/lambda/${OauthSignupGETFunction}"
 
-  ##POST 
+##########################################################################
+# Lambda - Process from load UI                                          #
+##########################################################################
   OauthOptinPOSTFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: build/oauth/optin/post/
+      CodeUri: build/oauth-optin-post
       Policies:
         - AWSLambdaBasicExecutionRole
         - Version: "2012-10-17"
@@ -180,13 +248,21 @@ Resources:
           Properties:
             Path: /custom/optin
             Method: POST
-    Metadata:
-      BuildMethod: makefile
+      Tags:
+        Name: optin-process-page
+        env: !Ref StageName
+        service: oauth
+  
+  OauthOptinPOSTFunctionLogs:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      RetentionInDays: 1
+      LogGroupName: !Sub "/aws/lambda/${OauthOptinPOSTFunction}"
   
   OauthConsentPOSTFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: build/oauth/consent/post/
+      CodeUri: build/oauth-consent-post
       Policies:
         - AWSLambdaBasicExecutionRole
         - Version: "2012-10-17"
@@ -205,13 +281,21 @@ Resources:
           Properties:
             Path: /custom/consent
             Method: POST
-    Metadata:
-      BuildMethod: makefile
+      Tags:
+        Name: consent-process-page
+        env: !Ref StageName
+        service: oauth
+  
+  OauthConsentPOSTFunctionLogs:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      RetentionInDays: 1
+      LogGroupName: !Sub "/aws/lambda/${OauthConsentPOSTFunction}"
 
   OauthLoginPOSTFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: build/oauth/login/post/
+      CodeUri: build/oauth-login-post
       Policies:
         - AWSLambdaBasicExecutionRole
         - Version: "2012-10-17"
@@ -230,13 +314,21 @@ Resources:
           Properties:
             Path: /v2/login
             Method: POST
-    Metadata:
-      BuildMethod: makefile
+      Tags:
+        Name: consent-process-page
+        env: !Ref StageName
+        service: oauth
+  
+  OauthLoginPOSTFunctionLogs:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      RetentionInDays: 1
+      LogGroupName: !Sub "/aws/lambda/${OauthLoginPOSTFunction}"
   
   OauthSignupPOSTFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: build/oauth/signup/post/
+      CodeUri: build/oauth-signup-post
       Policies:
         - AWSLambdaBasicExecutionRole
         - Version: "2012-10-17"
@@ -254,8 +346,16 @@ Resources:
           Properties:
             Path: /v2/signup
             Method: POST
-    Metadata:
-      BuildMethod: makefile
+      Tags:
+        Name: signup-process-page
+        env: !Ref StageName
+        service: oauth
+  
+  OauthSignupPOSTFunctionLogs:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      RetentionInDays: 1
+      LogGroupName: !Sub "/aws/lambda/${OauthSignupPOSTFunction}"
 
 Outputs:
   OAuthUrl:
@@ -263,4 +363,4 @@ Outputs:
     Value: !Sub "https://${ServerlessHttpApi}.execute-api.${AWS::Region}.amazonaws.com/"
     Export:
       Name: 
-        Fn::Sub: ${AWS::StackName}-OAuthUrl
+        Fn::Sub: oauth-AuthUrl
