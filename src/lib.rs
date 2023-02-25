@@ -1,9 +1,7 @@
-pub mod aws;
 pub mod error;
 pub mod models;
 pub mod queries;
 pub mod utils;
-pub mod services;
 
 pub fn setup_tracing() {
     tracing_subscriber::fmt()
