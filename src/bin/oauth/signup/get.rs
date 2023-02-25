@@ -1,8 +1,9 @@
 use lambda_http::{run, service_fn, Error, IntoResponse, Request, RequestExt};
-use oauth_flow::services::page::Page;
+use oauth_flow::queries::get_page_query::{Page, PageRequest};
 use oauth_flow::setup_tracing;
 use oauth_flow::utils::api_helper::{ApiHelper, ApiResponse, HttpStatusCode};
 use oauth_flow::utils::crypto::CriptoHelper;
+use oauth_flow::utils::injections::oauth::signup::get_di::{GetAppClient, GetAppInitialisation};
 use serde_json::json;
 use std::collections::HashMap;
 
@@ -13,26 +14,35 @@ async fn main() -> Result<(), Error> {
     let config = aws_config::load_from_env().await;
     let s3_client = aws_sdk_s3::Client::new(&config);
 
-    run(service_fn(|event: Request| execute(&s3_client, event))).await
+    let bucket_name = std::env::var("CONFIG_BUCKETNAME").expect("CONFIG_BUCKETNAME must be set");
+    let query = Page::builder()
+        .bucket_name(bucket_name)
+        .client(s3_client)
+        .build();
+
+    let app_client = GetAppClient::builder().query(query).build();
+
+    run(service_fn(|event: Request| execute(&app_client, event))).await
 }
 
 pub async fn execute(
-    s3_client: &aws_sdk_s3::Client,
+    app_client: &dyn GetAppInitialisation,
     event: Request,
 ) -> Result<impl IntoResponse, Error> {
     println!("{event:?}");
+    let query_param = event.query_string_parameters();
+    let client_id = query_param
+        .first("client_id")
+        .expect("client_id not found in query string");
 
-    let bucket = std::env::var("CONFIG_BUCKETNAME").expect("CONFIG_BUCKETNAME must be set");
-
-    let page = Page::builder()
-        .s3_client(s3_client)
-        .query_params(event.query_string_parameters())
-        .bucket(bucket)
-        .build();
-
-    let signup_page = page
-        .get_file_from_s3("signup")
-        .await;
+    let signup_page = app_client
+        .query(
+            &PageRequest::builder()
+                .client_id(client_id)
+                .section("signup")
+                .build(),
+        )
+        .await?;
 
     if let Some(signup_page) = signup_page {
         let url = format!(

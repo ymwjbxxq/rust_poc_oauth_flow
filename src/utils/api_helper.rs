@@ -68,37 +68,3 @@ impl IntExt for HttpStatusCode {
         *self as u16
     }
 }
-
-pub trait BodyExt {
-    fn get_from_body<T>(&self) -> Result<Option<T>, serde_json::Error>
-    where
-        T: Serialize + for<'de> Deserialize<'de> + std::fmt::Debug;
-}
-
-impl BodyExt for Request {
-    fn get_from_body<T>(&self) -> Result<Option<T>, serde_json::Error>
-    where
-        T: Serialize + for<'de> Deserialize<'de> + std::fmt::Debug,
-    {
-        let body_res: Result<T, serde_json::Error> = match self.body() {
-            Body::Text(body) => serde_json::from_str(body),
-            Body::Binary(body) => {
-                let result = str::from_utf8(body).unwrap(); //"email=a%40a.it&password=password&remember=on"
-                let my_object = serde_urlencoded::from_str(result).unwrap();
-                return Ok(Some(my_object));
-            }
-            _ => {
-                println!("Request body is not a JSON POST");
-                return Ok(None);
-            }
-        };
-        let my_object = match body_res {
-            Ok(my_object) => my_object,
-            Err(err) => {
-                println!("Failed to parse the object from request body: {}", err);
-                return Ok(None);
-            }
-        };
-        Ok(Some(my_object))
-    }
-}

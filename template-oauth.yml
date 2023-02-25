@@ -136,7 +136,7 @@ Resources:
   OauthSignupGETFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: build/oauth/signup-get/
+      CodeUri: build/oauth/signup/get/
       Policies:
         - AWSLambdaBasicExecutionRole
         - S3ReadPolicy:
@@ -232,7 +232,7 @@ Resources:
   OauthSignupPOSTFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: build/oauth/signup-post/
+      CodeUri: build/oauth/signup/post/
       Policies:
         - AWSLambdaBasicExecutionRole
         - Version: "2012-10-17"

@@ -6,7 +6,6 @@ use oauth_flow::models::user::User;
 use oauth_flow::queries::get_user_query::GetUserQuery;
 use oauth_flow::queries::get_user_query::LoginQuery;
 use oauth_flow::setup_tracing;
-use oauth_flow::utils::api_helper::BodyExt;
 use oauth_flow::utils::api_helper::{ApiHelper, ApiResponse, HttpStatusCode};
 use oauth_flow::utils::cookie::CookieExt;
 use serde_json::json;
@@ -82,12 +81,12 @@ pub async fn execute(
 }
 
 async fn login(aws_client: &AWSClient, event: &Request) -> Result<Option<User>, Error> {
-    let user = event.get_from_body::<User>()?;
+    let user = event.payload::<User>()?.unwrap();
     let query_params = event.query_string_parameters();
     let client_id = query_params.first("client_id").expect("client_id not found");
 
     let user = LoginQuery::new(aws_client.dynamo_db_client.as_ref().unwrap())
-        .execute(client_id, &user.unwrap().email.unwrap())
+        .execute(client_id, &user.email.unwrap())
         .await?;
 
     Ok(user)
