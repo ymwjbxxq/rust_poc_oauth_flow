@@ -1,5 +1,6 @@
-use lambda_http::{run, service_fn, Error, IntoResponse, Request, RequestExt};
-use oauth_flow::queries::get_page_query::{Page, PageRequest};
+use lambda_http::{run, service_fn, Error, IntoResponse, Request};
+use oauth_flow::dtos::oauth::load_page::page_request::PageRequest;
+use oauth_flow::queries::get_page_query::Page;
 use oauth_flow::setup_tracing;
 use oauth_flow::utils::api_helper::{ApiResponseType, ContentType, IsCors};
 use oauth_flow::utils::crypto::CriptoHelper;
@@ -34,31 +35,29 @@ pub async fn handler(
 ) -> Result<impl IntoResponse, Error> {
     println!("{event:?}");
 
-    let query_param = event.query_string_parameters();
-    let client_id = query_param
-        .first("client_id")
-        .expect("client_id not found in query string");
+    let request = PageRequest::validate(&event);
+    if let Some(request) = request {
+        let page = app_client
+            .query(&request)
+            .await
+            .ok()
+            .and_then(|page| page);
 
-    let page = app_client
-        .query(&PageRequest::builder().client_id(client_id).build())
-        .await
-        .ok()
-        .and_then(|page| page);
+        if let Some(page) = page {
+            let url = format!(
+                "{}://{}{}",
+                event.uri().scheme().unwrap(),
+                event.uri().host().unwrap(),
+                event.uri().path_and_query().unwrap()
+            );
 
-    if let Some(page) = page {
-        let url = format!(
-            "{}://{}{}",
-            event.uri().scheme().unwrap(),
-            event.uri().host().unwrap(),
-            event.uri().path_and_query().unwrap()
-        );
-
-        return Ok(ApiResponseType::Ok(
-            CriptoHelper::from_base64(page)?.replace("#url#", &url),
-            ContentType::Html,
-            IsCors::No,
-        )
-        .to_response());
+            return Ok(ApiResponseType::Ok(
+                CriptoHelper::from_base64(page)?.replace("#url#", &url),
+                ContentType::Html,
+                IsCors::No,
+            )
+            .to_response());
+        }
     }
 
     Ok(ApiResponseType::Conflict(

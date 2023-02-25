@@ -1,6 +1,6 @@
 use crate::{
     error::ApplicationError,
-    queries::get_page_query::{Page, PageQuery, PageRequest},
+    queries::get_page_query::{Page, PageQuery}, dtos::oauth::load_page::page_request::PageRequest,
 };
 use async_trait::async_trait;
 use typed_builder::TypedBuilder as Builder;

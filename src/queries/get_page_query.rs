@@ -1,14 +1,8 @@
-use crate::error::ApplicationError;
+use crate::{error::ApplicationError, dtos::oauth::load_page::page_request::PageRequest};
 use async_trait::async_trait;
 use aws_sdk_s3::Client;
 use serde::{Deserialize, Serialize};
 use typed_builder::TypedBuilder as Builder;
-
-#[derive(Builder)]
-pub struct PageRequest {
-    #[builder(setter(into))]
-    pub client_id: String,
-}
 
 #[async_trait]
 pub trait PageQuery {
@@ -30,7 +24,6 @@ pub struct Page {
 #[async_trait]
 impl PageQuery for Page {
     async fn execute(&self, request: &PageRequest) -> Result<Option<String>, ApplicationError> {
-        println!("Updating consent");
         let result = self
             .client
             .get_object()

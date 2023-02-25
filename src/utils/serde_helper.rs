@@ -9,16 +9,6 @@ impl SerdeExt for serde_json::Value {
     }
 }
 
-// impl<T> SerdeExt for Option<T> {
-//     #[inline]
-//     fn value_to_string(self) -> String {
-//         self.is_some().to_string()
-//     }
-// }
 
-// impl<T, Error> SerdeExt for Result<T, Error> {
-//     #[inline]
-//     fn value_to_string(self) -> std::string::String {
-//         self.is_ok().to_string()
-//     }
-// }
+
+

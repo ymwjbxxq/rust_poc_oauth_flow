@@ -29,7 +29,7 @@ impl AddQuery for AddUser {
             .table_name(self.table_name.to_owned())
             .item(
                 "client_id",
-                AttributeValue::S(request.client_id.to_lowercase()),
+                AttributeValue::S(request.client_id.clone().unwrap().to_lowercase()),
             )
             .item(
                 "user",
@@ -37,11 +37,11 @@ impl AddQuery for AddUser {
             )
             .item(
                 "family_name",
-                AttributeValue::S(request.family_name.to_lowercase()),
+                AttributeValue::S(request.family_name.to_owned()),
             )
             .item(
                 "given_name",
-                AttributeValue::S(request.given_name.to_lowercase()),
+                AttributeValue::S(request.given_name.to_owned()),
             )
             .item(
                 "given_name",
