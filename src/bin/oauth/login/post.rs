@@ -43,14 +43,11 @@ pub async fn execute(
         .ok()
         .and_then(|result| result);
 
-    //let query_params = event.query_string_parameters();
-    if let Some(user) = user {
-        let host = event
-            .headers()
-            .get("Host")
-            .expect("Cannot find host in the Request")
-            .to_str()?;
+    let host = event
+        .headers()
+        .get("Host");
 
+    if let (Some(user), Some(host)) = (user, host) {
         let cookie = Cookie::to_cookie_string(
             String::from("myOAuth"),
             HashMap::from([
@@ -66,7 +63,7 @@ pub async fn execute(
         headers.insert(http::header::SET_COOKIE, HeaderValue::from_str(&cookie)?);
 
         let target = ApiResponseType::build_url_from_querystring(
-            format!("https://{host}{}", app_client.redirect_path()),
+            format!("https://{}{}", host.to_str()?, app_client.redirect_path()),
             event.query_string_parameters(),
         );
 

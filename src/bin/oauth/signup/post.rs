@@ -31,23 +31,24 @@ pub async fn execute(
 ) -> Result<impl IntoResponse, Error> {
     println!("{event:?}");
     //register
-    let result = register_user(app_client, &event)
+    let is_registred = register_user(app_client, &event)
         .await
         .ok()
         .map(|result| result.is_some());
 
-    Ok(match result {
-        Some(_) => ApiResponseType::Created(
+    if is_registred.is_some() {
+        return Ok(ApiResponseType::Created(
             json!({ "message": ["We sent you an email please confirm your email."] }).to_string(),
             IsCors::No,
         )
-        .to_response(),
-        None => ApiResponseType::Conflict(
-            json!({ "errors": ["Cannot add user, please retry"] }).to_string(),
-            IsCors::No,
-        )
-        .to_response(),
-    })
+        .to_response());
+    }
+
+    Ok(ApiResponseType::BadRequest(
+        json!({ "errors": ["Input request not valid"] }).to_string(),
+        IsCors::No,
+    )
+    .to_response())
 }
 
 async fn register_user(
@@ -63,10 +64,10 @@ async fn register_user(
 
     user.client_id = Some(client_id.to_owned());
     user.email = Some(CriptoHelper::to_sha256_string(
-        &user.email.unwrap().as_bytes(),
+        user.email.unwrap().as_bytes(),
     ));
     user.password = Some(CriptoHelper::to_sha256_string(
-        &user.password.unwrap().as_bytes(),
+        user.password.unwrap().as_bytes(),
     ));
 
     app_client.query(&user).await?;

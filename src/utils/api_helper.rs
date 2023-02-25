@@ -23,10 +23,7 @@ pub enum IsCors {
 
 impl IsCors {
     fn value(&self) -> bool {
-        match *self {
-            IsCors::Yes => true,
-            _ => false,
-        }
+        matches!(*self, IsCors::Yes)
     }
 }
 
@@ -47,7 +44,7 @@ impl ContentType {
 impl ApiResponseType {
     pub fn build_url_from_hashmap(url: String, query_string: HashMap<&str, &str>) -> String {
         let encoded = serde_urlencoded::to_string(query_string).unwrap();
-        return format!("{url}?{encoded}");
+        format!("{url}?{encoded}")
     }
 
     pub fn build_url_from_querystring(url: String, query_string: QueryMap) -> String {

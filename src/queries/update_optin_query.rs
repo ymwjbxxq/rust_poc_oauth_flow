@@ -1,21 +1,10 @@
+use crate::dtos::optin::page_request::UpdateOptInRequest;
 use crate::error::ApplicationError;
 use async_trait::async_trait;
 use aws_sdk_dynamodb::model::AttributeValue;
 use aws_sdk_dynamodb::Client;
 use std::collections::HashMap;
 use typed_builder::TypedBuilder as Builder;
-
-#[derive(Builder)]
-pub struct UpdateOptInRequest {
-    #[builder(setter(into))]
-    pub client_id: String,
-
-    #[builder(setter(into))]
-    pub email: String,
-
-    #[builder(setter(into))]
-    pub is_optin: bool,
-}
 
 #[async_trait]
 pub trait UpdateOptInQuery {
@@ -49,7 +38,7 @@ impl UpdateOptInQuery for UpdateOptIn {
                 ),
             ])))
             .update_expression("set is_optin = :is_optin")
-            .expression_attribute_values(":is_optin", AttributeValue::Bool(request.is_optin))
+            .expression_attribute_values(":is_optin", AttributeValue::Bool(true))
             .send()
             .await?;
         println!("Optin updated");

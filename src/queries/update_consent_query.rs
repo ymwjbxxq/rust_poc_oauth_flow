@@ -1,3 +1,4 @@
+use crate::dtos::consent::page_request::UpdateConsentRequest;
 use crate::error::ApplicationError;
 use async_trait::async_trait;
 use aws_sdk_dynamodb::model::AttributeValue;
@@ -5,17 +6,6 @@ use aws_sdk_dynamodb::Client;
 use std::collections::HashMap;
 use typed_builder::TypedBuilder as Builder;
 
-#[derive(Builder)]
-pub struct UpdateConsentRequest {
-    #[builder(setter(into))]
-    pub client_id: String,
-
-    #[builder(setter(into))]
-    pub email: String,
-
-    #[builder(setter(into))]
-    pub is_consent: bool,
-}
 
 #[async_trait]
 pub trait UpdateConsentQuery {
@@ -49,7 +39,7 @@ impl UpdateConsentQuery for UpdateConsent {
                 ),
             ])))
             .update_expression("set is_consent = :is_consent")
-            .expression_attribute_values(":is_consent", AttributeValue::Bool(request.is_consent))
+            .expression_attribute_values(":is_consent", AttributeValue::Bool(true))
             .send()
             .await?;
         println!("Consent updated");

@@ -1,6 +1,6 @@
 use crate::{
     error::ApplicationError,
-    queries::update_consent_query::{UpdateConsent, UpdateConsentQuery, UpdateConsentRequest},
+    queries::update_consent_query::{UpdateConsent, UpdateConsentQuery}, dtos::consent::page_request::UpdateConsentRequest,
 };
 use async_trait::async_trait;
 use typed_builder::TypedBuilder as Builder;
