@@ -22,10 +22,10 @@ async fn main() -> Result<(), Error> {
         .oauth_authorize_uri(oauth_authorize_uri)
         .build();
 
-    run(service_fn(|event: Request| execute(&app_client, event))).await
+    run(service_fn(|event: Request| handler(&app_client, event))).await
 }
 
-pub async fn execute(
+pub async fn handler(
     app_client: &dyn LoginAppInitialisation,
     event: Request,
 ) -> Result<impl IntoResponse, Error> {

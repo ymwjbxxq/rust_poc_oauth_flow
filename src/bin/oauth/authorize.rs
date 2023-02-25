@@ -14,10 +14,10 @@ use uuid::Uuid;
 async fn main() -> Result<(), Error> {
     setup_tracing();
 
-    run(service_fn(execute)).await
+    run(service_fn(handler)).await
 }
 
-pub async fn execute(event: Request) -> Result<impl IntoResponse, Error> {
+pub async fn handler(event: Request) -> Result<impl IntoResponse, Error> {
     println!("{event:?}");
     let query_params = event.query_string_parameters();
     let host = event

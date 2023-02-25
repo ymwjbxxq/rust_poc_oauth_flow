@@ -25,10 +25,10 @@ async fn main() -> Result<(), Error> {
 
     let app_client = GetPageAppClient::builder().query(query).build();
 
-    run(service_fn(|event: Request| execute(&app_client, event))).await
+    run(service_fn(|event: Request| handler(&app_client, event))).await
 }
 
-pub async fn execute(
+pub async fn handler(
     app_client: &dyn GetPageAppInitialisation,
     event: Request,
 ) -> Result<impl IntoResponse, Error> {

@@ -30,10 +30,10 @@ async fn main() -> Result<(), Error> {
         .redirect_path(redirect_path)
         .build();
 
-    run(service_fn(|event: Request| execute(&app_client, event))).await
+    run(service_fn(|event: Request| handler(&app_client, event))).await
 }
 
-pub async fn execute(
+pub async fn handler(
     app_client: &dyn PostAppInitialisation,
     event: Request,
 ) -> Result<impl IntoResponse, Error> {
