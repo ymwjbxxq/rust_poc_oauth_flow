@@ -1,9 +1,9 @@
 use jsonwebtoken::{encode, EncodingKey, Header};
 use lambda_http::{run, service_fn, Error, IntoResponse, Request, RequestExt};
-use oauth_flow::setup_tracing;
-use oauth_flow::utils::api_helper::{ApiHelper, ApiResponse, HttpStatusCode};
+use oauth_flow::utils::api_helper::{ContentType, IsCors};
 use oauth_flow::utils::cookie::CookieHelper;
 use oauth_flow::utils::crypto::CriptoHelper;
+use oauth_flow::{setup_tracing, utils::api_helper::ApiResponseType};
 use serde::{Deserialize, Serialize};
 use serde_json::json;
 
@@ -11,10 +11,7 @@ use serde_json::json;
 async fn main() -> Result<(), Error> {
     setup_tracing();
 
-    run(service_fn(|event: Request| {
-        execute(event)
-    }))
-    .await
+    run(service_fn(|event: Request| execute(event))).await
 }
 
 pub async fn execute(event: Request) -> Result<impl IntoResponse, Error> {
@@ -42,19 +39,20 @@ pub async fn execute(event: Request) -> Result<impl IntoResponse, Error> {
             &EncodingKey::from_secret("privateKey".as_bytes()),
         )?;
 
-        return Ok(ApiHelper::response(ApiResponse {
-            status_code: HttpStatusCode::Success,
-            body: Some(json!({ "message": token }).to_string()),
-            headers: None,
-        }));
+        return Ok(ApiResponseType::Ok(
+            json!({ "message": token }).to_string(),
+            ContentType::Json,
+            IsCors::No,
+        )
+        .to_response());
     }
 
     println!("token Unauthorized");
-    Ok(ApiHelper::response(ApiResponse {
-        status_code: HttpStatusCode::Unauthorized,
-        body: Some(json!({ "message": "Unauthorized" }).to_string()),
-        headers: None,
-    }))
+    Ok(ApiResponseType::Forbidden(
+        json!({ "errors": ["Unauthorized"] }).to_string(),
+        IsCors::No,
+    )
+    .to_response())
 }
 
 #[derive(Debug, Serialize, Deserialize)]

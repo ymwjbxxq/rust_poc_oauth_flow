@@ -1,9 +1,10 @@
 use cookie::Cookie;
+use http::{HeaderMap, HeaderValue};
 use lambda_http::{run, service_fn, Error, IntoResponse, Request, RequestExt};
 use oauth_flow::models::user::User;
 use oauth_flow::queries::get_user_query::{GetUser, GetUserRequest};
 use oauth_flow::setup_tracing;
-use oauth_flow::utils::api_helper::{ApiHelper, ApiResponse, HttpStatusCode};
+use oauth_flow::utils::api_helper::{ApiResponseType, IsCors};
 use oauth_flow::utils::cookie::CookieExt;
 use oauth_flow::utils::injections::oauth::login::post_di::{PostAppClient, PostAppInitialisation};
 use serde_json::json;
@@ -37,56 +38,48 @@ pub async fn execute(
     event: Request,
 ) -> Result<impl IntoResponse, Error> {
     println!("{event:?}");
-    let result = login(app_client, &event)
+    let user = login(app_client, &event)
         .await
         .ok()
         .and_then(|result| result);
-    
-    let query_params = event.query_string_parameters();
-    return Ok(match result {
-        Some(user) => {
-            let host = event
-                .headers()
-                .get("Host")
-                .expect("Cannot find host in the Request")
-                .to_str()?;
 
-            let mut headers = HashMap::new();
-            headers.insert(
-                http::header::SET_COOKIE,
-                Cookie::to_cookie_string(
-                    String::from("myOAuth"),
-                    HashMap::from([
-                        (String::from("email"), user.email.unwrap()),
-                        (
-                            String::from("is_consent"),
-                            user.is_consent.unwrap().to_string(),
-                        ),
-                        (String::from("is_optin"), user.is_optin.unwrap().to_string()),
-                    ]),
-                ),
-            );
-            headers.insert(http::header::CONTENT_TYPE, "application/json".to_string());
-            headers.insert(
-                http::header::LOCATION,
-                ApiHelper::build_url_from_querystring(
-                    format!("https://{host}{}", app_client.redirect_path()),
-                    query_params,
-                ),
-            );
+    //let query_params = event.query_string_parameters();
+    if let Some(user) = user {
+        let host = event
+            .headers()
+            .get("Host")
+            .expect("Cannot find host in the Request")
+            .to_str()?;
 
-            ApiHelper::response(ApiResponse {
-                status_code: HttpStatusCode::Found,
-                body: None,
-                headers: Some(headers),
-            })
-        }
-        None => ApiHelper::response(ApiResponse {
-            status_code: HttpStatusCode::NotFound,
-            body: Some(json!({ "message": "User not found" }).to_string()),
-            headers: None,
-        }),
-    });
+        let cookie = Cookie::to_cookie_string(
+            String::from("myOAuth"),
+            HashMap::from([
+                (String::from("email"), user.email.unwrap()),
+                (
+                    String::from("is_consent"),
+                    user.is_consent.unwrap().to_string(),
+                ),
+                (String::from("is_optin"), user.is_optin.unwrap().to_string()),
+            ]),
+        );
+        let mut headers = HeaderMap::new();
+        headers.insert(http::header::SET_COOKIE, HeaderValue::from_str(&cookie)?);
+
+        let target = ApiResponseType::build_url_from_querystring(
+            format!("https://{host}{}", app_client.redirect_path()),
+            event.query_string_parameters(),
+        );
+
+        return Ok(
+            ApiResponseType::FoundWithCustomHeaders(target, IsCors::No, headers).to_response(),
+        );
+    }
+
+    Ok(ApiResponseType::NoContent(
+        json!({ "errors": ["User not found"] }).to_string(),
+        IsCors::No,
+    )
+    .to_response())
 }
 
 async fn login(

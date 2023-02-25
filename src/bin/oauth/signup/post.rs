@@ -2,7 +2,7 @@ use lambda_http::{run, service_fn, Error, IntoResponse, Request, RequestExt};
 use oauth_flow::models::user::User;
 use oauth_flow::queries::add_user_query::AddUser;
 use oauth_flow::setup_tracing;
-use oauth_flow::utils::api_helper::{ApiHelper, ApiResponse, HttpStatusCode};
+use oauth_flow::utils::api_helper::{ApiResponseType, IsCors};
 use oauth_flow::utils::crypto::CriptoHelper;
 use oauth_flow::utils::injections::oauth::signup::post_di::{PostAppClient, PostAppInitialisation};
 use serde_json::json;
@@ -37,18 +37,16 @@ pub async fn execute(
         .map(|result| result.is_some());
 
     Ok(match result {
-        Some(_) => ApiHelper::response(ApiResponse {
-            status_code: HttpStatusCode::Created,
-            body: Some(
-                json!({ "message": "We sent you an email please confirm your email." }).to_string(),
-            ),
-            headers: None,
-        }),
-        None => ApiHelper::response(ApiResponse {
-            status_code: HttpStatusCode::InternalServerError,
-            body: Some(json!({ "message": "Cannot add user" }).to_string()),
-            headers: None,
-        }),
+        Some(_) => ApiResponseType::Created(
+            json!({ "message": ["We sent you an email please confirm your email."] }).to_string(),
+            IsCors::No,
+        )
+        .to_response(),
+        None => ApiResponseType::Conflict(
+            json!({ "errors": ["Cannot add user, please retry"] }).to_string(),
+            IsCors::No,
+        )
+        .to_response(),
     })
 }
 

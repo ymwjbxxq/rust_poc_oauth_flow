@@ -1,9 +1,12 @@
 use cookie::Cookie;
+use http::HeaderMap;
+use http::HeaderValue;
 use lambda_http::{run, service_fn, Error, IntoResponse, Request, RequestExt};
-use oauth_flow::queries::update_consent_query::UpdateConsentRequest;
 use oauth_flow::queries::update_consent_query::UpdateConsent;
+use oauth_flow::queries::update_consent_query::UpdateConsentRequest;
 use oauth_flow::setup_tracing;
-use oauth_flow::utils::api_helper::{ApiHelper, ApiResponse, HttpStatusCode};
+use oauth_flow::utils::api_helper::ApiResponseType;
+use oauth_flow::utils::api_helper::IsCors;
 use oauth_flow::utils::cookie::CookieExt;
 use oauth_flow::utils::cookie::CookieHelper;
 use oauth_flow::utils::injections::oauth::consent::post_di::{
@@ -68,30 +71,20 @@ pub async fn execute(
         .expect("Cannot find host in the Request")
         .to_str()?;
 
-    let mut headers = HashMap::new();
-    headers.insert(
-        http::header::SET_COOKIE,
-        Cookie::to_cookie_string(
-            String::from("myOAuth"),
-            HashMap::from([
-                (String::from("email"), email.to_owned()),
-                (String::from("is_consent"), true.to_string()),
-                (String::from("is_optin"), is_optin.to_string()),
-            ]),
-        ),
+    let cookie = Cookie::to_cookie_string(
+        String::from("myOAuth"),
+        HashMap::from([
+            (String::from("email"), email.to_owned()),
+            (String::from("is_consent"), true.to_string()),
+            (String::from("is_optin"), is_optin.to_string()),
+        ]),
     );
-    headers.insert(http::header::CONTENT_TYPE, "application/json".to_string());
-    headers.insert(
-        http::header::LOCATION,
-        ApiHelper::build_url_from_querystring(
-            format!("https://{host}{}", app_client.redirect_path()),
-            query_params,
-        ),
+    let mut headers = HeaderMap::new();
+    headers.insert(http::header::SET_COOKIE, HeaderValue::from_str(&cookie)?);
+    let target = ApiResponseType::build_url_from_querystring(
+        format!("https://{host}{}", app_client.redirect_path()),
+        query_params,
     );
 
-    Ok(ApiHelper::response(ApiResponse {
-        status_code: HttpStatusCode::Found,
-        body: None,
-        headers: Some(headers),
-    }))
+    Ok(ApiResponseType::FoundWithCustomHeaders(target, IsCors::No, headers).to_response())
 }

@@ -1,8 +1,9 @@
 use cookie::Cookie;
+use http::{HeaderMap, HeaderValue};
 use lambda_http::{run, service_fn, Error, IntoResponse, Request, RequestExt};
 use oauth_flow::queries::update_optin_query::{UpdateOptIn, UpdateOptInRequest};
 use oauth_flow::setup_tracing;
-use oauth_flow::utils::api_helper::{ApiHelper, ApiResponse, HttpStatusCode};
+use oauth_flow::utils::api_helper::{ApiResponseType, IsCors};
 use oauth_flow::utils::cookie::CookieExt;
 use oauth_flow::utils::cookie::CookieHelper;
 use oauth_flow::utils::injections::oauth::optin::post_di::{PostAppClient, PostAppInitialisation};
@@ -43,6 +44,13 @@ pub async fn execute(
     let email = cookie
         .get("email")
         .expect("email must be set at this point");
+
+    let host = event
+        .headers()
+        .get("Host")
+        .expect("Cannot find host in the Request")
+        .to_str()?;
+
     let query_params = event.query_string_parameters();
     let client_id = query_params
         .first("client_id")
@@ -56,36 +64,20 @@ pub async fn execute(
 
     app_client.query(&request).await?;
 
-    let host = event
-        .headers()
-        .get("Host")
-        .expect("Cannot find host in the Request")
-        .to_str()?;
-
-    let mut headers = HashMap::new();
-    headers.insert(
-        http::header::SET_COOKIE,
-        Cookie::to_cookie_string(
-            String::from("myOAuth"),
-            HashMap::from([
-                (String::from("email"), email.to_owned()),
-                (String::from("is_consent"), is_consent.to_string()),
-                (String::from("is_optin"), true.to_string()),
-            ]),
-        ),
+    let cookie = Cookie::to_cookie_string(
+        String::from("myOAuth"),
+        HashMap::from([
+            (String::from("email"), email.to_owned()),
+            (String::from("is_consent"), is_consent.to_string()),
+            (String::from("is_optin"), true.to_string()),
+        ]),
     );
-    headers.insert(http::header::CONTENT_TYPE, "application/json".to_string());
-    headers.insert(
-        http::header::LOCATION,
-        ApiHelper::build_url_from_querystring(
-            format!("https://{host}{}", app_client.redirect_path()),
-            query_params,
-        ),
+    let mut headers = HeaderMap::new();
+    headers.insert(http::header::SET_COOKIE, HeaderValue::from_str(&cookie)?);
+    let target = ApiResponseType::build_url_from_querystring(
+        format!("https://{host}{}", app_client.redirect_path()),
+        query_params,
     );
 
-    Ok(ApiHelper::response(ApiResponse {
-        status_code: HttpStatusCode::Found,
-        body: None,
-        headers: Some(headers),
-    }))
+   Ok(ApiResponseType::FoundWithCustomHeaders(target, IsCors::No, headers).to_response())
 }
