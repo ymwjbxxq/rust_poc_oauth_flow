@@ -127,15 +127,11 @@ impl ApiResponseType {
             );
             headers.insert(
                 http::header::ACCESS_CONTROL_ALLOW_HEADERS,
-                HeaderValue::from_static("content-type,x-requested-with"),
+                HeaderValue::from_static("content-type,x-amz-date,authorization,x-api-key,x-amz-security-token,access-control-allow-headers,access-control-request-methods,access-control-request-headers,access-control-allow-methods,access-control-allow-origin,x-requested-with"),
             );
             headers.insert(
                 http::header::ACCESS_CONTROL_ALLOW_METHODS,
-                HeaderValue::from_static("GET, POST, OPTIONS, PATCH, PUT, DELETE"),
-            );
-            headers.insert(
-                http::header::ACCESS_CONTROL_ALLOW_CREDENTIALS,
-                HeaderValue::from_static("true"),
+                HeaderValue::from_static("GET, POST, OPTIONS"),
             );
         }
     }
