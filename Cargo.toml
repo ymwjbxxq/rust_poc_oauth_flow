@@ -10,7 +10,7 @@ cookie = "0.17"
 futures = "0.3"
 http = "0.2"
 aws_lambda_events = { version = "0.7", default-features = false, features = ["apigw"] }
-lambda_http = { version = "0.7", default-features = false, features = ["apigw_http"] }
+lambda_http = { version = "0.7", default-features = false, features = ["apigw_rest"] }
 lambda_runtime = "0.7.3"
 aws-sdk-dynamodb = "0.24.0"
 aws-sdk-s3 = "0.24.0"
@@ -41,8 +41,8 @@ name = "app-random-api"
 path = "src/bin/app/random_api.rs"
 
 [[bin]]
-name = "app-lambda-authorizer"
-path = "src/bin/app/authorizer.rs"
+name = "app-lambda-jwt"
+path = "src/bin/app/jwt.rs"
 
 [[bin]]
 name = "app-auth"
