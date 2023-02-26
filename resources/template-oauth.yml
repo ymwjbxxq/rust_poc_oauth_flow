@@ -51,25 +51,46 @@ Resources:
       BillingMode: PAY_PER_REQUEST
 
 ##########################################################################
+#  OAUTH API                                                            #
+##########################################################################
+  OAuthApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      Name: !Sub ${AWS::StackName}
+      StageName: !Ref StageName
+      DefinitionBody: # an OpenApi definition
+        'Fn::Transform':
+          Name: 'AWS::Include'
+          Parameters:
+            Location: './oauth.yaml'
+      OpenApiVersion: 3.0.3
+      Cors:
+        AllowMethods: "'GET, POST, OPTIONS'"
+        AllowHeaders: "'content-type,x-amz-date,authorization,x-api-key,x-amz-security-token,access-control-allow-headers,access-control-request-methods,access-control-request-headers,access-control-allow-methods,access-control-allow-origin,x-requested-with'"
+        AllowOrigin: "'*'"
+      EndpointConfiguration: REGIONAL
+
+##########################################################################
 # Lambda                                                                 #
 ##########################################################################
   OauthAuthorizeFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: build/oauth-authorize
+      CodeUri: ../build//oauth-authorize
       Policies:
         - AWSLambdaBasicExecutionRole
       Environment:
         Variables:
-          OAUTH_AUTHORIZE_LOGIN_PATH: "/v2/login"
-          OAUTH_CUSTOM_OPTIN_PATH: "/custom/optin"
-          OAUTH_CUSTOM_CONSENT_PATH: "/custom/consent"
+          OAUTH_AUTHORIZE_LOGIN_PATH: !Sub "/${StageName}/v2/login"
+          OAUTH_CUSTOM_OPTIN_PATH: !Sub "/${StageName}/custom/optin"
+          OAUTH_CUSTOM_CONSENT_PATH: !Sub "/${StageName}/custom/consent"
       Events:
         Api:
-          Type: HttpApi
+          Type: Api
           Properties:
             Path: /authorize
             Method: GET
+            RestApiId: !Ref OAuthApi
       Tags:
         Name: authorize
         env: !Ref StageName
@@ -84,15 +105,16 @@ Resources:
   OauthTokenFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: build/oauth-token
+      CodeUri: ../build//oauth-token
       Policies:
         - AWSLambdaBasicExecutionRole
       Events:
         Api:
-          Type: HttpApi
+          Type: Api
           Properties:
             Path: /token
-            Method: ANY #IT SHOULD BE A POST BUT FOR THE PoC is fine
+            Method: GET
+            RestApiId: !Ref OAuthApi
       Tags:
         Name: token
         env: !Ref StageName
@@ -110,7 +132,7 @@ Resources:
   OauthOptinGETFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: build/oauth-get-page
+      CodeUri: ../build//oauth-get-page
       Policies:
         - AWSLambdaBasicExecutionRole
         - S3ReadPolicy:
@@ -121,10 +143,11 @@ Resources:
           PAGE_NAME: optin
       Events:
         Api:
-          Type: HttpApi
+          Type: Api
           Properties:
             Path: /custom/optin
             Method: GET
+            RestApiId: !Ref OAuthApi
       Tags:
         Name: optin-load-page
         env: !Ref StageName
@@ -139,7 +162,7 @@ Resources:
   OauthConsentGETFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: build/oauth-get-page
+      CodeUri: ../build//oauth-get-page
       Policies:
         - AWSLambdaBasicExecutionRole
         - S3ReadPolicy:
@@ -150,10 +173,11 @@ Resources:
           PAGE_NAME: consent
       Events:
         Api:
-          Type: HttpApi
+          Type: Api
           Properties:
             Path: /custom/consent
             Method: GET
+            RestApiId: !Ref OAuthApi
       Tags:
         Name: consent-load-page
         env: !Ref StageName
@@ -168,7 +192,7 @@ Resources:
   OauthLoginGETFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: build/oauth-get-page
+      CodeUri: ../build//oauth-get-page
       Policies:
         - AWSLambdaBasicExecutionRole
         - S3ReadPolicy:
@@ -179,10 +203,11 @@ Resources:
           PAGE_NAME: login
       Events:
         Api:
-          Type: HttpApi
+          Type: Api
           Properties:
             Path: /v2/login
             Method: GET
+            RestApiId: !Ref OAuthApi
       Tags:
         Name: login-load-page
         env: !Ref StageName
@@ -197,7 +222,7 @@ Resources:
   OauthSignupGETFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: build/oauth-get-page
+      CodeUri: ../build//oauth-get-page
       Policies:
         - AWSLambdaBasicExecutionRole
         - S3ReadPolicy:
@@ -208,10 +233,11 @@ Resources:
           PAGE_NAME: signup
       Events:
         Api:
-          Type: HttpApi
+          Type: Api
           Properties:
             Path: /v2/signup
             Method: GET
+            RestApiId: !Ref OAuthApi
       Tags:
         Name: signup-load-page
         env: !Ref StageName
@@ -229,7 +255,7 @@ Resources:
   OauthOptinPOSTFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: build/oauth-optin-post
+      CodeUri: ../build//oauth-optin-post
       Policies:
         - AWSLambdaBasicExecutionRole
         - Version: "2012-10-17"
@@ -241,13 +267,14 @@ Resources:
       Environment:
         Variables:
           TABLE_NAME: !Ref OAuthServiceTable
-          OAUTH_AUTHORIZE_PATH: "/authorize"
+          OAUTH_AUTHORIZE_PATH: !Sub "/${StageName}/authorize"
       Events:
         Api:
-          Type: HttpApi
+          Type: Api
           Properties:
             Path: /custom/optin
             Method: POST
+            RestApiId: !Ref OAuthApi
       Tags:
         Name: optin-process-page
         env: !Ref StageName
@@ -262,7 +289,7 @@ Resources:
   OauthConsentPOSTFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: build/oauth-consent-post
+      CodeUri: ../build//oauth-consent-post
       Policies:
         - AWSLambdaBasicExecutionRole
         - Version: "2012-10-17"
@@ -274,13 +301,14 @@ Resources:
       Environment:
         Variables:
           TABLE_NAME: !Ref OAuthServiceTable
-          OAUTH_AUTHORIZE_PATH: "/authorize"
+          OAUTH_AUTHORIZE_PATH: !Sub "/${StageName}/authorize"
       Events:
         Api:
-          Type: HttpApi
+          Type: Api
           Properties:
             Path: /custom/consent
             Method: POST
+            RestApiId: !Ref OAuthApi
       Tags:
         Name: consent-process-page
         env: !Ref StageName
@@ -295,7 +323,7 @@ Resources:
   OauthLoginPOSTFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: build/oauth-login-post
+      CodeUri: ../build//oauth-login-post
       Policies:
         - AWSLambdaBasicExecutionRole
         - Version: "2012-10-17"
@@ -307,13 +335,14 @@ Resources:
       Environment:
         Variables:
           TABLE_NAME: !Ref OAuthServiceTable
-          OAUTH_AUTHORIZE_PATH: "/authorize"
+          OAUTH_AUTHORIZE_PATH: !Sub "/${StageName}/authorize"
       Events:
         Api:
-          Type: HttpApi
+          Type: Api
           Properties:
             Path: /v2/login
             Method: POST
+            RestApiId: !Ref OAuthApi
       Tags:
         Name: consent-process-page
         env: !Ref StageName
@@ -328,7 +357,7 @@ Resources:
   OauthSignupPOSTFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: build/oauth-signup-post
+      CodeUri: ../build/oauth-signup-post
       Policies:
         - AWSLambdaBasicExecutionRole
         - Version: "2012-10-17"
@@ -342,10 +371,11 @@ Resources:
           TABLE_NAME: !Ref OAuthServiceTable
       Events:
         Api:
-          Type: HttpApi
+          Type: Api
           Properties:
             Path: /v2/signup
             Method: POST
+            RestApiId: !Ref OAuthApi
       Tags:
         Name: signup-process-page
         env: !Ref StageName
@@ -360,7 +390,7 @@ Resources:
 Outputs:
   OAuthUrl:
     Description: "API Gateway endpoint URL"
-    Value: !Sub "https://${ServerlessHttpApi}.execute-api.${AWS::Region}.amazonaws.com/"
+    Value: !Sub "https://${OAuthApi}.execute-api.${AWS::Region}.amazonaws.com/${StageName}/"
     Export:
       Name: 
         Fn::Sub: oauth-AuthUrl
