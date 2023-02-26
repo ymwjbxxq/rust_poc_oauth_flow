@@ -32,12 +32,13 @@ impl AuthRequest {
         let cookie = CookieHelper::from_http_header(event.headers()).ok();
         if let Some(cookie) = cookie {
             let cookie_state = cookie.get("state");
+            let code_verifier = cookie.get("code_verifier");
 
             let query_params = event.query_string_parameters();
             let client_id = query_params.first("client_id");
             let querystring_state = query_params.first("state");
             let code = query_params.first("code");
-            let code_verifier = query_params.first("code_verifier");
+
             let redirect_uri = query_params.first("redirect_uri");
             let host = event.headers().get("Host");
 

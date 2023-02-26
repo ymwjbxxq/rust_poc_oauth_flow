@@ -39,7 +39,7 @@ pub async fn handler(
                 ]),
             );
             return Ok(ApiResponseType::Found(target, IsCors::Yes).to_response());
-        }
+        } 
     }
 
     Ok(ApiResponseType::Forbidden(
