@@ -27,7 +27,6 @@ pub struct GetUserRequest {
 impl GetUserRequest {
     pub fn validate(event: &http::Request<Body>) -> Option<GetUserRequest> {
         let user = event.payload::<LoginRequest>().ok().and_then(|user| user);
-
         if let Some(user) = user {
             let query_params = event.query_string_parameters();
             let client_id = query_params.first("client_id");
