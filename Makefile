@@ -1,4 +1,4 @@
-FUNCTIONS := app-random-api app-lambda-authorizer app-auth app-login oauth-consent-post oauth-login-post oauth-optin-post oauth-signup-post oauth-get-page oauth-token oauth-authorize
+FUNCTIONS := app-random-api app-lambda-jwt app-auth app-login oauth-consent-post oauth-login-post oauth-optin-post oauth-signup-post oauth-get-page oauth-token oauth-authorize
 
 ARCH := aarch64-unknown-linux-gnu
 ARCH_SPLIT = $(subst -, ,$(ARCH))
@@ -21,9 +21,11 @@ build-%:
 	cp -v ./target/$(ARCH)/release/$* ./build/$*/bootstrap
 
 deploy:
-	sam deploy --guided --no-fail-on-empty-changeset --no-confirm-changeset --profile test --stack-name oauth --template-file template-oauth.yml  
-	sam deploy --guided --no-fail-on-empty-changeset --no-confirm-changeset --profile test --stack-name app   --template-file template-app.yml
+	sam deploy --no-fail-on-empty-changeset --no-confirm-changeset --profile test --region eu-central-1 --stack-name oauth --template-file ./resources/template-oauth.yml
+	sam deploy --no-fail-on-empty-changeset --no-confirm-changeset --profile test --region eu-central-1 --stack-name app   --template-file ./resources/template-app.yml
+	sam deploy --no-fail-on-empty-changeset --no-confirm-changeset --profile test --region eu-central-1 --stack-name api   --template-file ./resources/template-api.yml
 
 delete:
 	sam delete --profile test --stack-name app
 	sam delete --profile test --stack-name oauth
+	sam delete --profile test --stack-name api
