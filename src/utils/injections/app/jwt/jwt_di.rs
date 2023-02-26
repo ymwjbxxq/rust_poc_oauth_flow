@@ -8,7 +8,7 @@ use crate::{
 };
 
 #[async_trait]
-pub trait AuthorizerAppInitialisation: Send + Sync {
+pub trait JwtApiInitialisation: Send + Sync {
     async fn validate_token(&self, raw_token: &str) -> Result<Option<Claims>, ApplicationError>;
     
     fn to_response(
@@ -20,13 +20,13 @@ pub trait AuthorizerAppInitialisation: Send + Sync {
 }
 
 #[derive(Debug, Builder)]
-pub struct AuthorizerAppClient {
+pub struct JwtApiClient {
     #[builder(setter(into))]
     pub jwt: Jwt,
 }
 
 #[async_trait]
-impl AuthorizerAppInitialisation for AuthorizerAppClient {
+impl JwtApiInitialisation for JwtApiClient {
     async fn validate_token(&self, raw_token: &str) -> Result<Option<Claims>, ApplicationError> {
         self.jwt.validate_token(raw_token).await
     }

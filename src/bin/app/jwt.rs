@@ -5,7 +5,7 @@ use lambda_runtime::{run, service_fn, Error, LambdaEvent};
 use oauth_flow::{
     dtos::app::authorizer::authorizer_request::AuthorizerRequest,
     setup_tracing,
-    utils::{injections::app::authorizer::authorizer_di::{AuthorizerAppInitialisation, AuthorizerAppClient}, jwt::Jwt},
+    utils::{injections::app::jwt::jwt_di::{JwtApiInitialisation, JwtApiClient}, jwt::Jwt},
 };
 
 #[tokio::main]
@@ -13,7 +13,7 @@ async fn main() -> Result<(), Error> {
     setup_tracing();
 
     let jwt = Jwt::new("privateKey");
-    let app_client = AuthorizerAppClient::builder().jwt(jwt).build();
+    let app_client = JwtApiClient::builder().jwt(jwt).build();
 
     run(service_fn(
         |event: LambdaEvent<ApiGatewayCustomAuthorizerRequestTypeRequest>| {
@@ -24,7 +24,7 @@ async fn main() -> Result<(), Error> {
 }
 
 pub async fn handler(
-    app_client: &dyn AuthorizerAppInitialisation,
+    app_client: &dyn JwtApiInitialisation,
     event: LambdaEvent<ApiGatewayCustomAuthorizerRequestTypeRequest>,
 ) -> Result<ApiGatewayCustomAuthorizerResponse, Error> {
     println!("EVENT {event:?}");
