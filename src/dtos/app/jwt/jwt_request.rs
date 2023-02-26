@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 use typed_builder::TypedBuilder as Builder;
 
 #[derive(Debug, Builder, Serialize, Deserialize)]
-pub struct AuthorizerRequest {
+pub struct JwtRequest {
     #[builder(default, setter(into))]
     pub method_arn: String,
 
@@ -11,8 +11,8 @@ pub struct AuthorizerRequest {
     pub authorization: String,
 }
 
-impl AuthorizerRequest {
-    pub fn validate(event: &ApiGatewayCustomAuthorizerRequestTypeRequest) -> Option<AuthorizerRequest> {
+impl JwtRequest {
+    pub fn validate(event: &ApiGatewayCustomAuthorizerRequestTypeRequest) -> Option<JwtRequest> {
         let method_arn = &event.method_arn;
         let authorization = event.headers.get("Authorization");
 

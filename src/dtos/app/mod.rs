@@ -1,2 +1,3 @@
 pub mod login;
-pub mod authorizer;
+pub mod jwt;
+pub mod auth;

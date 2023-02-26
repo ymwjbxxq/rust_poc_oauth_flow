@@ -3,7 +3,7 @@ use aws_lambda_events::apigw::{
 };
 use lambda_runtime::{run, service_fn, Error, LambdaEvent};
 use oauth_flow::{
-    dtos::app::authorizer::authorizer_request::AuthorizerRequest,
+    dtos::app::jwt::jwt_request::JwtRequest,
     setup_tracing,
     utils::{injections::app::jwt::jwt_di::{JwtApiInitialisation, JwtApiClient}, jwt::Jwt},
 };
@@ -29,7 +29,7 @@ pub async fn handler(
 ) -> Result<ApiGatewayCustomAuthorizerResponse, Error> {
     println!("EVENT {event:?}");
 
-    let request = AuthorizerRequest::validate(&event.payload);
+    let request = JwtRequest::validate(&event.payload);
     if let Some(request) = request {
         let claims = app_client
             .validate_token(&request.authorization)

@@ -25,7 +25,7 @@ pub async fn handler(event: Request) -> Result<impl IntoResponse, Error> {
             let claims = Claims::builder()
                 .sub(request.user)
                 .company(request.client_id)
-                .exp((Utc::now() + Duration::minutes(60)).timestamp())
+                .exp((Utc::now() + Duration::minutes(10)).timestamp())
                 .build();
 
             let token = Jwt::new("private_key")
