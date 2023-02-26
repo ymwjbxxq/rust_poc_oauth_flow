@@ -1,49 +1,52 @@
+use crate::dtos::oauth::login::get_user_request::GetUserRequest;
 use crate::error::ApplicationError;
-use std::collections::HashMap;
-use crate::utils::crypto::CriptoHelper;
 use crate::models::user::User;
+use async_trait::async_trait;
 use aws_sdk_dynamodb::model::AttributeValue;
 use aws_sdk_dynamodb::Client;
-use async_trait::async_trait;
+use typed_builder::TypedBuilder as Builder;
+
+#[derive(Debug, Builder)]
+pub struct GetUser {
+    #[builder(setter(into))]
+    table_name: String,
+
+    #[builder(setter(into))]
+    client: Client,
+}
 
 #[async_trait]
 pub trait GetUserQuery {
-  fn new(client: &Client) -> Self;
-  async fn execute(&self, client_id: &str, email: &str) -> Result<Option<User>, ApplicationError>;
-}
-
-#[derive(Debug)]
-pub struct LoginQuery {
-  table_name: String,
-  client: Client,
+    async fn execute(&self, request: &GetUserRequest) -> Result<Option<User>, ApplicationError>;
 }
 
 #[async_trait]
-impl GetUserQuery for LoginQuery {
-  fn new(client: &Client) -> Self {
-    let table_name = std::env::var("TABLE_NAME").expect("TABLE_NAME must be set");
-    Self { 
-      table_name,
-      client: client.clone(),
+impl GetUserQuery for GetUser {
+    async fn execute(&self, request: &GetUserRequest) -> Result<Option<User>, ApplicationError> {
+        let res = self
+            .client
+            .get_item()
+            .table_name(self.table_name.to_owned())
+            .key(
+                "client_id",
+                AttributeValue::S(request.client_id.to_lowercase()),
+            )
+            .key(
+                "user",
+                AttributeValue::S(format!(
+                    "{}#{}",
+                    request.email.to_lowercase(),
+                    request.password.to_lowercase()
+                )),
+            )
+            .projection_expression("client_id, #user, is_consent, is_optin")
+            .expression_attribute_names("#user", "user")
+            .send()
+            .await?;
+
+        Ok(match res.item {
+            None => None,
+            Some(item) => Some(User::from_dynamodb(item)?),
+        })
     }
-  }
-
-  async fn execute(&self, client_id: &str, email: &str) -> Result<Option<User>, ApplicationError> {
-    log::info!("Fetching user for app {} with {}", client_id, email);
-    let res = self.client
-      .get_item()
-      .table_name(self.table_name.to_owned())
-      .set_key(Some(HashMap::from([
-          ("client_id".to_owned(), AttributeValue::S(client_id.to_owned())),
-          ("email".to_owned(), AttributeValue::S(CriptoHelper::to_sha256_string(email))),
-        ])))
-      //.projection_expression("email, is_consent, is_optin")
-      .send()
-      .await?;
-
-    Ok(match res.item {
-      None => None,
-      Some(item) => Some(User::from_dynamodb(item)?),
-    })
-  }
 }

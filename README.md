@@ -13,9 +13,9 @@ It is just a PoC and so take it for what it is.
 
 I have created 3 APIs:
 
-App endpoint protected by Lambda Authorizer
-App endpoints not protected
-OAuth endpoints
+* App endpoint protected by Lambda Authorizer
+* App endpoints not protected
+* OAuth endpoints
 
 If, for example, you need to add extra steps at the original flow, you can, and this is why I have added two more:
 
@@ -26,7 +26,7 @@ At the end of the flow, we should be able to see the JWT token:
 ```App
 Authorization: eyJhbGciOiJIUzI1NiJ9.T0RBVUxDQVk0V0k1S1ZQU01DUkZCTExBOEs3QURNUEQzWUM4WFdUNVQ1UDRVUElRREw.956xdJUWC4mfDJlohbqP2kqFUNoAPlZ8nRRJCfzo1KI
 ```
-To add more latency and authenticity, I load some UI from a configuration file hosted in S3. This file could be custom made for each clientId that the OAuth provider is supporting. You can find an example on the file myApp.json  (you should upload manually on the S3).
+To add more latency and authenticity, I load some UI from a configuration file hosted in S3. This file could be custom made for each clientId that the OAuth provider is supporting. You can find an example on the file clientid1.json  (you should upload manually on the S3).
 
 ### EXTRA: ###
 
@@ -46,14 +46,14 @@ You can find more details [here](https://github.com/ymwjbxxq/protect-sensitive-d
 * ["Type-Driven API Design in Rust" by Will Crichton](https://www.youtube.com/watch?v=bnnacleqg6k)
 
 ### MANUAL TEST WITH POSTMAN: ###
-
-1. Register a user at - https://[your-oauth-domain].execute-api.eu-central-1.amazonaws.com/
-2. User click login link:  https://[your-app-domain].execute-api.eu-central-1.amazonaws.com/login?client_id=myApp
-3. Authorization code quest + code challange to Oauth provider - https://[your-oauth-domain].execute-api.eu-central-1.amazonaws.com/authorize?response_type=code&state=e7761619-867d-4591-ab8f-f516afebc1aa&code_challenge_method=S256&client_id=myApp&code_challenge=E6eArpYbPr7JJ12opY7fQ6r6fD-KfZcadk6VQIgeDls&redirect_uri=https%3A%2F%2F[your-app-domain].execute-api.eu-central-1.amazonaws.com%2F%2Fauth
-4. Redirec to login page - https://[your-oauth-domain].execute-api.eu-central-1.amazonaws.com/v2/login?code_challenge=E6eArpYbPr7JJ12opY7fQ6r6fD-KfZcadk6VQIgeDls&redirect_uri=https%3A%2F%2F[your-app-domain].execute-api.eu-central-1.amazonaws.com%2F%2Fauth&code_challenge_method=S256&client_id=myApp&response_type=code&state=e7761619-867d-4591-ab8f-f516afebc1aa
-5. Authenticate and consent/optin - https://[your-oauth-domain].execute-api.eu-central-1.amazonaws.com/authorize?code_challenge=E6eArpYbPr7JJ12opY7fQ6r6fD-KfZcadk6VQIgeDls&response_type=code&state=e7761619-867d-4591-ab8f-f516afebc1aa&code_challenge_method=S256&client_id=myApp&redirect_uri=https%3A%2F%2F[your-app-domain].execute-api.eu-central-1.amazonaws.com%2F%2Fauth
-6. Authorization code - https://[your-app-domain].execute-api.eu-central-1.amazonaws.com/auth?redirect_uri=https%3A%2F%2F[your-app-domain].execute-api.eu-central-1.amazonaws.com%2F%2Fauth&code=0128cf82-808d-4949-bb77-a71fe2213750&state=e7761619-867d-4591-ab8f-f516afebc1aa&code_challenge=E6eArpYbPr7JJ12opY7fQ6r6fD-KfZcadk6VQIgeDls&client_id=myApp
-7. Request token - https://[your-oauth-domain].execute-api.eu-central-1.amazonaws.com/token?grant_type=authorization_code&code_verifier=bSsHtJBHWBSduNeZ-LA03w1LtKQTTGRVWN76YH5uE4l92e5j6_ijnqASPobIwsNNBqyxlVa9aGbTFvwSVDBqfRa7efsgF25to1M0UzYNUtoNft0rUD3QSbvTYYFEUcOsSLePXLKZXbvbVPMArKt-sqyYRiazeCXReCjIfOKLRdg&redirect_uri=https%3A%2F%2F[your-app-domain].execute-api.eu-central-1.amazonaws.com%2F%2Fauth&client_id=myApp&code=0128cf82-808d-4949-bb77-a71fe2213750
+0. Upload the files to simulate a website
+1. Register a user at - https://[your-oauth-domain]/{stage}/v2/signup?client_id=clientid1
+2. User click login link:  https://[your-app-domain].execute-api.eu-central-1.amazonaws.com/{stage}/login?client_id=clientid1
+3. Authorization code quest + code challange to Oauth provider - https://[your-oauth-domain].execute-api.eu-central-1.amazonaws.com/{stage}/authorize?response_type=code&state=e7761619-867d-4591-ab8f-f516afebc1aa&code_challenge_method=S256&client_id=clientid1&code_challenge=E6eArpYbPr7JJ12opY7fQ6r6fD-KfZcadk6VQIgeDls&redirect_uri=https%3A%2F%2F[your-app-domain].execute-api.eu-central-1.amazonaws.com%2F%2Fauth
+4. Redirec to login page - https://[your-oauth-domain].execute-api.eu-central-1.amazonaws.com/{stage}/v2/login?code_challenge=E6eArpYbPr7JJ12opY7fQ6r6fD-KfZcadk6VQIgeDls&redirect_uri=https%3A%2F%2F[your-app-domain].execute-api.eu-central-1.amazonaws.com%2F%2Fauth&code_challenge_method=S256&client_id=clientid1&response_type=code&state=e7761619-867d-4591-ab8f-f516afebc1aa
+5. Authenticate and consent/optin - https://[your-oauth-domain].execute-api.eu-central-1.amazonaws.com/{stage}/authorize?code_challenge=E6eArpYbPr7JJ12opY7fQ6r6fD-KfZcadk6VQIgeDls&response_type=code&state=e7761619-867d-4591-ab8f-f516afebc1aa&code_challenge_method=S256&client_id=clientid1&redirect_uri=https%3A%2F%2F[your-app-domain].execute-api.eu-central-1.amazonaws.com%2F%2Fauth
+6. Authorization code - https://[your-app-domain].execute-api.eu-central-1.amazonaws.com/{stage}/auth?redirect_uri=https%3A%2F%2F[your-app-domain].execute-api.eu-central-1.amazonaws.com%2F%2Fauth&code=0128cf82-808d-4949-bb77-a71fe2213750&state=e7761619-867d-4591-ab8f-f516afebc1aa&code_challenge=E6eArpYbPr7JJ12opY7fQ6r6fD-KfZcadk6VQIgeDls&client_id=clientid1
+7. Request token - https://[your-oauth-domain].execute-api.eu-central-1.amazonaws.com/{stage}/token?grant_type=authorization_code&code_verifier=bSsHtJBHWBSduNeZ-LA03w1LtKQTTGRVWN76YH5uE4l92e5j6_ijnqASPobIwsNNBqyxlVa9aGbTFvwSVDBqfRa7efsgF25to1M0UzYNUtoNft0rUD3QSbvTYYFEUcOsSLePXLKZXbvbVPMArKt-sqyYRiazeCXReCjIfOKLRdg&redirect_uri=https%3A%2F%2F[your-app-domain].execute-api.eu-central-1.amazonaws.com%2F%2Fauth&client_id=clientid1&code=0128cf82-808d-4949-bb77-a71fe2213750
 8. Now with the token we can call our protected API - eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJiQGIuY29tIiwiY29tcGFueSI6IkFDTUUiLCJleHAiOjEwMDAwMDAwMDAwfQ.TXdR1GMY_5nqQLDTk3uSZlRjt7JeVdK8HUuTRo44-OU
 
 ### LOAD TEST WITH POSTMAN: ###
