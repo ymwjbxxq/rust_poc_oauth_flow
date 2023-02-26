@@ -58,13 +58,13 @@ pub async fn handler(
                 event.query_string_parameters(),
             );
 
-            return Ok(ApiResponseType::FoundWithCustomHeaders(target, IsCors::No, headers).to_response())
+            return Ok(ApiResponseType::FoundWithCustomHeaders(target, IsCors::Yes, headers).to_response())
         }
     }
 
     Ok(ApiResponseType::BadRequest(
         json!({ "errors": ["Input request not valid"] }).to_string(),
-        IsCors::No,
+        IsCors::Yes,
     )
     .to_response())
 }

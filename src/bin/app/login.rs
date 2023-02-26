@@ -65,13 +65,13 @@ pub async fn handler(
         );
 
         return Ok(
-            ApiResponseType::FoundWithCustomHeaders(target, IsCors::No, headers).to_response(),
+            ApiResponseType::FoundWithCustomHeaders(target, IsCors::Yes, headers).to_response(),
         );
     }
 
     Ok(ApiResponseType::Conflict(
         json!({ "errors": ["Request is missing parameters"] }).to_string(),
-        IsCors::No,
+        IsCors::Yes,
     )
     .to_response())
 }

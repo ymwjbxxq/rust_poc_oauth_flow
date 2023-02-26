@@ -61,15 +61,17 @@ pub async fn handler(
                 event.query_string_parameters(),
             );
 
+             println!("target {:?}", target);
+
             return Ok(
-                ApiResponseType::FoundWithCustomHeaders(target, IsCors::No, headers).to_response(),
+                ApiResponseType::FoundWithCustomHeaders(target, IsCors::Yes, headers).to_response(),
             );
         }
     }
 
     Ok(ApiResponseType::NoContent(
         json!({ "errors": ["User not found"] }).to_string(),
-        IsCors::No,
+        IsCors::Yes,
     )
     .to_response())
 }

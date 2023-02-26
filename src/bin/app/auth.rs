@@ -55,12 +55,12 @@ pub async fn handler(event: Request) -> Result<impl IntoResponse, Error> {
                 ),
             ]),
         );
-        return Ok(ApiResponseType::Found(target, IsCors::No).to_response());
+        return Ok(ApiResponseType::Found(target, IsCors::Yes).to_response());
     }
 
     Ok(ApiResponseType::Forbidden(
         json!({ "errors": ["Unauthorized"] }).to_string(),
-        IsCors::No,
+        IsCors::Yes,
     )
     .to_response())
 }

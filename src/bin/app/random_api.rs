@@ -18,7 +18,7 @@ pub async fn handler(event: Request) -> Result<impl IntoResponse, Error> {
     Ok(ApiResponseType::Ok(
         json!({ "message": "Yeah" }).to_string(),
         ContentType::Json,
-        IsCors::No,
+        IsCors::Yes,
     )
     .to_response())
 }

@@ -38,6 +38,7 @@ pub async fn handler(event: Request) -> Result<impl IntoResponse, Error> {
     if cookie.is_ok() {
         let mut cookie = cookie.unwrap();
         if cookie.get("is_optin").is_none() {
+          println!("is_optin is none");
             let redirect_path = std::env::var("OAUTH_CUSTOM_OPTIN_PATH")
                 .expect("OAUTH_CUSTOM_OPTIN_PATH must be set");
 
@@ -45,10 +46,12 @@ pub async fn handler(event: Request) -> Result<impl IntoResponse, Error> {
                 format!("https://{host}{redirect_path}"),
                 query_params,
             );
-            return Ok(ApiResponseType::Found(target, IsCors::No).to_response());
+            return Ok(ApiResponseType::Found(target, IsCors::Yes).to_response());
         }
 
         if cookie.get("is_consent").is_none() {
+
+          println!("is_consent is none");
             let redirect_path = std::env::var("OAUTH_CUSTOM_CONSENT_PATH")
                 .expect("OAUTH_CUSTOM_CONSENT_PATH must be set");
 
@@ -56,7 +59,7 @@ pub async fn handler(event: Request) -> Result<impl IntoResponse, Error> {
                 format!("https://{host}{redirect_path}"),
                 query_params,
             );
-            return Ok(ApiResponseType::Found(target, IsCors::No).to_response());
+            return Ok(ApiResponseType::Found(target, IsCors::Yes).to_response());
         }
 
         cookie.insert(
@@ -104,6 +107,5 @@ pub async fn handler(event: Request) -> Result<impl IntoResponse, Error> {
             ]),
         );
     }
-
-    Ok(ApiResponseType::FoundWithCustomHeaders(target, IsCors::No, headers).to_response())
+    Ok(ApiResponseType::FoundWithCustomHeaders(target, IsCors::Yes, headers).to_response())
 }

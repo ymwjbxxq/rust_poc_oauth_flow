@@ -37,7 +37,7 @@ pub async fn handler(
             return Ok(ApiResponseType::Created(
                 json!({ "message": ["We sent you an email please confirm your email."] })
                     .to_string(),
-                IsCors::No,
+                IsCors::Yes,
             )
             .to_response());
         }
@@ -45,7 +45,7 @@ pub async fn handler(
 
     Ok(ApiResponseType::BadRequest(
         json!({ "errors": ["Input request not valid"] }).to_string(),
-        IsCors::No,
+        IsCors::Yes,
     )
     .to_response())
 }

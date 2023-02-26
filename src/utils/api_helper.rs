@@ -127,7 +127,7 @@ impl ApiResponseType {
             );
             headers.insert(
                 http::header::ACCESS_CONTROL_ALLOW_HEADERS,
-                HeaderValue::from_static("Content-Type"),
+                HeaderValue::from_static("content-type,x-requested-with"),
             );
             headers.insert(
                 http::header::ACCESS_CONTROL_ALLOW_METHODS,

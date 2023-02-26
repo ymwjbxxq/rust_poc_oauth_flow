@@ -54,7 +54,7 @@ pub async fn handler(
             return Ok(ApiResponseType::Ok(
                 CriptoHelper::from_base64(page)?.replace("#url#", &url),
                 ContentType::Html,
-                IsCors::No,
+                IsCors::Yes,
             )
             .to_response());
         }
@@ -62,7 +62,7 @@ pub async fn handler(
 
     Ok(ApiResponseType::Conflict(
         json!({ "errors": ["Cannot load UI"] }).to_string(),
-        IsCors::No,
+        IsCors::Yes,
     )
     .to_response())
 }

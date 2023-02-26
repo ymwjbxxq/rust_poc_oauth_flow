@@ -37,7 +37,7 @@ pub async fn handler(event: Request) -> Result<impl IntoResponse, Error> {
                 return Ok(ApiResponseType::Ok(
                     json!({ "token": token }).to_string(),
                     ContentType::Json,
-                    IsCors::No,
+                    IsCors::Yes,
                 )
                 .to_response());
             }
@@ -47,7 +47,7 @@ pub async fn handler(event: Request) -> Result<impl IntoResponse, Error> {
     println!("token Unauthorized");
     Ok(ApiResponseType::Forbidden(
         json!({ "errors": ["Unauthorized"] }).to_string(),
-        IsCors::No,
+        IsCors::Yes,
     )
     .to_response())
 }
