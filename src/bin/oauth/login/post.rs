@@ -61,8 +61,6 @@ pub async fn handler(
                 event.query_string_parameters(),
             );
 
-             println!("target {:?}", target);
-
             return Ok(
                 ApiResponseType::FoundWithCustomHeaders(target, IsCors::Yes, headers).to_response(),
             );

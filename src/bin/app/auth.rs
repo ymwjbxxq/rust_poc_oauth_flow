@@ -27,7 +27,7 @@ pub async fn handler(
 
     let request = AuthRequest::validate(&event);
     if let Some(request) = request {
-        if request.querystring_state.eq(&request.cookie_state) {
+        if request.querystring_state == request.cookie_state {
             let target = ApiResponseType::build_url_from_hashmap(
                 app_client.oauth_token_uri().to_owned(),
                 HashMap::from([
@@ -39,7 +39,7 @@ pub async fn handler(
                 ]),
             );
             return Ok(ApiResponseType::Found(target, IsCors::Yes).to_response());
-        } 
+        }
     }
 
     Ok(ApiResponseType::Forbidden(

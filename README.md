@@ -46,8 +46,12 @@ You can find more details [here](https://github.com/ymwjbxxq/protect-sensitive-d
 * ["Type-Driven API Design in Rust" by Will Crichton](https://www.youtube.com/watch?v=bnnacleqg6k)
 
 ### MANUAL TEST WITH POSTMAN: ###
-0. Upload the files to simulate a website
-1. Register a user at - https://[your-oauth-domain]/{stage}/v2/signup?client_id=clientid1
+1. Upload the files to simulate a website
+2. Register a user at - https://[your-oauth-domain]/{stage}/v2/signup?client_id=clientid1
+
+Open PostMan:
+
+1. SET: do not follow redirects
 2. User click login link:  https://[your-app-domain].execute-api.eu-central-1.amazonaws.com/{stage}/login?client_id=clientid1
 3. Authorization code quest + code challange to Oauth provider - https://[your-oauth-domain].execute-api.eu-central-1.amazonaws.com/{stage}/authorize?response_type=code&state=e7761619-867d-4591-ab8f-f516afebc1aa&code_challenge_method=S256&client_id=clientid1&code_challenge=E6eArpYbPr7JJ12opY7fQ6r6fD-KfZcadk6VQIgeDls&redirect_uri=https%3A%2F%2F[your-app-domain].execute-api.eu-central-1.amazonaws.com%2F%2Fauth
 4. Redirec to login page - https://[your-oauth-domain].execute-api.eu-central-1.amazonaws.com/{stage}/v2/login?code_challenge=E6eArpYbPr7JJ12opY7fQ6r6fD-KfZcadk6VQIgeDls&redirect_uri=https%3A%2F%2F[your-app-domain].execute-api.eu-central-1.amazonaws.com%2F%2Fauth&code_challenge_method=S256&client_id=clientid1&response_type=code&state=e7761619-867d-4591-ab8f-f516afebc1aa
@@ -55,6 +59,16 @@ You can find more details [here](https://github.com/ymwjbxxq/protect-sensitive-d
 6. Authorization code - https://[your-app-domain].execute-api.eu-central-1.amazonaws.com/{stage}/auth?redirect_uri=https%3A%2F%2F[your-app-domain].execute-api.eu-central-1.amazonaws.com%2F%2Fauth&code=0128cf82-808d-4949-bb77-a71fe2213750&state=e7761619-867d-4591-ab8f-f516afebc1aa&code_challenge=E6eArpYbPr7JJ12opY7fQ6r6fD-KfZcadk6VQIgeDls&client_id=clientid1
 7. Request token - https://[your-oauth-domain].execute-api.eu-central-1.amazonaws.com/{stage}/token?grant_type=authorization_code&code_verifier=bSsHtJBHWBSduNeZ-LA03w1LtKQTTGRVWN76YH5uE4l92e5j6_ijnqASPobIwsNNBqyxlVa9aGbTFvwSVDBqfRa7efsgF25to1M0UzYNUtoNft0rUD3QSbvTYYFEUcOsSLePXLKZXbvbVPMArKt-sqyYRiazeCXReCjIfOKLRdg&redirect_uri=https%3A%2F%2F[your-app-domain].execute-api.eu-central-1.amazonaws.com%2F%2Fauth&client_id=clientid1&code=0128cf82-808d-4949-bb77-a71fe2213750
 8. Now with the token we can call our protected API - eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJiQGIuY29tIiwiY29tcGFueSI6IkFDTUUiLCJleHAiOjEwMDAwMDAwMDAwfQ.TXdR1GMY_5nqQLDTk3uSZlRjt7JeVdK8HUuTRo44-OU
+
+### TEST FROM THE BROWSER: ###
+
+1. Upload the files to simulate a website
+2. Register a user at - https://[your-oauth-domain]/{stage}/v2/signup?client_id=clientid1
+3. Open the page index.html
+4. Insert https://[your-app-domain].execute-api.eu-central-1.amazonaws.com/{stage}/login?client_id=clientid1
+5. Click login
+6. Enter the data from point 2
+7 Now with the token we can call our protected API - eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJiQGIuY29tIiwiY29tcGFueSI6IkFDTUUiLCJleHAiOjEwMDAwMDAwMDAwfQ.TXdR1GMY_5nqQLDTk3uSZlRjt7JeVdK8HUuTRo44-OU
 
 ### LOAD TEST WITH POSTMAN: ###
 
