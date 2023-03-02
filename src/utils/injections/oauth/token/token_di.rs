@@ -1,28 +1,27 @@
 use async_trait::async_trait;
 use typed_builder::TypedBuilder as Builder;
 
-use crate::{error::ApplicationError, models::csrf::CSRF, queries::{get_csrf_query::{GetCSRFRequest, GetCSRF, GetCSRFQuery}, delete_csrf_query::{DeleteCSRF, DeleteCSRFRequest, DeleteCSRFQuery}}};
+use crate::{
+    error::ApplicationError,
+    models::csrf::CSRF,
+    queries::{get_csrf_query::{GetCSRF, GetCSRFQuery, GetCSRFRequest}, delete_csrf_query::{DeleteCSRF, DeleteCSRFRequest, DeleteCSRFQuery}},
+};
 
 #[async_trait]
-pub trait AuthAppInitialisation: Send + Sync {
-    fn oauth_token_uri(&self) -> &str;
-
+pub trait ToeknAppInitialisation: Send + Sync {
     async fn get_csrf_query(
         &self,
         request: &GetCSRFRequest,
     ) -> Result<Option<CSRF>, ApplicationError>;
 
-    async fn delete_csrf_query(
+     async fn delete_csrf_query(
         &self,
         request: &DeleteCSRFRequest,
     ) -> Result<(), ApplicationError>;
 }
 
 #[derive(Debug, Builder)]
-pub struct AuthAppClient {
-    #[builder(setter(into))]
-    pub oauth_token_uri: String,
-
+pub struct ToeknAppClient {
     #[builder(setter(into))]
     pub get_csrf_query: GetCSRF,
 
@@ -31,7 +30,7 @@ pub struct AuthAppClient {
 }
 
 #[async_trait]
-impl AuthAppInitialisation for AuthAppClient {
+impl ToeknAppInitialisation for ToeknAppClient {
     async fn get_csrf_query(
         &self,
         request: &GetCSRFRequest,
@@ -44,9 +43,5 @@ impl AuthAppInitialisation for AuthAppClient {
         request: &DeleteCSRFRequest,
     ) -> Result<(), ApplicationError> {
         self.delete_csrf_query.execute(request).await
-    }
-
-    fn oauth_token_uri(&self) -> &str {
-        &self.oauth_token_uri
     }
 }

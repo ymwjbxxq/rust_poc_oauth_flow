@@ -1,14 +1,11 @@
-use cookie::Cookie;
-use http::{HeaderMap, HeaderValue};
 use lambda_http::{run, service_fn, Error, IntoResponse, Request, RequestExt};
 use oauth_flow::dtos::oauth::login::get_user_request::GetUserRequest;
+use oauth_flow::queries::add_csrf_query::{AddCSRF, AddCSRFRequest};
 use oauth_flow::queries::get_user_query::GetUser;
 use oauth_flow::setup_tracing;
 use oauth_flow::utils::api_helper::{ApiResponseType, IsCors};
-use oauth_flow::utils::cookie::CookieExt;
 use oauth_flow::utils::injections::oauth::login::post_di::{PostAppClient, PostAppInitialisation};
 use serde_json::json;
-use std::collections::HashMap;
 
 #[tokio::main]
 async fn main() -> Result<(), Error> {
@@ -17,16 +14,23 @@ async fn main() -> Result<(), Error> {
     let config = aws_config::load_from_env().await;
     let dynamodb_client = aws_sdk_dynamodb::Client::new(&config);
 
-    let table_name = std::env::var("TABLE_NAME").expect("TABLE_NAME must be set");
-    let query = GetUser::builder()
+    let table_name = std::env::var("USER_TABLE_NAME").expect("USER_TABLE_NAME must be set");
+    let get_user_query = GetUser::builder()
         .table_name(table_name)
+        .client(dynamodb_client.clone())
+        .build();
+
+    let table_name = std::env::var("CSRF_TABLE_NAME").expect("CSRF_TABLE_NAME must be set");
+    let add_csrf_query = AddCSRF::builder()
+        .table_name(table_name.to_owned())
         .client(dynamodb_client)
         .build();
 
     let redirect_path =
         std::env::var("OAUTH_AUTHORIZE_PATH").expect("OAUTH_AUTHORIZE_PATH must be set");
     let app_client = PostAppClient::builder()
-        .query(query)
+        .get_user_query(get_user_query)
+        .add_csrf_query(add_csrf_query)
         .redirect_path(redirect_path)
         .build();
 
@@ -40,30 +44,25 @@ pub async fn handler(
     println!("{event:?}");
     let request = GetUserRequest::validate(&event);
     if let Some(request) = request {
-        let user = app_client.query(&request).await.ok().and_then(|user| user);
+        let user = app_client.get_user_query(&request).await.ok().and_then(|result| result);
         if let Some(user) = user {
-            let cookie = Cookie::to_cookie_string(
-                String::from("myOAuth"),
-                HashMap::from([
-                    (String::from("user"), user.user),
-                    (
-                        String::from("is_consent"),
-                        user.is_consent.to_string(),
-                    ),
-                    (String::from("is_optin"), user.is_optin.to_string()),
-                ]),
-            );
-            let mut headers = HeaderMap::new();
-            headers.insert(http::header::SET_COOKIE, HeaderValue::from_str(&cookie)?);
+            let result = app_client
+                .add_csrf_query(
+                    &AddCSRFRequest::builder()
+                        .client_id(request.client_id.to_owned())
+                        .sk(format!("code_challenge#{}", request.code_challenge))
+                        .data(Some(user.user))
+                        .build(),
+                )
+                .await;
+            if result.is_ok() {
+                let target = ApiResponseType::build_url_from_querystring(
+                    format!("https://{}{}", request.host, app_client.redirect_path(),),
+                    event.query_string_parameters(),
+                );
 
-            let target = ApiResponseType::build_url_from_querystring(
-                format!("https://{}{}", request.host, app_client.redirect_path()),
-                event.query_string_parameters(),
-            );
-
-            return Ok(
-                ApiResponseType::FoundWithCustomHeaders(target, IsCors::Yes, headers).to_response(),
-            );
+                return Ok(ApiResponseType::Found(target, IsCors::Yes).to_response());
+            }
         }
     }
 

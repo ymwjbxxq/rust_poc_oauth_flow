@@ -4,7 +4,7 @@ use aws_sdk_dynamodb::model::AttributeValue;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
-#[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
+#[derive(Clone, Default, Debug, Deserialize, PartialEq, Serialize)]
 pub struct User {
     pub user: String,
 

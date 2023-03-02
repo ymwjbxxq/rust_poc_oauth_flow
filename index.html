@@ -88,18 +88,37 @@
     $(function () {
       $("#login").click(function () {
         console.log($("#url").val());
-        window.location.href = $("#url").val();
-        return false;
-
+        $.ajax({
+          url: $("#url").val(),
+          type: "GET",
+          contentType: "application/json",
+          dataType: 'json',
+          success: function (data, textStatus, jqXHR) {
+            if (jqXHR.status === 200) {
+              console.log(jqXHR.responseJSON.url);
+              window.location.href = jqXHR.responseJSON.url;
+              return false;
+            } else {
+              $("#result").html(jqXHR.responseJSON);
+            }
+          },
+          error: function (jqXHR, textStatus, errorThrown) {
+            console.log(textStatus + ": " + jqXHR.status + " " + errorThrown);
+            $("#result").html(errorThrown);
+          }
+        });
       });
     });
   </script>
 </head>
 
 <body>
-  <label for="url"><b>Redirect to</b></label>
-  <input type="text" placeholder="Redirect to" id="url" required>
+  <div>creates a cryptographically-random code_verifier and from this generates a code_challenge</div>
+  <label for="url"><b>Set
+      https://[your-app-domain].execute-api.eu-central-1.amazonaws.com/{stage}/login?client_id=clientid1</b></label>
+  <input type="text" placeholder="Login" id="url" required>
   <button id="login">Login</button>
+  <div id="result"></div>
 </body>
 
 </html>
