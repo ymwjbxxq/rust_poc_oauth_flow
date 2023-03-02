@@ -138,6 +138,7 @@ Resources:
             - Effect: Allow
               Action: 
                 - dynamodb:GetItem
+                - dynamodb:DeleteItem
               Resource: !GetAtt CSRFTable.Arn
       Environment:
         Variables:

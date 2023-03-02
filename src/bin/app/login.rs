@@ -3,7 +3,7 @@ use lambda_http::{run, service_fn, Error, IntoResponse, Request};
 use oauth_flow::dtos::app::login::login_request::LoginRequest;
 use oauth_flow::queries::add_csrf_query::{AddCSRF, AddCSRFRequest};
 use oauth_flow::setup_tracing;
-use oauth_flow::utils::api_helper::{ApiResponseType, IsCors};
+use oauth_flow::utils::api_helper::{ApiResponseType, ContentType, IsCors};
 use oauth_flow::utils::crypto::CriptoHelper;
 use oauth_flow::utils::injections::app::login::login_di::{LoginAppClient, LoginAppInitialisation};
 use serde_json::json;
@@ -46,12 +46,7 @@ pub async fn handler(
     if let Some(request) = request {
         let state = Uuid::new_v5(
             &Uuid::NAMESPACE_OID,
-            format!(
-                "{}{}",
-                Uuid::new_v4(),
-                Utc::now().timestamp_millis()
-            )
-            .as_bytes(),
+            format!("{}{}", Uuid::new_v4(), Utc::now().timestamp_millis()).as_bytes(),
         )
         .to_string();
 
@@ -84,7 +79,12 @@ pub async fn handler(
                     ),
                 ]),
             );
-            return Ok(ApiResponseType::Found(target, IsCors::Yes).to_response());
+            return Ok(ApiResponseType::Ok(
+                json!({ "url": target }).to_string(),
+                ContentType::Json,
+                IsCors::Yes,
+            )
+            .to_response());
         }
     }
 

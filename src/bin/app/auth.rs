@@ -43,6 +43,7 @@ pub async fn handler(
 ) -> Result<impl IntoResponse, Error> {
     println!("{event:?}");
 
+    let mut messages: Vec<String> = Vec::new();
     let request = AuthRequest::validate(&event);
     if let Some(request) = request {
         let csrf_state = app_client
@@ -77,12 +78,18 @@ pub async fn handler(
                 );
 
                 return Ok(ApiResponseType::Found(target, IsCors::Yes).to_response());
+            } else {
+                messages.push("problem deleting csrf".to_string());
             }
+        } else {
+            messages.push("csrf not found".to_string());
         }
+    } else {
+        messages.push("Invalid request".to_string());
     }
 
     Ok(ApiResponseType::Forbidden(
-        json!({ "errors": ["Unauthorized"] }).to_string(),
+        json!({ "errors": messages }).to_string(),
         IsCors::Yes,
     )
     .to_response())
