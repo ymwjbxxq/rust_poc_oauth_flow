@@ -50,6 +50,24 @@ Resources:
           AttributeType: S
       BillingMode: PAY_PER_REQUEST
 
+  CSRFTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      KeySchema:
+        - AttributeName: client_id
+          KeyType: HASH
+        - AttributeName: sk
+          KeyType: RANGE
+      AttributeDefinitions:
+        - AttributeName: client_id
+          AttributeType: S
+        - AttributeName: sk
+          AttributeType: S
+      TimeToLiveSpecification:
+        AttributeName: ttl
+        Enabled: true
+      BillingMode: PAY_PER_REQUEST
+
 ##########################################################################
 #  OAUTH API                                                            #
 ##########################################################################
@@ -79,11 +97,18 @@ Resources:
       CodeUri: ../build//oauth-authorize
       Policies:
         - AWSLambdaBasicExecutionRole
+        - Version: "2012-10-17"
+          Statement:
+            - Effect: Allow
+              Action: 
+                - dynamodb:GetItem
+              Resource: !GetAtt CSRFTable.Arn
       Environment:
         Variables:
           OAUTH_AUTHORIZE_LOGIN_PATH: !Sub "/${StageName}/v2/login"
           OAUTH_CUSTOM_OPTIN_PATH: !Sub "/${StageName}/custom/optin"
           OAUTH_CUSTOM_CONSENT_PATH: !Sub "/${StageName}/custom/consent"
+          CSRF_TABLE_NAME: !Ref CSRFTable
       Events:
         Api:
           Type: Api
@@ -108,6 +133,15 @@ Resources:
       CodeUri: ../build//oauth-token
       Policies:
         - AWSLambdaBasicExecutionRole
+        - Version: "2012-10-17"
+          Statement:
+            - Effect: Allow
+              Action: 
+                - dynamodb:GetItem
+              Resource: !GetAtt CSRFTable.Arn
+      Environment:
+        Variables:
+          CSRF_TABLE_NAME: !Ref CSRFTable
       Events:
         Api:
           Type: Api
@@ -332,10 +366,15 @@ Resources:
               Action: 
                 - dynamodb:GetItem
               Resource: !GetAtt OAuthServiceTable.Arn
+            - Effect: Allow
+              Action:
+                - dynamodb:PutItem
+              Resource: !GetAtt CSRFTable.Arn
       Environment:
         Variables:
-          TABLE_NAME: !Ref OAuthServiceTable
+          USER_TABLE_NAME: !Ref OAuthServiceTable
           OAUTH_AUTHORIZE_PATH: !Sub "/${StageName}/authorize"
+          CSRF_TABLE_NAME: !Ref CSRFTable
       Events:
         Api:
           Type: Api

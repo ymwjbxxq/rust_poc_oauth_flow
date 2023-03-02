@@ -27,6 +27,26 @@ Globals:
 
 Resources:
 ##########################################################################
+#  DynamoDB table for login                                              #
+##########################################################################
+  CSRFTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      KeySchema:
+        - AttributeName: client_id
+          KeyType: HASH
+        - AttributeName: sk
+          KeyType: RANGE
+      AttributeDefinitions:
+        - AttributeName: client_id
+          AttributeType: S
+        - AttributeName: sk
+          AttributeType: S
+      TimeToLiveSpecification:
+        AttributeName: ttl
+        Enabled: true
+      BillingMode: PAY_PER_REQUEST
+##########################################################################
 #  LOGIN API                                                            #
 ##########################################################################
   LoginApi:
@@ -56,9 +76,16 @@ Resources:
       CodeUri: ../build/app-auth
       Policies:
         - AWSLambdaBasicExecutionRole
+        - Version: "2012-10-17"
+          Statement:
+            - Effect: Allow
+              Action: 
+                - dynamodb:GetItem
+              Resource: !GetAtt CSRFTable.Arn
       Environment:
         Variables:
-           OAUTH_TOKEN_URL: !Sub ['${domain}token', domain: !ImportValue oauth-AuthUrl]
+          OAUTH_TOKEN_URL: !Sub ['${domain}token', domain: !ImportValue oauth-AuthUrl]
+          CSRF_TABLE_NAME: !Ref CSRFTable
       Events:
         Api:
           Type: Api
@@ -83,10 +110,17 @@ Resources:
       CodeUri: ../build/app-login
       Policies:
         - AWSLambdaBasicExecutionRole
+        - Version: "2012-10-17"
+          Statement:
+            - Effect: Allow
+              Action: 
+                - dynamodb:PutItem
+              Resource: !GetAtt CSRFTable.Arn
       Environment:
         Variables:
           REDIRECT_PATH: !Sub "/${StageName}/auth"
           OAUTH_AUTHORIZE_URL: !Sub ['${domain}authorize', domain: !ImportValue oauth-AuthUrl]
+          CSRF_TABLE_NAME: !Ref CSRFTable
       Events:
         Api:
           Type: Api

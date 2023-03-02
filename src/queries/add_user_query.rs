@@ -44,7 +44,7 @@ impl AddQuery for AddUser {
                 AttributeValue::S(request.given_name.to_owned()),
             )
             .item(
-                "given_name",
+                "is_consent",
                 AttributeValue::Bool(request.is_consent.unwrap_or_default()),
             )
             .item(
