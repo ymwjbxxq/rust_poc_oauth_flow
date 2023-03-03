@@ -36,18 +36,54 @@ To reduce the exposure in clear of sensitive data, you can combine AWS CloudFron
 * Encrypt at the edge
 * Pass it through before the application can process it, reducing exposure.
 
-You can find more details [here](https://github.com/ymwjbxxq/protect-sensitive-data-with-aws-lambda-edge)
+Lambda edge will load the client config and from there take SSM key to load RSA public key to encrypt sensitive data
 
-### What I have Learnt ###
+Example:
+```
+// -----BEGIN PUBLIC KEY-----
+// MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEApl23EO002XmcyJ+ztbgS
+// rhsR8IyPhfu+V9V84jleUSEaVBYRPhp5UNmKOgvmWKe1fLqZ3M/bjMehvUd72oLF
+// CIDPWMfmrU51+1CijNLWp8/VnbO0p6kbhybbH2uuJLiBXCYiT6pjNbgef9n9ABkq
+// TbuCdpdU5m8eJd0le+8KKEWTYVbqvGxIVcLd4uVtyJRvPVe2oIddcotqK4wdEajg
+// U68M9ruJ4Ilr88aUczVcRxP253rI9Haza4PwcNsomHLCSJ1ymReA8sevbA7tzWPw
+// lYMwAO2NAnIOmqrUwkoT94lCbuTcaB2D0/Z0LQY7BsVPbMYh5xFm3hI3FjX+cmCu
+// ewIDAQAB
+// -----END PUBLIC KEY-----
 
-* [Error handling](https://www.sheshbabu.com/posts/rust-error-handling/)
-* [Safe JSON representations with Rust](https://n14n.dev/articles/2021/safe-json-representations-with-rust/)
-* [Implementing a Trait on a Type](https://doc.rust-lang.org/book/ch10-02-traits.html#implementing-a-trait-on-a-type)
-* ["Type-Driven API Design in Rust" by Will Crichton](https://www.youtube.com/watch?v=bnnacleqg6k)
+
+// -----BEGIN RSA PRIVATE KEY-----
+// MIIEowIBAAKCAQEApl23EO002XmcyJ+ztbgSrhsR8IyPhfu+V9V84jleUSEaVBYR
+// Php5UNmKOgvmWKe1fLqZ3M/bjMehvUd72oLFCIDPWMfmrU51+1CijNLWp8/VnbO0
+// p6kbhybbH2uuJLiBXCYiT6pjNbgef9n9ABkqTbuCdpdU5m8eJd0le+8KKEWTYVbq
+// vGxIVcLd4uVtyJRvPVe2oIddcotqK4wdEajgU68M9ruJ4Ilr88aUczVcRxP253rI
+// 9Haza4PwcNsomHLCSJ1ymReA8sevbA7tzWPwlYMwAO2NAnIOmqrUwkoT94lCbuTc
+// aB2D0/Z0LQY7BsVPbMYh5xFm3hI3FjX+cmCuewIDAQABAoIBAGrlgIFxySmLyL/o
+// TdKPigExB5/m0Tmn/i/1zx6U+hNrD73DyCR9YkIe5YBSsRl5+VVBmSeWr12P0E8M
+// pXpL2EqUaaaEG6Zz6b8nmqqdtqtxEbMZCxVHxZZb0yQnTmft3cDWB+nkc4bK3V4N
+// NVFg2hvERhnpNvYxo890f2dYutAQioTssdNDo628QKrZBjz+CqWEkjp0F5LAska5
+// rhRX25x5R0ih7CMrTLZt+Dzk2JbhRPVAlkj3d8a7amLjWoRyN2CD90tQOCzbNiZD
+// UzvlV4s3idVAiaSClZwrkvL6uiC7qnSwRXCjJlMOeFdJy9JRMiAtX9L63OTQ+onC
+// Z3VGTLECgYEA38A9lioJ3v0op9S0sdoq83cig4VWIVkDDDV/ofQH/xZB6D/tY9PS
+// n80yQhi7tc+dae0AZYVoh4ifVsw0FfcwtoUDPL9cYi0GInhnAlTn7UuppWI2pOlG
+// 2XazBFB26BNskvCYsKbsMiS+E5BoQHecmZOcBv251w4XZv2WVhBSLX0CgYEAvlgj
+// yD/RguhIB0x+OgQmZPSGWQ8qXW7+e109RMQ59RGTsBCQq38FUZGrIJIbRBSmlybr
+// r3PJXHiSFbt52KWIivN5k+bjuJKYpJEpfDlRG8Kp3HFZLrWTd5U00cdZxd8LDFvc
+// INrhWI2GGVn8qdZdrszTlZPpS8AW1I3Nhl15bVcCgYEAxEYtgBlWWV53mGmVLGJ1
+// xOZfx0FioZQkgUQ4tseLcC+FFwdk5Wn93CIzERoDJ2R88FtvOp8BZ8roA0rT8eTJ
+// vYIGqfYvQwu90uUNb1UtsdHqeeIijxz3AnIGbSVseP35Axi8yFFU5lOmzSCi4tJJ
+// 88oxV0yhBc4dp0GR6+MbQz0CgYBFUCFPlXW8vssj5UX96G72ylh16+DYf0eqMqzR
+// 8sbMKCdosM+Ns8aDCpGPXcUSCJcVabXfgUFtK/a+dTOModLUDo9SPXzlRHTTUI0T
+// 0GdpvXxPavM34CUgIbRHQ9m8BVmnmXfSewIeVgLkDnHEguxAcBQIXwFQdVWa9zxF
+// VpqWJwKBgDSnlhgBDzM7E3rqfJLtxFd8/QX6k6ZhtNabO25MyBgwblBmHq2EIOrt
+// jvwjJz2q+EpWR2iptUpJaqNTYJP4e8J+8nSotuVC1A022SBnWZvm+V2sEiCNc5+f
+// ytszGwriSCNPW7m2PVhgC74NS9u+MOOqpRn9qSb4b3Zdm9kEhVng
+// -----END RSA PRIVATE KEY-----
+```
 
 ### MANUAL TEST WITH POSTMAN: ###
 1. Upload the files to simulate a website
-2. Register a user at - https://[your-oauth-domain]/{stage}/v2/signup?client_id=clientid1
+2. Upload the RSA public and private key into SSM
+3. Register a user at - https://[your-oauth-domain]/{stage}/v2/signup?client_id=clientid1
 
 Open PostMan:
 
@@ -63,12 +99,13 @@ Open PostMan:
 ### TEST FROM THE BROWSER: ###
 
 1. Upload the files to simulate a website
-2. Register a user at - https://[your-oauth-domain]/{stage}/v2/signup?client_id=clientid1
-3. Open the page index.html
-4. Insert https://[your-app-domain].execute-api.eu-central-1.amazonaws.com/{stage}/login?client_id=clientid1
-5. Click login
-6. Enter the data from point 2
-7 Now with the token we can call our protected API - eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJiQGIuY29tIiwiY29tcGFueSI6IkFDTUUiLCJleHAiOjEwMDAwMDAwMDAwfQ.TXdR1GMY_5nqQLDTk3uSZlRjt7JeVdK8HUuTRo44-OU
+2. Upload the RSA public and private key into SSM
+3. Register a user at - https://[your-oauth-domain]/{stage}/v2/signup?client_id=clientid1
+4. Open the page index.html
+5. Insert https://[your-app-domain].execute-api.eu-central-1.amazonaws.com/{stage}/login?client_id=clientid1
+6. Click login
+7. Enter the data from point 2
+8 Now with the token we can call our protected API - eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJiQGIuY29tIiwiY29tcGFueSI6IkFDTUUiLCJleHAiOjEwMDAwMDAwMDAwfQ.TXdR1GMY_5nqQLDTk3uSZlRjt7JeVdK8HUuTRo44-OU
 
 ### LOAD TEST WITH POSTMAN: ###
 

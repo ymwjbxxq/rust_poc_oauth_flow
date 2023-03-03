@@ -1,0 +1,11 @@
+{
+  "PII_fields": [
+    "email",
+    "family_name",
+    "given_name",
+    "password"
+  ],
+  "public_key": "ssm:/clientid1/public_key",
+  "private_key": "ssm:/clientid1/private_key"
+}
+

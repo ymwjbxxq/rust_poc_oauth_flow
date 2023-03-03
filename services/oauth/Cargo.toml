@@ -1,0 +1,67 @@
+[package]
+name = "oauth"
+version.workspace = true
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+cookie.workspace = true
+futures.workspace = true
+http.workspace = true
+aws_lambda_events.workspace = true
+lambda_http.workspace = true
+lambda_runtime.workspace = true
+aws-sdk-dynamodb.workspace = true
+aws-sdk-s3.workspace = true
+aws-types.workspace = true
+aws-config.workspace = true
+log.workspace = true
+rand.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+serde_qs.workspace = true
+sha2.workspace = true
+tracing-subscriber.workspace = true
+tokio.workspace = true
+uuid.workspace = true
+async-trait.workspace = true
+base64-url.workspace = true
+base64.workspace = true
+jsonwebtoken.workspace = true
+serde_urlencoded.workspace = true
+crypto.workspace = true
+rsa.workspace = true
+typed-builder.workspace = true
+chrono.workspace = true
+
+# OAUTH POST
+[[bin]]
+name = "oauth-consent-post"
+path = "src/bin/consent/post.rs"
+
+[[bin]]
+name = "oauth-optin-post"
+path = "src/bin/optin/post.rs"
+
+[[bin]]
+name = "oauth-login-post"
+path = "src/bin/login/post.rs"
+
+[[bin]]
+name = "oauth-signup-post"
+path = "src/bin/signup/post.rs"
+
+#OAUTH GET
+[[bin]]
+name = "oauth-get-page"
+path = "src/bin/get_page.rs"
+
+#OAUTH GENERAL
+[[bin]]
+name = "oauth-authorize"
+path = "src/bin/authorize.rs"
+
+[[bin]]
+name = "oauth-token"
+path = "src/bin/token.rs"
