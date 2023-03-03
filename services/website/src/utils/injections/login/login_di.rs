@@ -1,7 +1,7 @@
+use crate::queries::add_csrf_query::{AddCSRF, AddCSRFQuery, AddCSRFRequest};
 use async_trait::async_trait;
+use shared::error::ApplicationError;
 use typed_builder::TypedBuilder as Builder;
-
-use crate::{queries::add_csrf_query::{AddCSRF, AddCSRFRequest, AddCSRFQuery}, error::ApplicationError};
 
 #[async_trait]
 pub trait LoginAppInitialisation: Send + Sync {

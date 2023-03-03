@@ -1,8 +1,8 @@
-use crate::error::ApplicationError;
 use crate::models::csrf::CSRF;
 use async_trait::async_trait;
 use aws_sdk_dynamodb::model::AttributeValue;
 use aws_sdk_dynamodb::Client;
+use shared::error::ApplicationError;
 use typed_builder::TypedBuilder as Builder;
 
 #[derive(Debug, Default, Builder)]
@@ -39,10 +39,7 @@ impl GetCSRFQuery for GetCSRF {
                 "client_id",
                 AttributeValue::S(request.client_id.to_lowercase()),
             )
-            .key(
-                "sk",
-                AttributeValue::S(request.sk.to_owned()),
-            )
+            .key("sk", AttributeValue::S(request.sk.to_owned()))
             .projection_expression("client_id, #data, sk")
             .expression_attribute_names("#data", "data")
             .send()

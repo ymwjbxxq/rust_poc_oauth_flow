@@ -1,7 +1,6 @@
-use crate::error::ApplicationError;
-use crate::utils::dynamodb::AttributeValuesExt;
 use aws_sdk_dynamodb::model::AttributeValue;
 use serde::{Deserialize, Serialize};
+use shared::{error::ApplicationError, utils::dynamodb::AttributeValuesExt};
 use std::collections::HashMap;
 
 #[derive(Clone, Default, Debug, Deserialize, PartialEq, Serialize)]

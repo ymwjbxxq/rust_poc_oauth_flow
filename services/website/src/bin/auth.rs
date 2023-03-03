@@ -1,12 +1,12 @@
 use lambda_http::{run, service_fn, Error, IntoResponse, Request};
+use serde_json::json;
+use shared::utils::api_helper::{ApiResponseType, IsCors};
+use std::collections::HashMap;
 use website::dtos::auth::auth_request::AuthRequest;
 use website::queries::delete_csrf_query::{DeleteCSRF, DeleteCSRFRequest};
 use website::queries::get_csrf_query::{GetCSRF, GetCSRFRequest};
 use website::setup_tracing;
-use website::utils::api_helper::{ApiResponseType, IsCors};
 use website::utils::injections::auth::auth_di::{AuthAppClient, AuthAppInitialisation};
-use serde_json::json;
-use std::collections::HashMap;
 
 #[tokio::main]
 async fn main() -> Result<(), Error> {
@@ -88,9 +88,8 @@ pub async fn handler(
         messages.push("Invalid request".to_string());
     }
 
-    Ok(ApiResponseType::Forbidden(
-        json!({ "errors": messages }).to_string(),
-        IsCors::Yes,
+    Ok(
+        ApiResponseType::Forbidden(json!({ "errors": messages }).to_string(), IsCors::Yes)
+            .to_response(),
     )
-    .to_response())
 }

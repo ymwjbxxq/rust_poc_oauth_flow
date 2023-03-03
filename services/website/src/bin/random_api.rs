@@ -1,9 +1,7 @@
 use lambda_http::{run, service_fn, Error, IntoResponse, Request};
-use website::{
-    setup_tracing,
-    utils::api_helper::{ApiResponseType, ContentType, IsCors},
-};
 use serde_json::json;
+use shared::utils::api_helper::{ApiResponseType, ContentType, IsCors};
+use website::setup_tracing;
 
 #[tokio::main]
 async fn main() -> Result<(), Error> {

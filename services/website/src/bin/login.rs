@@ -1,14 +1,14 @@
 use chrono::Utc;
 use lambda_http::{run, service_fn, Error, IntoResponse, Request};
+use serde_json::json;
+use shared::utils::api_helper::{ApiResponseType, ContentType, IsCors};
+use shared::utils::crypto::CriptoHelper;
+use std::collections::HashMap;
+use uuid::Uuid;
 use website::dtos::login::login_request::LoginRequest;
 use website::queries::add_csrf_query::{AddCSRF, AddCSRFRequest};
 use website::setup_tracing;
-use website::utils::api_helper::{ApiResponseType, ContentType, IsCors};
-use website::utils::crypto::CriptoHelper;
 use website::utils::injections::login::login_di::{LoginAppClient, LoginAppInitialisation};
-use serde_json::json;
-use std::collections::HashMap;
-use uuid::Uuid;
 
 #[tokio::main]
 async fn main() -> Result<(), Error> {

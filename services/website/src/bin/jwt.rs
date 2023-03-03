@@ -2,10 +2,11 @@ use aws_lambda_events::apigw::{
     ApiGatewayCustomAuthorizerRequestTypeRequest, ApiGatewayCustomAuthorizerResponse,
 };
 use lambda_runtime::{run, service_fn, Error, LambdaEvent};
+use shared::utils::jwt::Jwt;
 use website::{
     dtos::jwt::jwt_request::JwtRequest,
     setup_tracing,
-    utils::{injections::jwt::jwt_di::{JwtApiInitialisation, JwtApiClient}, jwt::Jwt},
+    utils::injections::jwt::jwt_di::{JwtApiClient, JwtApiInitialisation},
 };
 
 #[tokio::main]

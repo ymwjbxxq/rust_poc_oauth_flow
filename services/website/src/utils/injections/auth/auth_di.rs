@@ -1,7 +1,13 @@
+use crate::{
+    models::csrf::CSRF,
+    queries::{
+        delete_csrf_query::{DeleteCSRF, DeleteCSRFQuery, DeleteCSRFRequest},
+        get_csrf_query::{GetCSRF, GetCSRFQuery, GetCSRFRequest},
+    },
+};
 use async_trait::async_trait;
+use shared::error::ApplicationError;
 use typed_builder::TypedBuilder as Builder;
-
-use crate::{error::ApplicationError, models::csrf::CSRF, queries::{get_csrf_query::{GetCSRFRequest, GetCSRF, GetCSRFQuery}, delete_csrf_query::{DeleteCSRF, DeleteCSRFRequest, DeleteCSRFQuery}}};
 
 #[async_trait]
 pub trait AuthAppInitialisation: Send + Sync {
@@ -12,10 +18,7 @@ pub trait AuthAppInitialisation: Send + Sync {
         request: &GetCSRFRequest,
     ) -> Result<Option<CSRF>, ApplicationError>;
 
-    async fn delete_csrf_query(
-        &self,
-        request: &DeleteCSRFRequest,
-    ) -> Result<(), ApplicationError>;
+    async fn delete_csrf_query(&self, request: &DeleteCSRFRequest) -> Result<(), ApplicationError>;
 }
 
 #[derive(Debug, Builder)]
@@ -39,10 +42,7 @@ impl AuthAppInitialisation for AuthAppClient {
         self.get_csrf_query.execute(request).await
     }
 
-    async fn delete_csrf_query(
-        &self,
-        request: &DeleteCSRFRequest,
-    ) -> Result<(), ApplicationError> {
+    async fn delete_csrf_query(&self, request: &DeleteCSRFRequest) -> Result<(), ApplicationError> {
         self.delete_csrf_query.execute(request).await
     }
 

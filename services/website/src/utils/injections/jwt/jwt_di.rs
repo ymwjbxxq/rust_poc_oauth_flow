@@ -1,16 +1,15 @@
 use async_trait::async_trait;
 use aws_lambda_events::apigw::ApiGatewayCustomAuthorizerResponse;
-use typed_builder::TypedBuilder as Builder;
-
-use crate::{
+use shared::{
     error::ApplicationError,
     utils::jwt::{Claims, Jwt},
 };
+use typed_builder::TypedBuilder as Builder;
 
 #[async_trait]
 pub trait JwtApiInitialisation: Send + Sync {
     async fn validate_token(&self, raw_token: &str) -> Result<Option<Claims>, ApplicationError>;
-    
+
     fn to_response(
         &self,
         effect: String,
