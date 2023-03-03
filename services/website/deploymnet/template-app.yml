@@ -73,7 +73,7 @@ Resources:
   AppAuthFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: ../build/app-auth
+      CodeUri: ../../build/app-auth
       Policies:
         - AWSLambdaBasicExecutionRole
         - Version: "2012-10-17"
@@ -108,7 +108,7 @@ Resources:
   AppLoginFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: ../build/app-login
+      CodeUri: ../../build/app-login
       Policies:
         - AWSLambdaBasicExecutionRole
         - Version: "2012-10-17"
