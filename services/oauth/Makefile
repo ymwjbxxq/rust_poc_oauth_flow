@@ -21,7 +21,7 @@ build-%:
 	cp -v ../target/$(ARCH)/release/$* ../build/$*/bootstrap
 
 deploy:
-	sam deploy --no-fail-on-empty-changeset --no-confirm-changeset --profile test --region eu-central-1 --stack-name oauth --template-file ./resources/template-oauth.yml
+	sam deploy --no-fail-on-empty-changeset --no-confirm-changeset --profile test --region eu-central-1 --stack-name oauth --template-file ./deployment/template-oauth.yml
 
 delete:
 	sam delete --profile test --stack-name oauth
