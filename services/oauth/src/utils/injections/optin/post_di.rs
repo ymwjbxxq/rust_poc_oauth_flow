@@ -1,8 +1,9 @@
 use crate::{
-    error::ApplicationError,
-    queries::update_optin_query::{UpdateOptIn, UpdateOptInQuery}, dtos::optin::update_optin_request::UpdateOptInRequest,
+    dtos::optin::update_optin_request::UpdateOptInRequest,
+    queries::update_optin_query::{UpdateOptIn, UpdateOptInQuery},
 };
 use async_trait::async_trait;
+use shared::error::ApplicationError;
 use typed_builder::TypedBuilder as Builder;
 
 #[async_trait]

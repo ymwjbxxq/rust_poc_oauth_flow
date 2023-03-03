@@ -1,13 +1,11 @@
-use cookie::Cookie;
 use http::{HeaderMap, HeaderValue};
 use lambda_http::{run, service_fn, Error, IntoResponse, Request, RequestExt};
 use oauth::dtos::optin::update_optin_request::UpdateOptInRequest;
 use oauth::queries::update_optin_query::UpdateOptIn;
 use oauth::setup_tracing;
-use oauth::utils::api_helper::{ApiResponseType, IsCors};
-use oauth::utils::cookie::CookieExt;
 use oauth::utils::injections::optin::post_di::{PostAppClient, PostAppInitialisation};
 use serde_json::json;
+use shared::utils::api_helper::{ApiResponseType, IsCors};
 use std::collections::HashMap;
 
 #[tokio::main]
@@ -43,22 +41,22 @@ pub async fn handler(
     if let Some(request) = request {
         let is_opted_in = app_client.query(&request).await.is_ok();
         if is_opted_in {
-            let cookie = Cookie::to_cookie_string(
-                String::from("myOAuth"),
-                HashMap::from([
-                    (String::from("user"), request.user.to_owned()),
-                    (String::from("is_consent"), request.is_consent),
-                    (String::from("is_optin"), "true".to_owned()),
-                ]),
-            );
-            let mut headers = HeaderMap::new();
-            headers.insert(http::header::SET_COOKIE, HeaderValue::from_str(&cookie)?);
-            let target = ApiResponseType::build_url_from_querystring(
-               format!("https://{}{}", request.host, app_client.redirect_path()),
-                event.query_string_parameters(),
-            );
+            // let cookie = Cookie::to_cookie_string(
+            //     String::from("myOAuth"),
+            //     HashMap::from([
+            //         (String::from("user"), request.user.to_owned()),
+            //         (String::from("is_consent"), request.is_consent),
+            //         (String::from("is_optin"), "true".to_owned()),
+            //     ]),
+            // );
+            // let mut headers = HeaderMap::new();
+            // headers.insert(http::header::SET_COOKIE, HeaderValue::from_str(&cookie)?);
+            // let target = ApiResponseType::build_url_from_querystring(
+            //    format!("https://{}{}", request.host, app_client.redirect_path()),
+            //     event.query_string_parameters(),
+            // );
 
-            return Ok(ApiResponseType::FoundWithCustomHeaders(target, IsCors::Yes, headers).to_response())
+            // return Ok(ApiResponseType::FoundWithCustomHeaders(target, IsCors::Yes, headers).to_response())
         }
     }
 

@@ -1,8 +1,8 @@
 use crate::dtos::signup::singup_request::SignUpRequest;
-use crate::error::ApplicationError;
 use async_trait::async_trait;
-use aws_sdk_dynamodb::Client;
 use aws_sdk_dynamodb::model::AttributeValue;
+use aws_sdk_dynamodb::Client;
+use shared::error::ApplicationError;
 use typed_builder::TypedBuilder as Builder;
 
 #[derive(Debug, Builder)]
@@ -33,7 +33,11 @@ impl AddQuery for AddUser {
             )
             .item(
                 "user",
-                AttributeValue::S(format!("{}#{}", request.email.to_lowercase(), request.password.to_lowercase())),
+                AttributeValue::S(format!(
+                    "{}#{}",
+                    request.email.to_lowercase(),
+                    request.password.to_lowercase()
+                )),
             )
             .item(
                 "family_name",

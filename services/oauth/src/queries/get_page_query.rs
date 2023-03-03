@@ -1,7 +1,8 @@
-use crate::{error::ApplicationError, dtos::load_page::page_request::PageRequest};
+use crate::dtos::load_page::page_request::PageRequest;
 use async_trait::async_trait;
 use aws_sdk_s3::Client;
 use serde::{Deserialize, Serialize};
+use shared::error::ApplicationError;
 use typed_builder::TypedBuilder as Builder;
 
 #[async_trait]

@@ -1,10 +1,9 @@
 use crate::dtos::consent::update_consent_request::UpdateConsentRequest;
-use crate::error::ApplicationError;
 use async_trait::async_trait;
 use aws_sdk_dynamodb::model::AttributeValue;
 use aws_sdk_dynamodb::Client;
+use shared::error::ApplicationError;
 use typed_builder::TypedBuilder as Builder;
-
 
 #[async_trait]
 pub trait UpdateConsentQuery {
@@ -27,7 +26,10 @@ impl UpdateConsentQuery for UpdateConsent {
         self.client
             .update_item()
             .table_name(self.table_name.to_owned())
-            .key("client_id",AttributeValue::S(request.client_id.to_lowercase()))
+            .key(
+                "client_id",
+                AttributeValue::S(request.client_id.to_lowercase()),
+            )
             .key("user", AttributeValue::S(request.user.to_lowercase()))
             .update_expression("set is_consent = :is_consent")
             .expression_attribute_values(":is_consent", AttributeValue::Bool(true))

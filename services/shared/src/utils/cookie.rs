@@ -1,15 +1,14 @@
-use crate::error::ApplicationError;
-use crate::utils::serde_helper::SerdeExt;
-use cookie::Cookie;
 use http::{HeaderMap, HeaderValue};
 use serde_json::{Map, Value};
 use std::collections::HashMap;
+use crate::error::ApplicationError;
+use cookie::Cookie;
+use super::serde_helper::SerdeExt;
 
 pub trait CookieExt {
     fn to_map(parsed_cookie: String) -> HashMap<String, String>;
     fn to_cookie_string(cookie_name: String, cookie: HashMap<String, String>) -> String;
 }
-
 impl CookieExt for Cookie<'_> {
     fn to_map(parsed_cookie: String) -> HashMap<String, String> {
         let cookie = Cookie::parse(parsed_cookie).unwrap();
@@ -19,10 +18,8 @@ impl CookieExt for Cookie<'_> {
         for (key, value) in serde_dic.into_iter() {
             cookie_dic.insert(key.to_owned(), value.value_to_string());
         }
-
         cookie_dic
     }
-
     fn to_cookie_string(cookie_name: String, cookie_hash_map: HashMap<String, String>) -> String {
         let cookie = Cookie::build(
             cookie_name,
@@ -32,13 +29,10 @@ impl CookieExt for Cookie<'_> {
         .secure(true)
         .http_only(true)
         .finish();
-
         cookie.to_string()
     }
 }
-
 pub struct CookieHelper;
-
 impl CookieHelper {
     pub fn from_http_header(
         headers: &HeaderMap<HeaderValue>,
@@ -51,7 +45,6 @@ impl CookieHelper {
                 ))
             }
         };
-
         if let Ok(cookie) = cookie_header.to_str() {
             Ok(Cookie::to_map(cookie.to_string()))
         } else {

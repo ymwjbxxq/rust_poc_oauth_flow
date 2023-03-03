@@ -2,9 +2,9 @@ use lambda_http::{run, service_fn, Error, IntoResponse, Request};
 use oauth::dtos::signup::singup_request::SignUpRequest;
 use oauth::queries::add_user_query::AddUser;
 use oauth::setup_tracing;
-use oauth::utils::api_helper::{ApiResponseType, IsCors};
 use oauth::utils::injections::signup::post_di::{PostAppClient, PostAppInitialisation};
 use serde_json::json;
+use shared::utils::api_helper::{ApiResponseType, IsCors};
 
 #[tokio::main]
 async fn main() -> Result<(), Error> {

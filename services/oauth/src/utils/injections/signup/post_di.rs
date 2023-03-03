@@ -1,8 +1,9 @@
 use crate::{
-    error::ApplicationError,
-    queries::add_user_query::{AddQuery, AddUser}, dtos::signup::singup_request::SignUpRequest,
+    dtos::signup::singup_request::SignUpRequest,
+    queries::add_user_query::{AddQuery, AddUser},
 };
 use async_trait::async_trait;
+use shared::error::ApplicationError;
 use typed_builder::TypedBuilder as Builder;
 
 #[async_trait]

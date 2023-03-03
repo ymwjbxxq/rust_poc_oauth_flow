@@ -1,6 +1,6 @@
 use lambda_http::{Body, RequestExt};
-use typed_builder::TypedBuilder as Builder;
 use serde::{Deserialize, Serialize};
+use typed_builder::TypedBuilder as Builder;
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct LoginRequest {
@@ -36,7 +36,9 @@ impl GetUserRequest {
             let code_challenge = query_params.first("code_challenge");
             let host = event.headers().get("Host");
 
-            if let (Some(client_id), Some(host), Some(code_challenge)) = (client_id, host, code_challenge) {
+            if let (Some(client_id), Some(host), Some(code_challenge)) =
+                (client_id, host, code_challenge)
+            {
                 return Some(
                     Self::builder()
                         .email(user.email)

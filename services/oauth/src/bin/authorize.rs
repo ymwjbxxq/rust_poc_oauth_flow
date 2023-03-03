@@ -2,10 +2,9 @@ use lambda_http::{run, service_fn, Error, IntoResponse, Request, RequestExt};
 use oauth::queries::get_csrf_query::GetCSRF;
 use oauth::queries::get_csrf_query::GetCSRFRequest;
 use oauth::setup_tracing;
-use oauth::utils::api_helper::ApiResponseType;
-use oauth::utils::api_helper::IsCors;
 use oauth::utils::injections::authorize::authorize_di::AuthorizeAppClient;
 use oauth::utils::injections::authorize::authorize_di::AuthorizeAppInitialisation;
+use shared::utils::api_helper::{ApiResponseType, IsCors};
 use std::collections::HashMap;
 use uuid::Uuid;
 

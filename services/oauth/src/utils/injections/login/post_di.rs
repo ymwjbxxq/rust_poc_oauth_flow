@@ -1,6 +1,5 @@
 use crate::{
     dtos::login::get_user_request::GetUserRequest,
-    error::ApplicationError,
     models::user::User,
     queries::{
         add_csrf_query::{AddCSRF, AddCSRFQuery, AddCSRFRequest},
@@ -8,6 +7,7 @@ use crate::{
     },
 };
 use async_trait::async_trait;
+use shared::error::ApplicationError;
 use typed_builder::TypedBuilder as Builder;
 
 #[async_trait]

@@ -1,8 +1,9 @@
 use crate::{
-    error::ApplicationError,
-    queries::get_page_query::{Page, PageQuery}, dtos::load_page::page_request::PageRequest,
+    dtos::load_page::page_request::PageRequest,
+    queries::get_page_query::{Page, PageQuery},
 };
 use async_trait::async_trait;
+use shared::error::ApplicationError;
 use typed_builder::TypedBuilder as Builder;
 
 #[async_trait]

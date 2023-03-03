@@ -3,13 +3,11 @@ use lambda_http::{run, service_fn, Error, IntoResponse, Request};
 use oauth::dtos::token::toekn_request::TokenRequest;
 use oauth::queries::delete_csrf_query::{DeleteCSRF, DeleteCSRFRequest};
 use oauth::queries::get_csrf_query::{GetCSRF, GetCSRFRequest};
-use oauth::utils::api_helper::{ContentType, IsCors};
-use oauth::utils::injections::token::token_di::{
-    ToeknAppClient, ToeknAppInitialisation,
-};
-use oauth::utils::jwt::{Claims, Jwt};
-use oauth::{setup_tracing, utils::api_helper::ApiResponseType};
+use oauth::setup_tracing;
+use oauth::utils::injections::token::token_di::{ToeknAppClient, ToeknAppInitialisation};
 use serde_json::json;
+use shared::utils::api_helper::{ApiResponseType, ContentType, IsCors};
+use shared::utils::jwt::{Claims, Jwt};
 
 #[tokio::main]
 async fn main() -> Result<(), Error> {
@@ -95,7 +93,7 @@ pub async fn handler(
                     messages.push("problem creating token".to_string());
                 }
             } else {
-                 messages.push("problem deleting csrf".to_string());
+                messages.push("problem deleting csrf".to_string());
             }
         } else {
             messages.push("csrf not found".to_string());
@@ -105,9 +103,8 @@ pub async fn handler(
     }
 
     println!("token Unauthorized");
-    Ok(ApiResponseType::Forbidden(
-        json!({ "errors": messages }).to_string(),
-        IsCors::Yes,
+    Ok(
+        ApiResponseType::Forbidden(json!({ "errors": messages }).to_string(), IsCors::Yes)
+            .to_response(),
     )
-    .to_response())
 }

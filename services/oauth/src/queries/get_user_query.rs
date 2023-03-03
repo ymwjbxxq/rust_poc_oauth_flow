@@ -1,9 +1,9 @@
 use crate::dtos::login::get_user_request::GetUserRequest;
-use crate::error::ApplicationError;
 use crate::models::user::User;
 use async_trait::async_trait;
 use aws_sdk_dynamodb::model::AttributeValue;
 use aws_sdk_dynamodb::Client;
+use shared::error::ApplicationError;
 use typed_builder::TypedBuilder as Builder;
 
 #[derive(Debug, Builder)]

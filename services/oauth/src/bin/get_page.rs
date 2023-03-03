@@ -2,12 +2,12 @@ use lambda_http::{run, service_fn, Error, IntoResponse, Request};
 use oauth::dtos::load_page::page_request::PageRequest;
 use oauth::queries::get_page_query::Page;
 use oauth::setup_tracing;
-use oauth::utils::api_helper::{ApiResponseType, ContentType, IsCors};
-use oauth::utils::crypto::CriptoHelper;
-use oauth::utils::injections::get_page_di::{
-    GetPageAppClient, GetPageAppInitialisation,
-};
+use oauth::utils::injections::get_page_di::{GetPageAppClient, GetPageAppInitialisation};
 use serde_json::json;
+use shared::utils::{
+    api_helper::{ApiResponseType, ContentType, IsCors},
+    crypto::CriptoHelper,
+};
 
 #[tokio::main]
 async fn main() -> Result<(), Error> {
@@ -37,11 +37,7 @@ pub async fn handler(
 
     let request = PageRequest::validate(&event);
     if let Some(request) = request {
-        let page = app_client
-            .query(&request)
-            .await
-            .ok()
-            .and_then(|page| page);
+        let page = app_client.query(&request).await.ok().and_then(|page| page);
 
         if let Some(page) = page {
             let url = format!(

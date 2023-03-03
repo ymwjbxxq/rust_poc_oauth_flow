@@ -1,11 +1,10 @@
-use async_trait::async_trait;
-use typed_builder::TypedBuilder as Builder;
-
 use crate::{
-    error::ApplicationError,
     models::csrf::CSRF,
     queries::get_csrf_query::{GetCSRF, GetCSRFQuery, GetCSRFRequest},
 };
+use async_trait::async_trait;
+use shared::error::ApplicationError;
+use typed_builder::TypedBuilder as Builder;
 
 #[async_trait]
 pub trait AuthorizeAppInitialisation: Send + Sync {

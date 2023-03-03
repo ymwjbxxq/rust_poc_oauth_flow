@@ -3,9 +3,9 @@ use oauth::dtos::login::get_user_request::GetUserRequest;
 use oauth::queries::add_csrf_query::{AddCSRF, AddCSRFRequest};
 use oauth::queries::get_user_query::GetUser;
 use oauth::setup_tracing;
-use oauth::utils::api_helper::{ApiResponseType, IsCors};
 use oauth::utils::injections::login::post_di::{PostAppClient, PostAppInitialisation};
 use serde_json::json;
+use shared::utils::api_helper::{ApiResponseType, IsCors};
 
 #[tokio::main]
 async fn main() -> Result<(), Error> {
@@ -44,7 +44,11 @@ pub async fn handler(
     println!("{event:?}");
     let request = GetUserRequest::validate(&event);
     if let Some(request) = request {
-        let user = app_client.get_user_query(&request).await.ok().and_then(|result| result);
+        let user = app_client
+            .get_user_query(&request)
+            .await
+            .ok()
+            .and_then(|result| result);
         if let Some(user) = user {
             let result = app_client
                 .add_csrf_query(
