@@ -40,3 +40,10 @@ path = "src/bin/auth.rs"
 name = "app-login"
 path = "src/bin/login.rs"
 
+[profile.release]
+strip = true  # Automatically strip symbols from the binary.
+opt-level = "z"  # Optimize for size.
+lto = "thin" # This is similar to "fat", but takes substantially less time to run while still achieving performance gains similar to "fat".
+codegen-units = 1  # Reduce parallel code generation units
+panic = "abort"
+
