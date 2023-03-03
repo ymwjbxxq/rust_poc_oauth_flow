@@ -31,6 +31,8 @@ Resources:
 ##########################################################################
   SourceBucket:
     Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub "oauth-config-bucket-${StageName}"
 
 ##########################################################################
 #  DynamoDB table for login                                              #
@@ -434,3 +436,23 @@ Outputs:
     Export:
       Name: 
         Fn::Sub: oauth-AuthUrl
+
+  OAuthDomain:
+    Description: "API Gateway endpoint URL"
+    Value: !Sub "${OAuthApi}.execute-api.${AWS::Region}.amazonaws.com"
+    Export:
+      Name: 
+        Fn::Sub: oauth-AuthDomain
+
+  SourceBucketName:
+    Value: !Ref SourceBucket
+    Export:
+      Name: SourceBucketName
+
+  SourceBucketArn:
+      Value:
+        Fn::GetAtt:
+          - SourceBucket
+          - Arn
+      Export:
+        Name: SourceBucketArn
