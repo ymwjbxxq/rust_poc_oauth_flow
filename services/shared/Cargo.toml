@@ -20,6 +20,7 @@ base64.workspace = true
 jsonwebtoken.workspace = true
 serde_urlencoded.workspace = true
 typed-builder.workspace = true
+openssl.workspace = true
 
 [profile.release]
 strip = true  # Automatically strip symbols from the binary.
