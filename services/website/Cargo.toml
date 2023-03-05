@@ -1,0 +1,49 @@
+[package]
+name = "website"
+version.workspace = true
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+shared = { path = "../shared" }
+aws_lambda_events.workspace = true
+lambda_http.workspace = true
+lambda_runtime.workspace = true
+aws-sdk-dynamodb.workspace = true
+aws-types.workspace = true
+aws-config.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+serde_qs.workspace = true
+tracing-subscriber.workspace = true
+tokio.workspace = true
+uuid.workspace = true
+async-trait.workspace = true
+typed-builder.workspace = true
+chrono.workspace = true
+
+# APP
+[[bin]]
+name = "app-random-api"
+path = "src/bin/random_api.rs"
+
+[[bin]]
+name = "app-lambda-jwt"
+path = "src/bin/jwt.rs"
+
+[[bin]]
+name = "app-auth"
+path = "src/bin/auth.rs"
+
+[[bin]]
+name = "app-login"
+path = "src/bin/login.rs"
+
+[profile.release]
+strip = true  # Automatically strip symbols from the binary.
+opt-level = "z"  # Optimize for size.
+lto = "thin" # This is similar to "fat", but takes substantially less time to run while still achieving performance gains similar to "fat".
+codegen-units = 1  # Reduce parallel code generation units
+panic = "abort"
+

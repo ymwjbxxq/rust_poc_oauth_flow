@@ -1,0 +1,119 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: PoC client for the Oauth Service
+
+##########################################################################
+#  Parameters                                                            #
+##########################################################################
+Parameters:
+  StageName:
+    Type: String
+    Default: test
+
+##########################################################################
+#  Global values that are applied to all resources                       #
+##########################################################################
+Globals:
+  Function:
+    MemorySize: 256
+    Architectures: ["arm64"]
+    Handler: bootstrap
+    Runtime: provided.al2
+    Timeout: 29
+    Environment:
+      Variables:
+        RUST_BACKTRACE: 1
+        RUST_LOG: info
+
+Resources:
+##########################################################################
+#  RANDOM API                                                            #
+##########################################################################
+  RandomApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      Name: !Sub ${AWS::StackName}
+      StageName: !Ref StageName
+      Description: An Amazon private REST API Gateway and an AWS Lambda function.
+      DefinitionBody: # an OpenApi definition
+        'Fn::Transform':
+          Name: 'AWS::Include'
+          Parameters:
+            Location: './api.yaml'
+      OpenApiVersion: 3.0.3
+      Cors:
+        AllowMethods: "'GET, POST, OPTIONS'"
+        AllowHeaders: "'content-type,x-amz-date,authorization,x-api-key,x-amz-security-token,access-control-allow-headers,access-control-request-methods,access-control-request-headers,access-control-allow-methods,access-control-allow-origin,x-requested-with'"
+        AllowOrigin: "'*'"
+      Auth:
+        AddDefaultAuthorizerToCorsPreflight: false
+        Authorizers:
+          jwt:
+            FunctionArn: !GetAtt JwtFunction.Arn
+            FunctionPayloadType: REQUEST
+            Identity:
+              Context:
+                - httpMethod
+                - resourceId
+              Headers:
+                - Authorization
+        DefaultAuthorizer: jwt
+        ResourcePolicy:
+          CustomStatements: [{
+            "Effect": "Allow",
+            "Principal": "*",
+            "Action": "execute-api:Invoke",
+            "Resource": "execute-api:/*/*/*"
+          }]
+      EndpointConfiguration: REGIONAL
+      Tags:
+        Name: my-protected-api
+        env: !Ref StageName
+        service: app
+
+
+  JwtFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ../../build/app-lambda-jwt
+      Policies:
+        - AWSLambdaBasicExecutionRole
+      Tags:
+        Name: jwt-authorizer
+        env: !Ref StageName
+        service: app
+  
+  JwtFunctionLogs:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      RetentionInDays: 1
+      LogGroupName: !Sub "/aws/lambda/${JwtFunction}"
+
+  RandomFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ../../build/app-random-api
+      Policies:
+        - AWSLambdaBasicExecutionRole
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            Path: /random
+            Method: GET
+            RestApiId: !Ref RandomApi
+      Tags:
+        Name: random-api
+        env: !Ref StageName
+        service: app
+  
+  RandomFunctionLogs:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      RetentionInDays: 1
+      LogGroupName: !Sub "/aws/lambda/${RandomFunction}"
+
+Outputs:
+  ProtectedEndpoint:
+    Description: The default endpoint for the HTTP API.
+    Value: !Sub "https://${RandomApi}.execute-api.${AWS::Region}.amazonaws.com/${StageName}/"

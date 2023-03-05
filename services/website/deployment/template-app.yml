@@ -1,0 +1,149 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: PoC client for the Oauth Service
+
+##########################################################################
+#  Parameters                                                            #
+##########################################################################
+Parameters:
+  StageName:
+    Type: String
+    Default: test
+
+##########################################################################
+#  Global values that are applied to all resources                       #
+##########################################################################
+Globals:
+  Function:
+    MemorySize: 256
+    Architectures: ["arm64"]
+    Handler: bootstrap
+    Runtime: provided.al2
+    Timeout: 29
+    Environment:
+      Variables:
+        RUST_BACKTRACE: 1
+        RUST_LOG: info
+
+Resources:
+##########################################################################
+#  DynamoDB table for login                                              #
+##########################################################################
+  CSRFTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      KeySchema:
+        - AttributeName: client_id
+          KeyType: HASH
+        - AttributeName: sk
+          KeyType: RANGE
+      AttributeDefinitions:
+        - AttributeName: client_id
+          AttributeType: S
+        - AttributeName: sk
+          AttributeType: S
+      TimeToLiveSpecification:
+        AttributeName: ttl
+        Enabled: true
+      BillingMode: PAY_PER_REQUEST
+##########################################################################
+#  LOGIN API                                                            #
+##########################################################################
+  LoginApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      Name: !Sub ${AWS::StackName}
+      StageName: !Ref StageName
+      DefinitionBody: # an OpenApi definition
+        'Fn::Transform':
+          Name: 'AWS::Include'
+          Parameters:
+            Location: './app.yaml'
+      OpenApiVersion: 3.0.3
+      Cors:
+        AllowMethods: "'GET, POST, OPTIONS'"
+        AllowHeaders: "'content-type,x-amz-date,authorization,x-api-key,x-amz-security-token,access-control-allow-headers,access-control-request-methods,access-control-request-headers,access-control-allow-methods,access-control-allow-origin,x-requested-with'"
+        AllowOrigin: "'*'"
+      EndpointConfiguration: REGIONAL
+      Tags:
+        Name: login-api
+        env: !Ref StageName
+        service: app
+
+  AppAuthFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ../../build/app-auth
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - Version: "2012-10-17"
+          Statement:
+            - Effect: Allow
+              Action: 
+                - dynamodb:GetItem
+                - dynamodb:DeleteItem
+              Resource: !GetAtt CSRFTable.Arn
+      Environment:
+        Variables:
+          OAUTH_TOKEN_URL: !Sub ['${domain}token', domain: !ImportValue oauth-AuthUrl]
+          CSRF_TABLE_NAME: !Ref CSRFTable
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            Path: /auth
+            Method: GET
+            RestApiId: !Ref LoginApi
+      Tags:
+        Name: auth
+        env: !Ref StageName
+        service: app
+  
+  AppAuthFunctionLogs:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      RetentionInDays: 1
+      LogGroupName: !Sub "/aws/lambda/${AppAuthFunction}"
+  
+  AppLoginFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ../../build/app-login
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - Version: "2012-10-17"
+          Statement:
+            - Effect: Allow
+              Action: 
+                - dynamodb:PutItem
+              Resource: !GetAtt CSRFTable.Arn
+      Environment:
+        Variables:
+          REDIRECT_PATH: !Sub "/${StageName}/auth"
+          OAUTH_AUTHORIZE_URL: !Sub ['${domain}authorize', domain: !ImportValue oauth-AuthUrl]
+          CSRF_TABLE_NAME: !Ref CSRFTable
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            Path: /login
+            Method: GET
+            RestApiId: !Ref LoginApi
+      Tags:
+        Name: login
+        env: !Ref StageName
+        service: app
+
+  AppLoginFunctionLogs:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      RetentionInDays: 1
+      LogGroupName: !Sub "/aws/lambda/${AppLoginFunction}"
+
+Outputs:
+  AppUrl:
+    Description: "API Gateway endpoint URL"
+    Value: !Sub "https://${LoginApi}.execute-api.${AWS::Region}.amazonaws.com/${StageName}/"
+    Export:
+      Name: 
+        Fn::Sub: ${AWS::StackName}-AppUrl

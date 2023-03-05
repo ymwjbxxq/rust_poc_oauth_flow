@@ -1,0 +1,62 @@
+[package]
+name = "oauth"
+version.workspace = true
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+shared = { path = "../shared" }
+http.workspace = true
+aws_lambda_events.workspace = true
+lambda_http.workspace = true
+aws-sdk-dynamodb.workspace = true
+aws-sdk-s3.workspace = true
+aws-types.workspace = true
+aws-config.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+tracing-subscriber.workspace = true
+tokio.workspace = true
+uuid.workspace = true
+async-trait.workspace = true
+typed-builder.workspace = true
+chrono.workspace = true
+
+# OAUTH POST
+[[bin]]
+name = "oauth-consent-post"
+path = "src/bin/consent/post.rs"
+
+[[bin]]
+name = "oauth-optin-post"
+path = "src/bin/optin/post.rs"
+
+[[bin]]
+name = "oauth-login-post"
+path = "src/bin/login/post.rs"
+
+[[bin]]
+name = "oauth-signup-post"
+path = "src/bin/signup/post.rs"
+
+#OAUTH GET
+[[bin]]
+name = "oauth-get-page"
+path = "src/bin/get_page.rs"
+
+#OAUTH GENERAL
+[[bin]]
+name = "oauth-authorize"
+path = "src/bin/authorize.rs"
+
+[[bin]]
+name = "oauth-token"
+path = "src/bin/token.rs"
+
+[profile.release]
+strip = true  # Automatically strip symbols from the binary.
+opt-level = "z"  # Optimize for size.
+lto = "thin" # This is similar to "fat", but takes substantially less time to run while still achieving performance gains similar to "fat".
+codegen-units = 1  # Reduce parallel code generation units
+panic = "abort"

@@ -1,0 +1,120 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Sample SAM configuration for Lambda@Edge to facilitate deployments and further updates
+
+Parameters:
+  StageName:
+    Description: The name of the stage is the first path segment in the Uniform Resource Identifier (URI) of a call to API Gateway
+    Type: String
+  SourceBucketArn:
+    Description: The SourceBucketArn from OAuth template
+    Type: String
+  AuthDomain:
+    Description: The AuthDomain from OAuth template
+    Type: String
+
+Resources:
+##########################################################################
+#  CloudFront::Distribution                                              #
+##########################################################################
+  CFDistribution:
+    Type: AWS::CloudFront::Distribution
+    Properties:
+      DistributionConfig:
+        PriceClass: PriceClass_100
+        IPV6Enabled: true
+        HttpVersion: http3
+        Enabled: true
+        Comment: !Sub '${ StageName} - for Lambda@Edge'
+        Origins:
+          - Id: MyOrigin
+            DomainName: !Ref AuthDomain
+            # OriginPath: !Sub "/${StageName}/v2/signup"
+            CustomOriginConfig:
+              HTTPSPort: 443
+              OriginProtocolPolicy: https-only
+              OriginSSLProtocols: 
+                - TLSv1.2
+        DefaultCacheBehavior:
+          TargetOriginId: MyOrigin
+          AllowedMethods:
+            - GET
+            - HEAD
+            - OPTIONS
+            - PUT
+            - POST
+            - PATCH
+            - DELETE
+          ViewerProtocolPolicy: redirect-to-https
+          LambdaFunctionAssociations:
+            - EventType: origin-request
+              IncludeBody: true
+              LambdaFunctionARN: !Ref LambdaEdgeFunction.Version
+          Compress: true
+          TargetOriginId: MyOrigin
+          CachePolicyId: 4135ea2d-6df8-44a3-9df3-4b5a84be39ad #CachingDisabled
+          OriginRequestPolicyId: b689b0a8-53d0-40ab-baf2-68738e2966ac #AllViewerExceptHostHeader
+
+  LambdaEdgeFunctionRole: 
+    Type: AWS::IAM::Role
+    Properties:
+      Path: /
+      ManagedPolicyArns:
+        - "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: "Allow"
+            Action: 
+              - "sts:AssumeRole"
+            Principal:
+              Service: 
+                - "lambda.amazonaws.com"
+                - "edgelambda.amazonaws.com"
+      Policies:
+        - PolicyName: "LambdaEdgeFunctionRolePolicy"
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - "ssm:GetParameter"
+                Resource: "*"
+              - Effect: Allow
+                Action:
+                  - "s3:GetObject"
+                Resource: 
+                  - !Ref SourceBucketArn
+                  - !Sub
+                    - "${SourceBucketArn}/*"
+                    - SourceBucketArn: !Ref SourceBucketArn
+
+  LambdaEdgeFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ../
+      Handler: handler.handler
+      Role: !GetAtt LambdaEdgeFunctionRole.Arn
+      MemorySize: 1024
+      Runtime: nodejs18.x
+      Timeout: 5
+      AutoPublishAlias: live
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        External:
+          - '@aws-sdk/client-ssm'
+          - '@aws-sdk/client-s3'
+        Minify: true
+        Target: "es2020"
+        EntryPoints: 
+          - src/handler.ts
+
+Outputs:
+  LambdaEdgeFunctionVersion: 
+    Description: Lambda@Edge Sample Function ARN with Version
+    Value: !Ref LambdaEdgeFunction.Version
+
+  CFDistribution: 
+    Description: Cloudfront Distribution Domain Name
+    Value: !GetAtt CFDistribution.DomainName

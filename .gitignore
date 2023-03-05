@@ -1,3 +1,4 @@
+node_modules/
 debug/
 target/
 **/.DS_Store
@@ -8,3 +9,4 @@ deploy.sh
 .aws-sam
 build
 samconfig.toml
+*.js
