@@ -9,3 +9,4 @@ deploy.sh
 .aws-sam
 build
 samconfig.toml
+*.js

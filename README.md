@@ -46,6 +46,18 @@ They can be stored in the "localStorage" but they could be altered by client-sid
 
 So to avoid all of them I store them into DynamoDB but i could be any cache service and I compared against them setting also a relative low TTL of 1 minute.
 
+Each client will have a secret_key made of:
+
+```
+{
+  "hash_salt": "some bcrypt hash encrypeted with the RSA Public key and converted to base64",
+  "aes_initVector": "some random 16 bytes encrypeted with the RSA Public key and converted to base64",
+  "aes_securitykey": "some random 32 bytes encrypeted with the RSA Public key and converted to base64"
+}
+```
+- public_key - RSA public key to encrypt the values of the secret_key
+- private_key - RSA private key to decrypt the encrypted secret_key values
+
 ### MANUAL SETUP: ###
 
 Lambda@Edge does not support envriment variables and so I cannot pass with the CI the OAuth S3 bucket name where the config is stored.

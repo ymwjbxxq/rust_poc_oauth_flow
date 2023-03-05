@@ -5,6 +5,7 @@
     "given_name",
     "password"
   ],
+  "secret_key": "ssm:/clientid1/secret_key",
   "public_key": "ssm:/clientid1/public_key",
   "private_key": "ssm:/clientid1/private_key"
 }
