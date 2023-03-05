@@ -17,9 +17,9 @@ The configuration contains
 
 - Custom PII_fields that the OAuth service encrypts at the edge for maximum security
 - RSA certificate generates for each website
-- Custom pages like the login
+- Custom pages like the Login
 
-Once the user register, we can do and if it is all successful, At the end of the flow, we should be able to see the JWT token:
+Once the user register, we can Login and if it is all successful and at the end of the flow, we should be able to see the JWT token:
 ```App
 Authorization: eyJhbGciOiJIUzI1NiJ9.T0RBVUxDQVk0V0k1S1ZQU01DUkZCTExBOEs3QURNUEQzWUM4WFdUNVQ1UDRVUElRREw.956xdJUWC4mfDJlohbqP2kqFUNoAPlZ8nRRJCfzo1KI
 ```
@@ -141,10 +141,19 @@ eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwYXlsb2FkIjp7Imhhc2hfc2FsdCI6ImQ3aWI5aEp
 
 ### MANUAL TEST WITH POSTMAN using Lambda@edge (all encrypted): ###
 
-Register a user at - https://[cloudfront-domain]/{stage}/v2/signup?client_id=clientid1 
-Body:
+Register a user at - https://[cloudfront-domain]/{stage}/v2/signup?client_id=clientid1
+
+POST:
 ```
-{"email":"a@a.com","password":"aaaa","family_name":"aaaa","given_name":"aaa","is_consent":"true","is_optin":"true","remember":"true"}
+{
+  "email":"a@a.com",
+  "password":"aaaa",
+  "family_name":"aaaa",
+  "given_name":"aaa",
+  "is_consent":"true",
+  "is_optin":"true",
+  "remember":"true"
+}
 ```
 
 **NOTE**:
@@ -168,7 +177,7 @@ Body:
 3. Register a user at - https://[your-oauth-domain]/{stage}/v2/signup?client_id=clientid1
 4. Open the page index.html
 5. Insert https://[your-app-domain].execute-api.eu-central-1.amazonaws.com/{stage}/login?client_id=clientid1
-6. Click login
+6. Click Login
 7. Enter the data from point 2
 8 Now, with the token, we can call our protected API - eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJiQGIuY29tIiwiY29tcGFueSI6IkFDTUUiLCJleHAiOjEwMDAwMDAwMDAwfQ.TXdR1GMY_5nqQLDTk3uSZlRjt7JeVdK8HUuTRo44-OU
 
@@ -176,38 +185,24 @@ Body:
 
 Data can be in clear based on the test with Lambda@edge or without.
 
-![picture](https://github.com/ymwjbxxq/rust_poc_oauth_flow/blob/main/readme/first-test.png)
+![picture](https://github.com/ymwjbxxq/rust_poc_oauth_flow/blob/main/readme/database.png)
 
 The reality is that with a custom domain etc., you will not access APIGW directly, so this situation will not happen. 
 
 
 ### LOAD TEST WITH POSTMAN: ###
 
-As I am not the most excellent automation tester, I could not find a better and easier way. So, I created a collection of steps in POSTMAN, simulating each user's registration and login, generating 5K registration and 5K login. 
-I run the same collection in an iteration setting the iteration and in parallel. 
-Each Lambda has some latency. For example, the GET for login and signup requests loads a page from S3 while the POST queries DynamoDB. 
-
-In the graph below, you can see:
-
-* Average
-* P99
-* P90
-
-![picture](https://github.com/ymwjbxxq/rust_poc_oauth_flow/blob/main/readme/first-test.png)
+TODO
 
 
 ### Deploy ###
 
 ```bash
-# Compile and prepare Lambda functions
-make build
-
-# Deploy the functions on AWS
-make deploy
+coming soon
 
 ```
 
 ### Cleanup ###
 ```
-make delete
+coming soon
 ```
