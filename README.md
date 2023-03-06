@@ -35,7 +35,7 @@ To reduce the exposure of sensitive data, I use AWS CloudFront with Lambda@Edge 
 
 Lambda edge will load the client config from S3 and, from there, take the SSM key to load secrets to encrypt sensitive data.
 
-![picture](https://github.com/ymwjbxxq/rust_poc_oauth_flow/blob/main/readme/protect%20sensitive%20data.png)
+![picture](https://github.com/ymwjbxxq/rust_poc_oauth_flow/blob/main/readme/protect-sensitive-data.png)
 
 To avoid [Cross Site Request Forgery (CSRF) attacks](https://owasp.org/www-community/attacks/csrf) the 
 This project tries to replicate the [Authorization Code Flow with Proof Key for Code Exchange (PKCE) using two parameters:
