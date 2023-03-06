@@ -33,9 +33,9 @@ impl GetUserQuery for GetUser {
             )
             .key(
                 "user",
-                AttributeValue::S(request.email.to_lowercase()),
+                AttributeValue::S(request.user.to_string()),
             )
-            .projection_expression("client_id, #user")
+            .projection_expression("#user, is_consent, is_optin")
             .expression_attribute_names("#user", "user")
             .send()
             .await?;
