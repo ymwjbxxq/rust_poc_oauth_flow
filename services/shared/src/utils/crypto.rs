@@ -1,7 +1,6 @@
 use crate::error::ApplicationError;
 use base64::{
-    alphabet,
-    engine::{self, general_purpose},
+    engine::general_purpose,
     Engine as _,
 };
 use base64_url;
