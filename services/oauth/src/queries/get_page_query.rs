@@ -29,7 +29,7 @@ impl PageQuery for Page {
             .client
             .get_object()
             .bucket(&self.bucket_name)
-            .key(format!("{}/{}.json", request.client_id, &self.page_name))
+            .key(format!("{}/pages/{}.json", request.client_id, &self.page_name))
             .response_content_type("application/json")
             .send()
             .await;
