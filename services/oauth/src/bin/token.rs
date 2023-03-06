@@ -68,17 +68,17 @@ pub async fn handler<'a>(
             .and_then(|result| result);
 
         if let Some(csrf_code_challange) = csrf_code_challange {
-            let email = csrf_code_challange
+
+            let user = csrf_code_challange
                 .data
-                .unwrap_or("none####none".to_owned())
+                .unwrap_or("none####none".to_owned());
+            let email = user
                 .split("####")
                 .collect::<Vec<&str>>()[0]
                 .to_owned();
-
-            let (delete_csrf, user) = token_preparation(app_client, &request, &email).await;
+            let (delete_csrf, user) = token_preparation(app_client, &request, &user).await;
             if delete_csrf.is_ok() && user.is_some() {
                 let token = generate_token(email, request);
-
                 if let Some(token) = token {
                     return Ok(ApiResponseType::Ok(
                         json!({ "token": token }).to_string(),
@@ -106,7 +106,7 @@ pub async fn handler<'a>(
     )
 }
 
-async fn token_preparation(app_client: &dyn TokenAppInitialisation, request: &TokenRequest, email: &String) -> (Result<(), shared::error::ApplicationError>, Option<oauth::models::user::User>) {
+async fn token_preparation(app_client: &dyn TokenAppInitialisation, request: &TokenRequest, user: &String) -> (Result<(), shared::error::ApplicationError>, Option<oauth::models::user::User>) {
     let delete_csrf = app_client
         .delete_csrf_query(
             &DeleteCSRFRequest::builder()
@@ -123,7 +123,7 @@ async fn token_preparation(app_client: &dyn TokenAppInitialisation, request: &To
         .get_user_query(
             &GetUserRequest::builder()
                 .client_id(request.client_id.to_owned())
-                .email(email.to_string())
+                .user(user.to_string())
                 .build(),
         )
         .await
