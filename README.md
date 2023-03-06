@@ -35,7 +35,7 @@ To reduce the exposure of sensitive data, I use AWS CloudFront with Lambda@Edge 
 
 Lambda edge will load the client config from S3 and, from there, take the SSM key to load secrets to encrypt sensitive data.
 
-![picture](https://github.com/ymwjbxxq/rust_poc_oauth_flow/blob/main/readme/protect%20sensitive%20data.png)
+![picture](https://github.com/ymwjbxxq/rust_poc_oauth_flow/blob/main/readme/protect-sensitive-data.png)
 
 To avoid [Cross Site Request Forgery (CSRF) attacks](https://owasp.org/www-community/attacks/csrf) the 
 This project tries to replicate the [Authorization Code Flow with Proof Key for Code Exchange (PKCE) using two parameters:
@@ -148,10 +148,10 @@ Register a user at - https://[cloudfront-domain]/{stage}/v2/signup?client_id=cli
 POST:
 ```
 {
-  "email":"a@a.com",
-  "password":"aaaa",
-  "family_name":"aaaa",
-  "given_name":"aaa",
+  "email":"a",
+  "password":"a",
+  "family_name":"a",
+  "given_name":"a",
   "is_consent":"true",
   "is_optin":"true",
   "remember":"true"
@@ -199,12 +199,15 @@ TODO
 
 ### Deploy ###
 
+**NOTE**: make sure to do the manual setup first
+
 ```bash
-coming soon
+  make build
+  make deploy
 
 ```
 
 ### Cleanup ###
 ```
-coming soon
+  make delete
 ```

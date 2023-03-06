@@ -12,13 +12,13 @@ else
 	cargo zigbuild --release --target $(ARCH)
 endif
 
-	rm -rf ../build
-	mkdir -p ../build
+	rm -rf ../build/oauth
+	mkdir -p ../build/oauth
 	${MAKE} ${MAKEOPTS} $(foreach function,${FUNCTIONS}, build-${function})
 
 build-%:
-	mkdir -p ../build/$*
-	cp -v ../target/$(ARCH)/release/$* ../build/$*/bootstrap
+	mkdir -p ../build/oauth/$*
+	cp -v ../target/$(ARCH)/release/$* ../build/oauth/$*/bootstrap
 
 deploy:
 	sam deploy --no-fail-on-empty-changeset --no-confirm-changeset --profile test --region eu-central-1 --stack-name oauth --template-file ./deployment/template-oauth.yml

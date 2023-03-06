@@ -28,7 +28,7 @@ export const handler = async (event: any): Promise<any> => {
 
     // load the config from S3 it should be s3 multi-region endpoint
     const params: GetObjectCommandInput = {
-      Bucket: "oauth-sourcebucket-1j1q9b4k0za14", //The function cannot have environment variables. Set a static bucket name
+      Bucket: "oauth-config-bucket-test", //The function cannot have environment variables. Set a static bucket name
       Key: `${querystring.get("client_id")}/config.json`,
     };
     let response: GetObjectCommandOutput = await s3_client.send(new GetObjectCommand(params));
