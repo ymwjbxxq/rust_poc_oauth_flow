@@ -12,13 +12,13 @@ else
 	cargo zigbuild --release --target $(ARCH)
 endif
 
-	rm -rf ../build
-	mkdir -p ../build
+	rm -rf ../build/website
+	mkdir -p ../build/website
 	${MAKE} ${MAKEOPTS} $(foreach function,${FUNCTIONS}, build-${function})
 
 build-%:
-	mkdir -p ../build/$*
-	cp -v ../target/$(ARCH)/release/$* ../build/$*/bootstrap
+	mkdir -p ../build/website/$*
+	cp -v ../target/$(ARCH)/release/$* ../build/website/$*/bootstrap
 
 deploy:
 	sam deploy --no-fail-on-empty-changeset --no-confirm-changeset --profile test --region eu-central-1 --stack-name app   --template-file ./deployment/template-app.yml

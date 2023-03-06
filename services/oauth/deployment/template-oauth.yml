@@ -96,7 +96,7 @@ Resources:
   OauthAuthorizeFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: ../../build//oauth-authorize
+      CodeUri: ../../build/oauth/oauth-authorize
       Policies:
         - AWSLambdaBasicExecutionRole
         - Version: "2012-10-17"
@@ -132,7 +132,7 @@ Resources:
   OauthTokenFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: ../../build//oauth-token
+      CodeUri: ../../build/oauth/oauth-token
       Policies:
         - AWSLambdaBasicExecutionRole
         - Version: "2012-10-17"
@@ -169,7 +169,7 @@ Resources:
   OauthOptinGETFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: ../../build//oauth-get-page
+      CodeUri: ../../build/oauth/oauth-get-page
       Policies:
         - AWSLambdaBasicExecutionRole
         - S3ReadPolicy:
@@ -199,7 +199,7 @@ Resources:
   OauthConsentGETFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: ../../build//oauth-get-page
+      CodeUri: ../../build/oauth/oauth-get-page
       Policies:
         - AWSLambdaBasicExecutionRole
         - S3ReadPolicy:
@@ -229,7 +229,7 @@ Resources:
   OauthLoginGETFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: ../../build//oauth-get-page
+      CodeUri: ../../build/oauth/oauth-get-page
       Policies:
         - AWSLambdaBasicExecutionRole
         - S3ReadPolicy:
@@ -259,7 +259,7 @@ Resources:
   OauthSignupGETFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: ../../build//oauth-get-page
+      CodeUri: ../../build/oauth/oauth-get-page
       Policies:
         - AWSLambdaBasicExecutionRole
         - S3ReadPolicy:
@@ -292,7 +292,7 @@ Resources:
   OauthOptinPOSTFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: ../../build//oauth-optin-post
+      CodeUri: ../../build/oauth/oauth-optin-post
       Policies:
         - AWSLambdaBasicExecutionRole
         - Version: "2012-10-17"
@@ -326,7 +326,7 @@ Resources:
   OauthConsentPOSTFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: ../../build//oauth-consent-post
+      CodeUri: ../../build/oauth/oauth-consent-post
       Policies:
         - AWSLambdaBasicExecutionRole
         - Version: "2012-10-17"
@@ -360,7 +360,7 @@ Resources:
   OauthLoginPOSTFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: ../../build//oauth-login-post
+      CodeUri: ../../build/oauth/oauth-login-post
       Policies:
         - AWSLambdaBasicExecutionRole
         - Version: "2012-10-17"
@@ -399,7 +399,7 @@ Resources:
   OauthSignupPOSTFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: ../../build/oauth-signup-post
+      CodeUri: ../../build/oauth/oauth-signup-post
       Policies:
         - AWSLambdaBasicExecutionRole
         - Version: "2012-10-17"

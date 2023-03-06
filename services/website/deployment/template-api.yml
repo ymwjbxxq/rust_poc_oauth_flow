@@ -75,7 +75,7 @@ Resources:
   JwtFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: ../../build/app-lambda-jwt
+      CodeUri: ../../build/website/app-lambda-jwt
       Policies:
         - AWSLambdaBasicExecutionRole
       Tags:
@@ -92,7 +92,7 @@ Resources:
   RandomFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: ../../build/app-random-api
+      CodeUri: ../../build/website/app-random-api
       Policies:
         - AWSLambdaBasicExecutionRole
       Events:

@@ -148,10 +148,10 @@ Register a user at - https://[cloudfront-domain]/{stage}/v2/signup?client_id=cli
 POST:
 ```
 {
-  "email":"a@a.com",
-  "password":"aaaa",
-  "family_name":"aaaa",
-  "given_name":"aaa",
+  "email":"a",
+  "password":"a",
+  "family_name":"a",
+  "given_name":"a",
   "is_consent":"true",
   "is_optin":"true",
   "remember":"true"
@@ -199,12 +199,15 @@ TODO
 
 ### Deploy ###
 
+**NOTE**: make sure to do the manual setup first
+
 ```bash
-coming soon
+  make build
+  make deploy
 
 ```
 
 ### Cleanup ###
 ```
-coming soon
+  make delete
 ```
