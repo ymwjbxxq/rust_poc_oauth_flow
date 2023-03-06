@@ -10,7 +10,7 @@ version = "0.1.0"
 
 [workspace.dependencies]
 cookie = "0.17"
-futures = "0.3"
+futures = { version = "0.3", default-features = false }
 http = "0.2"
 aws_lambda_events = { version = "0.7", default-features = false, features = ["apigw"] }
 lambda_http = { version = "0.7", default-features = false, features = ["apigw_rest"] }

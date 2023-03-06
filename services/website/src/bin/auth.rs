@@ -50,7 +50,7 @@ pub async fn handler(
             .get_csrf_query(
                 &GetCSRFRequest::builder()
                     .client_id(request.client_id.to_owned())
-                    .sk(format!("state#{}", request.state.to_owned()))
+                    .sk(format!("state####{}", request.state.to_owned()))
                     .build(),
             )
             .await
@@ -61,7 +61,7 @@ pub async fn handler(
                 .delete_csrf_query(
                     &DeleteCSRFRequest::builder()
                         .client_id(request.client_id.to_owned())
-                        .sk(format!("state#{}", request.state.to_owned()))
+                        .sk(format!("state####{}", request.state.to_owned()))
                         .build(),
                 )
                 .await;

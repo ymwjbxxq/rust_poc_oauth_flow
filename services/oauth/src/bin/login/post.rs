@@ -1,7 +1,7 @@
 use lambda_http::{run, service_fn, Error, IntoResponse, Request, RequestExt};
-use oauth::dtos::login::get_user_request::GetUserRequest;
+use oauth::dtos::login::login_user_request::LoginUserRequest;
 use oauth::queries::add_csrf_query::{AddCSRF, AddCSRFRequest};
-use oauth::queries::get_user_query::GetUser;
+use oauth::queries::login_user_query::LoginUser;
 use oauth::setup_tracing;
 use oauth::utils::injections::login::post_di::{PostAppClient, PostAppInitialisation};
 use serde_json::json;
@@ -15,7 +15,7 @@ async fn main() -> Result<(), Error> {
     let dynamodb_client = aws_sdk_dynamodb::Client::new(&config);
 
     let table_name = std::env::var("USER_TABLE_NAME").expect("USER_TABLE_NAME must be set");
-    let get_user_query = GetUser::builder()
+    let get_user_query = LoginUser::builder()
         .table_name(table_name)
         .client(dynamodb_client.clone())
         .build();
@@ -42,7 +42,7 @@ pub async fn handler(
     event: Request,
 ) -> Result<impl IntoResponse, Error> {
     println!("{event:?}");
-    let request = GetUserRequest::validate(&event);
+    let request = LoginUserRequest::validate(&event);
     if let Some(request) = request {
         let user = app_client
             .get_user_query(&request)
@@ -54,7 +54,7 @@ pub async fn handler(
                 .add_csrf_query(
                     &AddCSRFRequest::builder()
                         .client_id(request.client_id.to_owned())
-                        .sk(format!("code_challenge#{}", request.code_challenge))
+                        .sk(format!("code_challenge####{}", request.code_challenge))
                         .data(Some(user.user))
                         .build(),
                 )

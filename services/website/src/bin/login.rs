@@ -54,7 +54,7 @@ pub async fn handler(
             .add_csrf_query(
                 &AddCSRFRequest::builder()
                     .client_id(request.client_id.to_owned())
-                    .sk(format!("state#{}", state.to_owned()))
+                    .sk(format!("state####{}", state.to_owned()))
                     .data(None)
                     .build(),
             )

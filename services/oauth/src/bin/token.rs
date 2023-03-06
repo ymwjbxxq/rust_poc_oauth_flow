@@ -1,10 +1,12 @@
 use chrono::{Duration, Utc};
 use lambda_http::{run, service_fn, Error, IntoResponse, Request};
-use oauth::dtos::token::toekn_request::TokenRequest;
+use oauth::dtos::token::get_user_request::GetUserRequest;
+use oauth::dtos::token::token_request::TokenRequest;
 use oauth::queries::delete_csrf_query::{DeleteCSRF, DeleteCSRFRequest};
 use oauth::queries::get_csrf_query::{GetCSRF, GetCSRFRequest};
+use oauth::queries::get_user_query::GetUser;
 use oauth::setup_tracing;
-use oauth::utils::injections::token::token_di::{ToeknAppClient, ToeknAppInitialisation};
+use oauth::utils::injections::token::token_di::{TokenAppClient, TokenAppInitialisation};
 use serde_json::json;
 use shared::utils::api_helper::{ApiResponseType, ContentType, IsCors};
 use shared::utils::jwt::{Claims, Jwt};
@@ -24,10 +26,17 @@ async fn main() -> Result<(), Error> {
 
     let delete_csrf_query = DeleteCSRF::builder()
         .table_name(table_name)
-        .client(dynamodb_client)
+        .client(dynamodb_client.clone())
         .build();
 
-    let app_client = ToeknAppClient::builder()
+    let table_name = std::env::var("USER_TABLE_NAME").expect("USER_TABLE_NAME must be set");
+    let get_user_query = GetUser::builder()
+        .table_name(table_name)
+        .client(dynamodb_client.clone())
+        .build();
+
+    let app_client = TokenAppClient::builder()
+        .get_user_query(get_user_query)
         .get_csrf_query(get_csrf_query)
         .delete_csrf_query(delete_csrf_query)
         .build();
@@ -35,8 +44,8 @@ async fn main() -> Result<(), Error> {
     run(service_fn(|event: Request| handler(&app_client, event))).await
 }
 
-pub async fn handler(
-    app_client: &dyn ToeknAppInitialisation,
+pub async fn handler<'a>(
+    app_client: &dyn TokenAppInitialisation,
     event: Request,
 ) -> Result<impl IntoResponse, Error> {
     println!("{event:?}");
@@ -49,7 +58,7 @@ pub async fn handler(
                 &GetCSRFRequest::builder()
                     .client_id(request.client_id.to_owned())
                     .sk(format!(
-                        "code_challenge#{}",
+                        "code_challenge####{}",
                         request.code_verifier.to_owned()
                     ))
                     .build(),
@@ -59,28 +68,16 @@ pub async fn handler(
             .and_then(|result| result);
 
         if let Some(csrf_code_challange) = csrf_code_challange {
-            let result = app_client
-                .delete_csrf_query(
-                    &DeleteCSRFRequest::builder()
-                        .client_id(request.client_id.to_owned())
-                        .sk(format!(
-                            "code_challenge#{}",
-                            request.code_verifier.to_owned()
-                        ))
-                        .build(),
-                )
-                .await;
-            if result.is_ok() {
-                let claims = Claims::builder()
-                    .sub(csrf_code_challange.data.unwrap())
-                    .company(request.client_id)
-                    .exp((Utc::now() + Duration::minutes(10)).timestamp())
-                    .build();
+            let email = csrf_code_challange
+                .data
+                .unwrap_or("none####none".to_owned())
+                .split("####")
+                .collect::<Vec<&str>>()[0]
+                .to_owned();
 
-                let token = Jwt::new("private_key")
-                    .encode(&claims)
-                    .ok()
-                    .and_then(|token| token);
+            let (delete_csrf, user) = token_preparation(app_client, &request, &email).await;
+            if delete_csrf.is_ok() && user.is_some() {
+                let token = generate_token(email, request);
 
                 if let Some(token) = token {
                     return Ok(ApiResponseType::Ok(
@@ -107,4 +104,45 @@ pub async fn handler(
         ApiResponseType::Forbidden(json!({ "errors": messages }).to_string(), IsCors::Yes)
             .to_response(),
     )
+}
+
+async fn token_preparation(app_client: &dyn TokenAppInitialisation, request: &TokenRequest, email: &String) -> (Result<(), shared::error::ApplicationError>, Option<oauth::models::user::User>) {
+    let delete_csrf = app_client
+        .delete_csrf_query(
+            &DeleteCSRFRequest::builder()
+                .client_id(request.client_id.to_owned())
+                .sk(format!(
+                    "code_challenge####{}",
+                    request.code_verifier.to_owned()
+                ))
+                .build(),
+        )
+        .await;
+
+    let user = app_client
+        .get_user_query(
+            &GetUserRequest::builder()
+                .client_id(request.client_id.to_owned())
+                .email(email.to_string())
+                .build(),
+        )
+        .await
+        .ok()
+        .and_then(|result| result);
+    (delete_csrf, user)
+}
+
+fn generate_token(email: String, request: TokenRequest) -> Option<String> {
+    let claims = Claims::builder()
+        .iss("https://www.authservice.com/")
+        .sub(format!("authservice|{}", email))
+        .azp(request.client_id)
+        .exp((Utc::now() + Duration::minutes(10)).timestamp())
+        .build();
+
+    let token = Jwt::new("private_key")
+        .encode(&claims)
+        .ok()
+        .and_then(|token| token);
+    token
 }

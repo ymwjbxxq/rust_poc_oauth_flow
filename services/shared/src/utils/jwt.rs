@@ -10,10 +10,13 @@ use typed_builder::TypedBuilder as Builder;
 #[derive(Debug, Serialize, Deserialize, Builder)]
 pub struct Claims {
     #[builder(setter(into))]
-    pub sub: String,
+    pub iss: String,  // "https://my-domain.authservice.com/"
 
     #[builder(setter(into))]
-    pub company: String,
+    pub sub: String, //"authservice|userId"
+
+    #[builder(setter(into))]
+    pub azp: String, //my_client_id
 
     #[builder(setter(into))]
     pub exp: i64,

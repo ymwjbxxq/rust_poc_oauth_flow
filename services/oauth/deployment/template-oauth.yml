@@ -142,9 +142,16 @@ Resources:
                 - dynamodb:GetItem
                 - dynamodb:DeleteItem
               Resource: !GetAtt CSRFTable.Arn
+        - Version: "2012-10-17"
+          Statement:
+            - Effect: Allow
+              Action: 
+                - dynamodb:GetItem
+              Resource: !GetAtt OAuthServiceTable.Arn
       Environment:
         Variables:
           CSRF_TABLE_NAME: !Ref CSRFTable
+          USER_TABLE_NAME: !Ref OAuthServiceTable
       Events:
         Api:
           Type: Api

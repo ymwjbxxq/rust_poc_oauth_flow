@@ -1,4 +1,4 @@
-use crate::dtos::token::get_user_request::GetUserRequest;
+use crate::dtos::login::login_user_request::LoginUserRequest;
 use crate::models::user::User;
 use async_trait::async_trait;
 use aws_sdk_dynamodb::model::AttributeValue;
@@ -7,7 +7,7 @@ use shared::error::ApplicationError;
 use typed_builder::TypedBuilder as Builder;
 
 #[derive(Debug, Builder)]
-pub struct GetUser {
+pub struct LoginUser {
     #[builder(setter(into))]
     table_name: String,
 
@@ -16,13 +16,13 @@ pub struct GetUser {
 }
 
 #[async_trait]
-pub trait GetUserQuery {
-    async fn execute(&self, request: &GetUserRequest) -> Result<Option<User>, ApplicationError>;
+pub trait LoginUserQuery {
+    async fn execute(&self, request: &LoginUserRequest) -> Result<Option<User>, ApplicationError>;
 }
 
 #[async_trait]
-impl GetUserQuery for GetUser {
-    async fn execute(&self, request: &GetUserRequest) -> Result<Option<User>, ApplicationError> {
+impl LoginUserQuery for LoginUser {
+    async fn execute(&self, request: &LoginUserRequest) -> Result<Option<User>, ApplicationError> {
         let res = self
             .client
             .get_item()
@@ -33,9 +33,13 @@ impl GetUserQuery for GetUser {
             )
             .key(
                 "user",
-                AttributeValue::S(request.email.to_lowercase()),
+                AttributeValue::S(format!(
+                    "{}####{}",
+                    request.email.to_lowercase(),
+                    request.password.to_lowercase()
+                )),
             )
-            .projection_expression("client_id, #user")
+            .projection_expression("client_id, #user, is_consent, is_optin")
             .expression_attribute_names("#user", "user")
             .send()
             .await?;
