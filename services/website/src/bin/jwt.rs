@@ -2,7 +2,6 @@ use aws_lambda_events::apigw::{
     ApiGatewayCustomAuthorizerRequestTypeRequest, ApiGatewayCustomAuthorizerResponse,
 };
 use lambda_runtime::{run, service_fn, Error, LambdaEvent};
-use shared::utils::jwt::Jwt;
 use website::{
     dtos::jwt::jwt_request::JwtRequest,
     setup_tracing,
@@ -13,8 +12,8 @@ use website::{
 async fn main() -> Result<(), Error> {
     setup_tracing();
 
-    let jwt = Jwt::new("privateKey");
-    let app_client = JwtApiClient::builder().jwt(jwt).build();
+   // let jwt = Jwt::new("privateKey");
+    let app_client = JwtApiClient::builder().build();
 
     run(service_fn(
         |event: LambdaEvent<ApiGatewayCustomAuthorizerRequestTypeRequest>| {
@@ -33,7 +32,7 @@ pub async fn handler(
     let request = JwtRequest::validate(&event.payload);
     if let Some(request) = request {
         let claims = app_client
-            .validate_token(&request.authorization)
+            .validate_token(&request.authorization, "public_key")
             .await
             .ok()
             .and_then(|claims| claims);
