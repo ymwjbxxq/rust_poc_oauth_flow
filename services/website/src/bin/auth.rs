@@ -49,7 +49,7 @@ pub async fn handler(
         let csrf_state = app_client
             .get_csrf_query(
                 &GetCSRFRequest::builder()
-                    .client_id(request.client_id.to_owned())
+                    .client_id(request.client_id.to_lowercase())
                     .sk(format!("state####{}", request.state.to_owned()))
                     .build(),
             )
@@ -60,7 +60,7 @@ pub async fn handler(
             let result = app_client
                 .delete_csrf_query(
                     &DeleteCSRFRequest::builder()
-                        .client_id(request.client_id.to_owned())
+                        .client_id(request.client_id.to_lowercase())
                         .sk(format!("state####{}", request.state.to_owned()))
                         .build(),
                 )

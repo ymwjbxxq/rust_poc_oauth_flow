@@ -66,7 +66,7 @@ pub async fn handler(
         let login_status = app_client
             .get_csrf_query(
                 &GetCSRFRequest::builder()
-                    .client_id(client_id.to_owned())
+                    .client_id(client_id.to_lowercase())
                     .sk(sk.to_owned())
                     .build(),
             )

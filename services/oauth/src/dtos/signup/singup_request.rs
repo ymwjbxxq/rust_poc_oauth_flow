@@ -56,7 +56,7 @@ impl SignUpRequest {
                     Self::builder()
                         .password(user.password)
                         .email(user.email)
-                        .client_id(client_id.to_owned())
+                        .client_id(client_id.to_lowercase())
                         .family_name(user.family_name)
                         .given_name(user.given_name)
                         .is_consent(user.is_consent.unwrap_or_default())
