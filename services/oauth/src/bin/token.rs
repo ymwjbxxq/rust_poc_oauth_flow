@@ -64,7 +64,7 @@ pub async fn handler<'a>(
         let code_challange_result = app_client
             .get_csrf_query(
                 &GetCSRFRequest::builder()
-                    .client_id(request.client_id.to_owned())
+                    .client_id(request.client_id.to_lowercase())
                     .sk(format!(
                         "code_challenge####{}",
                         request.code_verifier.to_owned()
@@ -84,7 +84,7 @@ pub async fn handler<'a>(
             let delete_csrf = app_client
                 .delete_csrf_query(
                     &DeleteCSRFRequest::builder()
-                        .client_id(request.client_id.to_owned())
+                        .client_id(request.client_id.to_lowercase())
                         .sk(format!(
                             "code_challenge####{}",
                             request.code_verifier.to_owned()
@@ -96,7 +96,7 @@ pub async fn handler<'a>(
                 let user = app_client
                     .get_user_query(
                         &GetUserRequest::builder()
-                            .client_id(request.client_id.to_owned())
+                            .client_id(request.client_id.to_lowercase())
                             .user(user.to_string())
                             .build(),
                     )
@@ -146,14 +146,13 @@ async fn generate_token(
     let private_key = app_client
         .get_private_key_query(
             &GetPrivateKeyRequest::builder()
-                .client_id(client_id.to_owned())
-                .key_name(format!("/{}/secret_key", client_id.to_owned()))
+                .client_id(client_id.to_lowercase())
+                .key_name(format!("/{}/private_key", client_id.to_lowercase()))
                 .build(),
         )
         .await
         .ok()
         .and_then(|result| result);
-
     if let Some(private_key) = private_key {
         let claims = Claims::builder()
             .iss(format!("https://{client_id}.authservice.com/"))
