@@ -24,7 +24,6 @@ Once the user register, we can Login and if it is all successful and at the end 
 Authorization: eyJhbGciOiJIUzI1NiJ9.T0RBVUxDQVk0V0k1S1ZQU01DUkZCTExBOEs3QURNUEQzWUM4WFdUNVQ1UDRVUElRREw.956xdJUWC4mfDJlohbqP2kqFUNoAPlZ8nRRJCfzo1KI
 ```
 
-
 ### Security: ###
 
 To reduce the exposure of sensitive data, I use AWS CloudFront with Lambda@Edge to:
@@ -59,6 +58,12 @@ Each client will have a secret_key made of:
 ```
 - public_key - RSA public key to encrypt the values of the secret_key
 - private_key - RSA private key to decrypt the encrypted secret_key values
+
+### PAGE INJECTION: ###
+
+the old implementation is wrong
+
+COMING SOON
 
 ### MANUAL SETUP: ###
 
