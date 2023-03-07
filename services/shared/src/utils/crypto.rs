@@ -54,7 +54,6 @@ impl CriptoHelper {
         let _ = rsa
             .public_encrypt(data.as_bytes(), &mut buf, Padding::PKCS1)
             .unwrap();
-        println!("Encrypted: {:?}", buf);
 
         buf
     }

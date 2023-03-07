@@ -4,3 +4,4 @@ pub mod pages;
 pub mod csrf;
 pub mod user;
 pub mod login;
+pub mod token;
