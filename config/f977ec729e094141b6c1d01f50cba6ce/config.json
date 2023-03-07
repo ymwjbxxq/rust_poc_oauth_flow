@@ -1,0 +1,12 @@
+{
+  "PII_fields": [
+    "email",
+    "family_name",
+    "given_name",
+    "password"
+  ],
+  "secret_key": "ssm:/f977ec729e094141b6c1d01f50cba6ce/secret_key",
+  "public_key": "ssm:/f977ec729e094141b6c1d01f50cba6ce/public_key",
+  "private_key": "ssm:/f977ec729e094141b6c1d01f50cba6ce/private_key"
+}
+

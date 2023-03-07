@@ -94,7 +94,7 @@ The secret_key is a token made of:
 
 Once it is all done, we have something like
 
-**/clientid1/public_key**
+**/f977ec729e094141b6c1d01f50cba6ce/public_key**
 
 ```
 -----BEGIN PUBLIC KEY-----
@@ -108,7 +108,7 @@ ewIDAQAB
 -----END PUBLIC KEY-----
 ```
 
-**/clientid1/private_key**
+**/f977ec729e094141b6c1d01f50cba6ce/private_key**
 ```
 -----BEGIN RSA PRIVATE KEY-----
 MIIEowIBAAKCAQEApl23EO002XmcyJ+ztbgSrhsR8IyPhfu+V9V84jleUSEaVBYR
@@ -139,7 +139,7 @@ ytszGwriSCNPW7m2PVhgC74NS9u+MOOqpRn9qSb4b3Zdm9kEhVng
 -----END RSA PRIVATE KEY-----
 ```
 
-**/clientid1/secret_key**
+**/f977ec729e094141b6c1d01f50cba6ce/secret_key**
 ```
 eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwYXlsb2FkIjp7Imhhc2hfc2FsdCI6ImQ3aWI5aEpTR0pod3crSWJGellGZ2ZaNkMydTVrTGRCSEpvTHorb2VNalhiQ1RXc2NJQkJobkY0dkZ3Qk5SZzZIYlE3Z1ZSejAzQTZHZzJGdFZ4ZlcrSWIzTGFKUjBCSEJ5VURCeEZWcHdnUUFGd1VrWkNqSzRoMkF1TXN5RmE3c3FLQmlydEE3cGVXTWovd3Jwc3paQkhCQ2Y4T1J1REtMQ1ZqMGdUd0RVeERGbE1LRUhzM05hSlRKMDdtRkY5N0RHMWdBNlZmS3ZIcFFlMEpFQ29nVzcxNzJ6TFVmNW16YmFNTXY0YVdZM3lGdEN3ODkvaUU5UVVmeUZnelNRK0tQNU5uWUJnUmJnb2FsTHpoZkRQcVdCREU1dkRSVEhyc1MrV3pDa3EvaVJiNmZJRmZLT0plOUFIcW9yczZEVkx0MjRoU2FhK3dlL0U1cjRoWDBqMzQ1dz09IiwiYWVzX2luaXRWZWN0b3IiOiJmYnBoR0RvWUkwMGVRNFdqZlFFQStUR3dxT1Q4MWJzanM3SC9VU3dkZE9QSlFIeFlSeHZVd3hWTGhqR0tPS0lHdU5GZzNUZktrc1BjZ3lrUEJxOXZyVEdzRFFKRWRWeWtSVTRwLy9ZSU5jSEdTVXZnd00zYVZKb1FUOHVPMjd0MjJwZlU3ZFlubU1KdGVONDNzZXJYME94S2RSdThRZ2JrbzNUSEJaY3ZoY1dFYy9mMURkZXpYRk5Ddlo4dm10R1libGNNNWN0U25XN00ybTZRZmR4cGJjMkEyeXlvQlJFeFBMU2VyOWNsQjdFNExYdlhwTXcra3F1TE14R2VWbklONDViQlBRdWJEdUduN284QkJOVGhuendNcFFXU1ZOeG9RRGwxSkdxM0N4SkJramlEckFFWXJ3UjEvUGw0U1pRUnFnQmx1MytwenhCU1NVZUozdmtJdlE9PSIsImFlc19zZWN1cml0eWtleSI6ImxCaVRHMEdRcVNVNFJXQTkyWi9wUmtlSGdiV3hlZFhhdUVIVVNwSjR1ZlZFTGQ4OWNLdXFENWc4MHZ3ZXc5VWtrMGtzbFZHc0JqTTdQQU5ka3NHOVB2NlZVMGNPb050TnM4eE5jWDV4Q1RNUlNqTURoN1p0NWwydnZUdS8vVVhVejhjTDhnb29WemVKWE5Dc1hJWnpScko5WCs2RjlVOU96SnRzaHVkVktSUUR1WnR5bUNWWURNa09jUXEzL25nRDNiUnRWVUU3b1B3T2cxVFVuMTRmaGdScW03aHhXYlJtcHRpeUdobHZoWmtpMFVPc2M0bFJhRmhqWU9XVDVLWndDN1FKRml5Mk1wTTVYL1ZLNU1TUG5rVHVwWFVGYmw3WmVFeHZIc2RuWTNzOFhBVlN1V3VkUnNrTHdtK2VBM282VmlqUTl2WndicFcxZWR4aytaOVFQUT09In0sImlhdCI6MTY3ODAxMTg1OX0.NnyGQhjjUyV-oKpSKeK9T-irwRrThI2u-rQM25Tizq8
 
@@ -148,7 +148,7 @@ eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwYXlsb2FkIjp7Imhhc2hfc2FsdCI6ImQ3aWI5aEp
 
 ### MANUAL TEST WITH POSTMAN using Lambda@edge (all encrypted): ###
 
-Register a user at - https://[cloudfront-domain]/{stage}/v2/signup?client_id=clientid1
+Register a user at - https://[cloudfront-domain]/{stage}/v2/signup?client_id=f977ec729e094141b6c1d01f50cba6ce
 
 POST:
 ```
@@ -169,7 +169,7 @@ POST:
 - Copy the Location and paste it for the next step
 
 1. SET in Postman do not follow redirects
-2. GET -> user click login -  https://[your-app-domain]/{stage}/login?client_id=clientid1
+2. GET -> user click login -  https://[your-app-domain]/{stage}/login?client_id=f977ec729e094141b6c1d01f50cba6ce
 3. GET -> Authorization code quest + code challenge to Oauth provider - https://[your-oauth-domain].execute-api.eu-central-1.amazonaws.com/{stage}/authorize?....
 4. POST -> Redirec to login page - https://[cloudfront-domain]/{stage}/v2/login?.....
 5. GET -> Authenticate and consent/optin - https://[your-oauth-domain].execute-api.eu-central-1.amazonaws.com/{stage}/authorize?....
@@ -181,9 +181,9 @@ POST:
 
 1. Upload the files to simulate a website
 2. Upload the RSA public and private keys into SSM
-3. Register a user at - https://[your-oauth-domain]/{stage}/v2/signup?client_id=clientid1
+3. Register a user at - https://[your-oauth-domain]/{stage}/v2/signup?client_id=f977ec729e094141b6c1d01f50cba6ce
 4. Open the page index.html
-5. Insert https://[your-app-domain].execute-api.eu-central-1.amazonaws.com/{stage}/login?client_id=clientid1
+5. Insert https://[your-app-domain].execute-api.eu-central-1.amazonaws.com/{stage}/login?client_id=f977ec729e094141b6c1d01f50cba6ce
 6. Click Login
 7. Enter the data from point 2
 8 Now, with the token, we can call our protected API - eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJiQGIuY29tIiwiY29tcGFueSI6IkFDTUUiLCJleHAiOjEwMDAwMDAwMDAwfQ.TXdR1GMY_5nqQLDTk3uSZlRjt7JeVdK8HUuTRo44-OU
