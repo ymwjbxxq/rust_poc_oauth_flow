@@ -138,13 +138,24 @@ Resources:
         - Version: "2012-10-17"
           Statement:
             - Effect: Allow
+              Action:
+                - "ssm:GetParameter"
+              Resource: "*"
+            - Effect: Allow
               Action: 
                 - dynamodb:GetItem
                 - dynamodb:DeleteItem
               Resource: !GetAtt CSRFTable.Arn
+        - Version: "2012-10-17"
+          Statement:
+            - Effect: Allow
+              Action: 
+                - dynamodb:GetItem
+              Resource: !GetAtt OAuthServiceTable.Arn
       Environment:
         Variables:
           CSRF_TABLE_NAME: !Ref CSRFTable
+          USER_TABLE_NAME: !Ref OAuthServiceTable
       Events:
         Api:
           Type: Api
@@ -166,65 +177,65 @@ Resources:
 ##########################################################################
 # Lambda -  load UI                                                      #
 ##########################################################################
-  OauthOptinGETFunction:
-    Type: AWS::Serverless::Function
-    Properties:
-      CodeUri: ../../build/oauth/oauth-get-page
-      Policies:
-        - AWSLambdaBasicExecutionRole
-        - S3ReadPolicy:
-            BucketName: !Ref SourceBucket
-      Environment:
-        Variables:
-          CONFIG_BUCKETNAME: !Ref SourceBucket
-          PAGE_NAME: optin
-      Events:
-        Api:
-          Type: Api
-          Properties:
-            Path: /custom/optin
-            Method: GET
-            RestApiId: !Ref OAuthApi
-      Tags:
-        Name: optin-load-page
-        env: !Ref StageName
-        service: oauth
+  # OauthOptinGETFunction:
+  #   Type: AWS::Serverless::Function
+  #   Properties:
+  #     CodeUri: ../../build/oauth/oauth-get-page
+  #     Policies:
+  #       - AWSLambdaBasicExecutionRole
+  #       - S3ReadPolicy:
+  #           BucketName: !Ref SourceBucket
+  #     Environment:
+  #       Variables:
+  #         CONFIG_BUCKETNAME: !Ref SourceBucket
+  #         PAGE_NAME: optin
+  #     Events:
+  #       Api:
+  #         Type: Api
+  #         Properties:
+  #           Path: /custom/optin
+  #           Method: GET
+  #           RestApiId: !Ref OAuthApi
+  #     Tags:
+  #       Name: optin-load-page
+  #       env: !Ref StageName
+  #       service: oauth
 
-  OauthOptinGETFunctionLogs:
-    Type: AWS::Logs::LogGroup
-    Properties:
-      RetentionInDays: 1
-      LogGroupName: !Sub "/aws/lambda/${OauthOptinGETFunction}"
+  # OauthOptinGETFunctionLogs:
+  #   Type: AWS::Logs::LogGroup
+  #   Properties:
+  #     RetentionInDays: 1
+  #     LogGroupName: !Sub "/aws/lambda/${OauthOptinGETFunction}"
   
-  OauthConsentGETFunction:
-    Type: AWS::Serverless::Function
-    Properties:
-      CodeUri: ../../build/oauth/oauth-get-page
-      Policies:
-        - AWSLambdaBasicExecutionRole
-        - S3ReadPolicy:
-            BucketName: !Ref SourceBucket
-      Environment:
-        Variables:
-          CONFIG_BUCKETNAME: !Ref SourceBucket
-          PAGE_NAME: consent
-      Events:
-        Api:
-          Type: Api
-          Properties:
-            Path: /custom/consent
-            Method: GET
-            RestApiId: !Ref OAuthApi
-      Tags:
-        Name: consent-load-page
-        env: !Ref StageName
-        service: oauth
+  # OauthConsentGETFunction:
+  #   Type: AWS::Serverless::Function
+  #   Properties:
+  #     CodeUri: ../../build/oauth/oauth-get-page
+  #     Policies:
+  #       - AWSLambdaBasicExecutionRole
+  #       - S3ReadPolicy:
+  #           BucketName: !Ref SourceBucket
+  #     Environment:
+  #       Variables:
+  #         CONFIG_BUCKETNAME: !Ref SourceBucket
+  #         PAGE_NAME: consent
+  #     Events:
+  #       Api:
+  #         Type: Api
+  #         Properties:
+  #           Path: /custom/consent
+  #           Method: GET
+  #           RestApiId: !Ref OAuthApi
+  #     Tags:
+  #       Name: consent-load-page
+  #       env: !Ref StageName
+  #       service: oauth
 
-  OauthConsentGETFunctionLogs:
-    Type: AWS::Logs::LogGroup
-    Properties:
-      RetentionInDays: 1
-      LogGroupName: !Sub "/aws/lambda/${OauthConsentGETFunction}"
+  # OauthConsentGETFunctionLogs:
+  #   Type: AWS::Logs::LogGroup
+  #   Properties:
+  #     RetentionInDays: 1
+  #     LogGroupName: !Sub "/aws/lambda/${OauthConsentGETFunction}"
 
   OauthLoginGETFunction:
     Type: AWS::Serverless::Function
@@ -289,73 +300,73 @@ Resources:
 ##########################################################################
 # Lambda - Process from load UI                                          #
 ##########################################################################
-  OauthOptinPOSTFunction:
-    Type: AWS::Serverless::Function
-    Properties:
-      CodeUri: ../../build/oauth/oauth-optin-post
-      Policies:
-        - AWSLambdaBasicExecutionRole
-        - Version: "2012-10-17"
-          Statement:
-            - Effect: Allow
-              Action: 
-                - dynamodb:UpdateItem
-              Resource: !GetAtt OAuthServiceTable.Arn
-      Environment:
-        Variables:
-          TABLE_NAME: !Ref OAuthServiceTable
-          OAUTH_AUTHORIZE_PATH: !Sub "/${StageName}/authorize"
-      Events:
-        Api:
-          Type: Api
-          Properties:
-            Path: /custom/optin
-            Method: POST
-            RestApiId: !Ref OAuthApi
-      Tags:
-        Name: optin-process-page
-        env: !Ref StageName
-        service: oauth
+  # OauthOptinPOSTFunction:
+  #   Type: AWS::Serverless::Function
+  #   Properties:
+  #     CodeUri: ../../build/oauth/oauth-optin-post
+  #     Policies:
+  #       - AWSLambdaBasicExecutionRole
+  #       - Version: "2012-10-17"
+  #         Statement:
+  #           - Effect: Allow
+  #             Action: 
+  #               - dynamodb:UpdateItem
+  #             Resource: !GetAtt OAuthServiceTable.Arn
+  #     Environment:
+  #       Variables:
+  #         TABLE_NAME: !Ref OAuthServiceTable
+  #         OAUTH_AUTHORIZE_PATH: !Sub "/${StageName}/authorize"
+  #     Events:
+  #       Api:
+  #         Type: Api
+  #         Properties:
+  #           Path: /custom/optin
+  #           Method: POST
+  #           RestApiId: !Ref OAuthApi
+  #     Tags:
+  #       Name: optin-process-page
+  #       env: !Ref StageName
+  #       service: oauth
   
-  OauthOptinPOSTFunctionLogs:
-    Type: AWS::Logs::LogGroup
-    Properties:
-      RetentionInDays: 1
-      LogGroupName: !Sub "/aws/lambda/${OauthOptinPOSTFunction}"
+  # OauthOptinPOSTFunctionLogs:
+  #   Type: AWS::Logs::LogGroup
+  #   Properties:
+  #     RetentionInDays: 1
+  #     LogGroupName: !Sub "/aws/lambda/${OauthOptinPOSTFunction}"
   
-  OauthConsentPOSTFunction:
-    Type: AWS::Serverless::Function
-    Properties:
-      CodeUri: ../../build/oauth/oauth-consent-post
-      Policies:
-        - AWSLambdaBasicExecutionRole
-        - Version: "2012-10-17"
-          Statement:
-            - Effect: Allow
-              Action: 
-                - dynamodb:UpdateItem
-              Resource: !GetAtt OAuthServiceTable.Arn
-      Environment:
-        Variables:
-          TABLE_NAME: !Ref OAuthServiceTable
-          OAUTH_AUTHORIZE_PATH: !Sub "/${StageName}/authorize"
-      Events:
-        Api:
-          Type: Api
-          Properties:
-            Path: /custom/consent
-            Method: POST
-            RestApiId: !Ref OAuthApi
-      Tags:
-        Name: consent-process-page
-        env: !Ref StageName
-        service: oauth
+  # OauthConsentPOSTFunction:
+  #   Type: AWS::Serverless::Function
+  #   Properties:
+  #     CodeUri: ../../build/oauth/oauth-consent-post
+  #     Policies:
+  #       - AWSLambdaBasicExecutionRole
+  #       - Version: "2012-10-17"
+  #         Statement:
+  #           - Effect: Allow
+  #             Action: 
+  #               - dynamodb:UpdateItem
+  #             Resource: !GetAtt OAuthServiceTable.Arn
+  #     Environment:
+  #       Variables:
+  #         TABLE_NAME: !Ref OAuthServiceTable
+  #         OAUTH_AUTHORIZE_PATH: !Sub "/${StageName}/authorize"
+  #     Events:
+  #       Api:
+  #         Type: Api
+  #         Properties:
+  #           Path: /custom/consent
+  #           Method: POST
+  #           RestApiId: !Ref OAuthApi
+  #     Tags:
+  #       Name: consent-process-page
+  #       env: !Ref StageName
+  #       service: oauth
   
-  OauthConsentPOSTFunctionLogs:
-    Type: AWS::Logs::LogGroup
-    Properties:
-      RetentionInDays: 1
-      LogGroupName: !Sub "/aws/lambda/${OauthConsentPOSTFunction}"
+  # OauthConsentPOSTFunctionLogs:
+  #   Type: AWS::Logs::LogGroup
+  #   Properties:
+  #     RetentionInDays: 1
+  #     LogGroupName: !Sub "/aws/lambda/${OauthConsentPOSTFunction}"
 
   OauthLoginPOSTFunction:
     Type: AWS::Serverless::Function

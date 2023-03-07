@@ -53,8 +53,8 @@ pub async fn handler(
         let result = app_client
             .add_csrf_query(
                 &AddCSRFRequest::builder()
-                    .client_id(request.client_id.to_owned())
-                    .sk(format!("state#{}", state.to_owned()))
+                    .client_id(request.client_id.to_lowercase())
+                    .sk(format!("state####{}", state.to_owned()))
                     .data(None)
                     .build(),
             )

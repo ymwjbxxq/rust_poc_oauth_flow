@@ -1,6 +1,6 @@
 use lambda_http::{run, service_fn, Error, IntoResponse, Request};
 use oauth::dtos::signup::singup_request::SignUpRequest;
-use oauth::queries::add_user_query::AddUser;
+use oauth::queries::user::add_user_query::AddUser;
 use oauth::setup_tracing;
 use oauth::utils::injections::signup::post_di::{PostAppClient, PostAppInitialisation};
 use serde_json::json;

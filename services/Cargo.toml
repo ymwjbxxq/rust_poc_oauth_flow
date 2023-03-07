@@ -10,12 +10,13 @@ version = "0.1.0"
 
 [workspace.dependencies]
 cookie = "0.17"
-futures = "0.3"
+futures = { version = "0.3", default-features = false }
 http = "0.2"
 aws_lambda_events = { version = "0.7", default-features = false, features = ["apigw"] }
 lambda_http = { version = "0.7", default-features = false, features = ["apigw_rest"] }
 lambda_runtime = "0.7.3"
 aws-sdk-dynamodb = "0.24.0"
+aws-sdk-ssm = "0.24.0"
 aws-sdk-s3 = "0.24.0"
 aws-types = "0.54.1"
 aws-config = "0.54.1"
@@ -35,5 +36,5 @@ jsonwebtoken = "8"
 serde_urlencoded = "0.7"
 crypto = "0.4.0"
 openssl = { version = "0.10.45", features = ["vendored"] }
-typed-builder = "0.12.0"
+typed-builder = "0.13.0"
 chrono = { version = "0.4", default-features = false, features = ["time", "clock"] }

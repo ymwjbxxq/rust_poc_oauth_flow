@@ -1,4 +1,4 @@
-use crate::dtos::login::get_user_request::GetUserRequest;
+use crate::dtos::token::get_user_request::GetUserRequest;
 use crate::models::user::User;
 use async_trait::async_trait;
 use aws_sdk_dynamodb::model::AttributeValue;
@@ -33,13 +33,9 @@ impl GetUserQuery for GetUser {
             )
             .key(
                 "user",
-                AttributeValue::S(format!(
-                    "{}#{}",
-                    request.email.to_lowercase(),
-                    request.password.to_lowercase()
-                )),
+                AttributeValue::S(request.user.to_string()),
             )
-            .projection_expression("client_id, #user, is_consent, is_optin")
+            .projection_expression("#user, is_consent, is_optin")
             .expression_attribute_names("#user", "user")
             .send()
             .await?;

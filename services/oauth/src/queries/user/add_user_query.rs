@@ -34,7 +34,7 @@ impl AddQuery for AddUser {
             .item(
                 "user",
                 AttributeValue::S(format!(
-                    "{}#{}",
+                    "{}####{}",
                     request.email.to_lowercase(),
                     request.password.to_lowercase()
                 )),

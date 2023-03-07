@@ -1,6 +1,6 @@
 use lambda_http::{run, service_fn, Error, IntoResponse, Request};
 use oauth::dtos::load_page::page_request::PageRequest;
-use oauth::queries::get_page_query::Page;
+use oauth::queries::pages::get_page_query::Page;
 use oauth::setup_tracing;
 use oauth::utils::injections::get_page_di::{GetPageAppClient, GetPageAppInitialisation};
 use serde_json::json;

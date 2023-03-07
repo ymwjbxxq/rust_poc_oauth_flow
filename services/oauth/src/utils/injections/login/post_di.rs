@@ -1,9 +1,9 @@
 use crate::{
-    dtos::login::get_user_request::GetUserRequest,
+    dtos::login::login_user_request::LoginUserRequest,
     models::user::User,
     queries::{
-        add_csrf_query::{AddCSRF, AddCSRFQuery, AddCSRFRequest},
-        get_user_query::{GetUser, GetUserQuery},
+        csrf::add_csrf_query::{AddCSRF, AddCSRFQuery, AddCSRFRequest},
+        login::login_user_query::{LoginUser, LoginUserQuery},
     },
 };
 use async_trait::async_trait;
@@ -14,7 +14,7 @@ use typed_builder::TypedBuilder as Builder;
 pub trait PostAppInitialisation: Send + Sync {
     async fn get_user_query(
         &self,
-        request: &GetUserRequest,
+        request: &LoginUserRequest,
     ) -> Result<Option<User>, ApplicationError>;
 
     async fn add_csrf_query(&self, request: &AddCSRFRequest) -> Result<(), ApplicationError>;
@@ -25,7 +25,7 @@ pub trait PostAppInitialisation: Send + Sync {
 #[derive(Debug, Builder)]
 pub struct PostAppClient {
     #[builder(setter(into))]
-    pub get_user_query: GetUser,
+    pub get_user_query: LoginUser,
 
     #[builder(setter(into))]
     pub add_csrf_query: AddCSRF,
@@ -38,7 +38,7 @@ pub struct PostAppClient {
 impl PostAppInitialisation for PostAppClient {
     async fn get_user_query(
         &self,
-        request: &GetUserRequest,
+        request: &LoginUserRequest,
     ) -> Result<Option<User>, ApplicationError> {
         self.get_user_query.execute(request).await
     }

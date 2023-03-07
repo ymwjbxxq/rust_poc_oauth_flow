@@ -10,7 +10,7 @@ pub struct LoginRequest {
 }
 
 #[derive(Debug, Builder)]
-pub struct GetUserRequest {
+pub struct LoginUserRequest {
     #[builder(default, setter(into))]
     pub email: String,
 
@@ -27,8 +27,8 @@ pub struct GetUserRequest {
     pub host: String,
 }
 
-impl GetUserRequest {
-    pub fn validate(event: &http::Request<Body>) -> Option<GetUserRequest> {
+impl LoginUserRequest {
+    pub fn validate(event: &http::Request<Body>) -> Option<LoginUserRequest> {
         let user = event.payload::<LoginRequest>().ok().and_then(|user| user);
         if let Some(user) = user {
             let query_params = event.query_string_parameters();

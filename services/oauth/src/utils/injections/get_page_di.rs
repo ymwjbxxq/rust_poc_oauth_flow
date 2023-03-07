@@ -1,6 +1,6 @@
 use crate::{
     dtos::load_page::page_request::PageRequest,
-    queries::get_page_query::{Page, PageQuery},
+    queries::pages::get_page_query::{Page, PageQuery},
 };
 use async_trait::async_trait;
 use shared::error::ApplicationError;

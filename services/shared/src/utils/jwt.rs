@@ -10,38 +10,37 @@ use typed_builder::TypedBuilder as Builder;
 #[derive(Debug, Serialize, Deserialize, Builder)]
 pub struct Claims {
     #[builder(setter(into))]
-    pub sub: String,
+    pub iss: String, // "https://my-domain.authservice.com/"
 
     #[builder(setter(into))]
-    pub company: String,
+    pub sub: String, //"authservice|userId"
+
+    #[builder(setter(into))]
+    pub azp: String, //my_client_id
 
     #[builder(setter(into))]
     pub exp: i64,
 }
 
 #[derive(Debug, Clone, Default)]
-pub struct Jwt {
-    private_key: String,
-}
+pub struct Jwt {}
 
 impl Jwt {
-    pub fn new(private_key: &str) -> Self {
-        Jwt {
-            private_key: private_key.to_owned(),
-        }
-    }
-
-    fn get_token(&self, raw_token: &str) -> Option<String> {
+    fn get_token(raw_token: &str) -> Option<String> {
         let token = raw_token.strip_prefix("Bearer ");
 
         token.map(str::to_string)
     }
 
-    pub fn encode(&self, claims: &Claims) -> Result<Option<String>, ApplicationError> {
+    pub fn encode(
+        claims: &Claims,
+        private_key: &str,
+    ) -> Result<Option<String>, ApplicationError> {
         let token = jsonwebtoken::encode(
-            &jsonwebtoken::Header::new(Algorithm::HS256),
+            &jsonwebtoken::Header::new(Algorithm::RS256),
             claims,
-            &jsonwebtoken::EncodingKey::from_secret(self.private_key.as_bytes()),
+            &jsonwebtoken::EncodingKey::from_rsa_pem(private_key.as_bytes())
+                .expect("invalid private key"),
         )
         .ok();
 
@@ -49,7 +48,6 @@ impl Jwt {
     }
 
     pub fn to_response(
-        &self,
         effect: String,
         principal: &str,
         method_arn: String,
@@ -72,14 +70,14 @@ impl Jwt {
     }
 
     pub async fn validate_token(
-        &self,
         raw_token: &str,
+        public_key: &str,
     ) -> Result<Option<Claims>, ApplicationError> {
-        if let Some(token) = self.get_token(raw_token) {
-          let token_data = decode::<Value>(
+        if let Some(token) = Jwt::get_token(raw_token) {
+            let token_data = decode::<Value>(
                 &token,
-                &DecodingKey::from_secret(self.private_key.as_bytes()),
-                &Validation::new(Algorithm::HS256),
+                &DecodingKey::from_rsa_pem(public_key.as_bytes()).expect("invalid public key"),
+                &Validation::new(Algorithm::RS256),
             )
             .ok();
             if let Some(token_data) = token_data {

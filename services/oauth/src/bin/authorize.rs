@@ -1,6 +1,6 @@
 use lambda_http::{run, service_fn, Error, IntoResponse, Request, RequestExt};
-use oauth::queries::get_csrf_query::GetCSRF;
-use oauth::queries::get_csrf_query::GetCSRFRequest;
+use oauth::queries::csrf::get_csrf_query::GetCSRF;
+use oauth::queries::csrf::get_csrf_query::GetCSRFRequest;
 use oauth::setup_tracing;
 use oauth::utils::injections::authorize::authorize_di::AuthorizeAppClient;
 use oauth::utils::injections::authorize::authorize_di::AuthorizeAppInitialisation;
@@ -62,11 +62,11 @@ pub async fn handler(
         .expect("client_id is not in query string");
     let code_challenge = query_params.first("code_challenge");
     if let Some(code_challenge) = code_challenge {
-        let sk = format!("code_challenge#{code_challenge}");
+        let sk = format!("code_challenge####{code_challenge}");
         let login_status = app_client
             .get_csrf_query(
                 &GetCSRFRequest::builder()
-                    .client_id(client_id.to_owned())
+                    .client_id(client_id.to_lowercase())
                     .sk(sk.to_owned())
                     .build(),
             )
