@@ -75,94 +75,94 @@ paths:
           application/json: "{\n  \"statusCode\" : 200\n}\n"
         passthroughBehavior: "when_no_match"
         type: "mock"
-  /custom/optin:
-    get:
-      x-amazon-apigateway-integration:
-        httpMethod: "POST"
-        uri: 
-          Fn::Sub: "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${OauthOptinGETFunction.Arn}/invocations"
-        passthroughBehavior: "when_no_match"
-        type: "aws_proxy"
-    post:
-      x-amazon-apigateway-integration:
-        httpMethod: "POST"
-        uri: 
-          Fn::Sub: "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${OauthOptinPOSTFunction.Arn}/invocations"
-        passthroughBehavior: "when_no_match"
-        type: "aws_proxy"
-    options:
-      responses:
-        "200":
-          description: "200 response"
-          headers:
-            Access-Control-Allow-Origin:
-              schema:
-                type: "string"
-            Access-Control-Allow-Methods:
-              schema:
-                type: "string"
-            Access-Control-Allow-Headers:
-              schema:
-                type: "string"
-          content: {}
-      x-amazon-apigateway-integration:
-        responses:
-          default:
-            statusCode: "200"
-            responseParameters:
-              method.response.header.Access-Control-Allow-Methods: "'GET, POST, OPTIONS'"
-              method.response.header.Access-Control-Allow-Headers: "'content-type,x-amz-date,authorization,x-api-key,x-amz-security-token,access-control-allow-headers,access-control-request-methods,access-control-request-headers,access-control-allow-methods,access-control-allow-origin,x-requested-with'"
-              method.response.header.Access-Control-Allow-Origin: "'*'"
-            responseTemplates:
-              application/json: "{}\n"
-        requestTemplates:
-          application/json: "{\n  \"statusCode\" : 200\n}\n"
-        passthroughBehavior: "when_no_match"
-        type: "mock"
-  /custom/consent:
-    get:
-      x-amazon-apigateway-integration:
-        httpMethod: "POST"
-        uri: 
-          Fn::Sub: "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${OauthConsentGETFunction.Arn}/invocations"
-        passthroughBehavior: "when_no_match"
-        type: "aws_proxy"
-    post:
-      x-amazon-apigateway-integration:
-        httpMethod: "POST"
-        uri: 
-          Fn::Sub: "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${OauthConsentPOSTFunction.Arn}/invocations"
-        passthroughBehavior: "when_no_match"
-        type: "aws_proxy"
-    options:
-      responses:
-        "200":
-          description: "200 response"
-          headers:
-            Access-Control-Allow-Origin:
-              schema:
-                type: "string"
-            Access-Control-Allow-Methods:
-              schema:
-                type: "string"
-            Access-Control-Allow-Headers:
-              schema:
-                type: "string"
-          content: {}
-      x-amazon-apigateway-integration:
-        responses:
-          default:
-            statusCode: "200"
-            responseParameters:
-              method.response.header.Access-Control-Allow-Methods: "'GET, POST, OPTIONS'"
-              method.response.header.Access-Control-Allow-Headers: "'content-type,x-amz-date,authorization,x-api-key,x-amz-security-token,access-control-allow-headers,access-control-request-methods,access-control-request-headers,access-control-allow-methods,access-control-allow-origin,x-requested-with'"
-              method.response.header.Access-Control-Allow-Origin: "'*'"
-            responseTemplates:
-              application/json: "{}\n"
-        requestTemplates:
-          application/json: "{\n  \"statusCode\" : 200\n}\n"
-        passthroughBehavior: "when_no_match"
-        type: "mock"
+  # /custom/optin:
+  #   get:
+  #     x-amazon-apigateway-integration:
+  #       httpMethod: "POST"
+  #       uri: 
+  #         Fn::Sub: "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${OauthOptinGETFunction.Arn}/invocations"
+  #       passthroughBehavior: "when_no_match"
+  #       type: "aws_proxy"
+  #   post:
+  #     x-amazon-apigateway-integration:
+  #       httpMethod: "POST"
+  #       uri: 
+  #         Fn::Sub: "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${OauthOptinPOSTFunction.Arn}/invocations"
+  #       passthroughBehavior: "when_no_match"
+  #       type: "aws_proxy"
+  #   options:
+  #     responses:
+  #       "200":
+  #         description: "200 response"
+  #         headers:
+  #           Access-Control-Allow-Origin:
+  #             schema:
+  #               type: "string"
+  #           Access-Control-Allow-Methods:
+  #             schema:
+  #               type: "string"
+  #           Access-Control-Allow-Headers:
+  #             schema:
+  #               type: "string"
+  #         content: {}
+  #     x-amazon-apigateway-integration:
+  #       responses:
+  #         default:
+  #           statusCode: "200"
+  #           responseParameters:
+  #             method.response.header.Access-Control-Allow-Methods: "'GET, POST, OPTIONS'"
+  #             method.response.header.Access-Control-Allow-Headers: "'content-type,x-amz-date,authorization,x-api-key,x-amz-security-token,access-control-allow-headers,access-control-request-methods,access-control-request-headers,access-control-allow-methods,access-control-allow-origin,x-requested-with'"
+  #             method.response.header.Access-Control-Allow-Origin: "'*'"
+  #           responseTemplates:
+  #             application/json: "{}\n"
+  #       requestTemplates:
+  #         application/json: "{\n  \"statusCode\" : 200\n}\n"
+  #       passthroughBehavior: "when_no_match"
+  #       type: "mock"
+  # /custom/consent:
+  #   get:
+  #     x-amazon-apigateway-integration:
+  #       httpMethod: "POST"
+  #       uri: 
+  #         Fn::Sub: "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${OauthConsentGETFunction.Arn}/invocations"
+  #       passthroughBehavior: "when_no_match"
+  #       type: "aws_proxy"
+  #   post:
+  #     x-amazon-apigateway-integration:
+  #       httpMethod: "POST"
+  #       uri: 
+  #         Fn::Sub: "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${OauthConsentPOSTFunction.Arn}/invocations"
+  #       passthroughBehavior: "when_no_match"
+  #       type: "aws_proxy"
+  #   options:
+  #     responses:
+  #       "200":
+  #         description: "200 response"
+  #         headers:
+  #           Access-Control-Allow-Origin:
+  #             schema:
+  #               type: "string"
+  #           Access-Control-Allow-Methods:
+  #             schema:
+  #               type: "string"
+  #           Access-Control-Allow-Headers:
+  #             schema:
+  #               type: "string"
+  #         content: {}
+  #     x-amazon-apigateway-integration:
+  #       responses:
+  #         default:
+  #           statusCode: "200"
+  #           responseParameters:
+  #             method.response.header.Access-Control-Allow-Methods: "'GET, POST, OPTIONS'"
+  #             method.response.header.Access-Control-Allow-Headers: "'content-type,x-amz-date,authorization,x-api-key,x-amz-security-token,access-control-allow-headers,access-control-request-methods,access-control-request-headers,access-control-allow-methods,access-control-allow-origin,x-requested-with'"
+  #             method.response.header.Access-Control-Allow-Origin: "'*'"
+  #           responseTemplates:
+  #             application/json: "{}\n"
+  #       requestTemplates:
+  #         application/json: "{\n  \"statusCode\" : 200\n}\n"
+  #       passthroughBehavior: "when_no_match"
+  #       type: "mock"
   /v2/login:
     get:
       x-amazon-apigateway-integration:
