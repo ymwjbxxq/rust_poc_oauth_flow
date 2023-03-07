@@ -2,8 +2,8 @@ use crate::{
     dtos::login::login_user_request::LoginUserRequest,
     models::user::User,
     queries::{
-        add_csrf_query::{AddCSRF, AddCSRFQuery, AddCSRFRequest},
-        login_user_query::{LoginUser, LoginUserQuery},
+        csrf::add_csrf_query::{AddCSRF, AddCSRFQuery, AddCSRFRequest},
+        login::login_user_query::{LoginUser, LoginUserQuery},
     },
 };
 use async_trait::async_trait;

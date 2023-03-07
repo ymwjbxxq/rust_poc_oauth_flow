@@ -1,9 +1,9 @@
 use crate::{
     models::{csrf::CSRF, user::User},
     queries::{
-        delete_csrf_query::{DeleteCSRF, DeleteCSRFQuery, DeleteCSRFRequest},
-        get_csrf_query::{GetCSRF, GetCSRFQuery, GetCSRFRequest},
-        get_user_query::{GetUser, GetUserQuery},
+        csrf::delete_csrf_query::{DeleteCSRF, DeleteCSRFQuery, DeleteCSRFRequest},
+        csrf::get_csrf_query::{GetCSRF, GetCSRFQuery, GetCSRFRequest},
+        user::get_user_query::{GetUser, GetUserQuery},
     }, dtos::token::get_user_request::GetUserRequest,
 };
 use async_trait::async_trait;

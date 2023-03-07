@@ -1,6 +1,5 @@
 use crate::{
-    dtos::signup::singup_request::SignUpRequest,
-    queries::add_user_query::{AddQuery, AddUser},
+    dtos::signup::singup_request::SignUpRequest, queries::user::add_user_query::{AddUser, AddQuery}
 };
 use async_trait::async_trait;
 use shared::error::ApplicationError;

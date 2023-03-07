@@ -1,6 +1,6 @@
 use crate::{
     models::csrf::CSRF,
-    queries::get_csrf_query::{GetCSRF, GetCSRFQuery, GetCSRFRequest},
+    queries::csrf::get_csrf_query::{GetCSRF, GetCSRFQuery, GetCSRFRequest},
 };
 use async_trait::async_trait;
 use shared::error::ApplicationError;
