@@ -25,14 +25,6 @@ chrono.workspace = true
 
 # OAUTH POST
 [[bin]]
-name = "oauth-consent-post"
-path = "src/bin/consent/post.rs"
-
-[[bin]]
-name = "oauth-optin-post"
-path = "src/bin/optin/post.rs"
-
-[[bin]]
 name = "oauth-login-post"
 path = "src/bin/login/post.rs"
 

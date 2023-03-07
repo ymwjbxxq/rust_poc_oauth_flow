@@ -1,6 +1,6 @@
 use lambda_http::{run, service_fn, Error, IntoResponse, Request, RequestExt};
-use oauth::queries::get_csrf_query::GetCSRF;
-use oauth::queries::get_csrf_query::GetCSRFRequest;
+use oauth::queries::csrf::get_csrf_query::GetCSRF;
+use oauth::queries::csrf::get_csrf_query::GetCSRFRequest;
 use oauth::setup_tracing;
 use oauth::utils::injections::authorize::authorize_di::AuthorizeAppClient;
 use oauth::utils::injections::authorize::authorize_di::AuthorizeAppInitialisation;

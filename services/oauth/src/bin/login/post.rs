@@ -1,7 +1,7 @@
 use lambda_http::{run, service_fn, Error, IntoResponse, Request, RequestExt};
 use oauth::dtos::login::login_user_request::LoginUserRequest;
-use oauth::queries::add_csrf_query::{AddCSRF, AddCSRFRequest};
-use oauth::queries::login_user_query::LoginUser;
+use oauth::queries::csrf::add_csrf_query::{AddCSRF, AddCSRFRequest};
+use oauth::queries::login::login_user_query::LoginUser;
 use oauth::setup_tracing;
 use oauth::utils::injections::login::post_di::{PostAppClient, PostAppInitialisation};
 use serde_json::json;
