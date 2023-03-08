@@ -8,7 +8,7 @@ use typed_builder::TypedBuilder as Builder;
 
 #[async_trait]
 pub trait JwtApiInitialisation: Send + Sync {
-    async fn validate_token(&self, raw_token: &str, public_key: &str) -> Result<Option<Claims>, ApplicationError>;
+    async fn validate_token(&self, raw_token: &str) -> Result<Option<Claims>, ApplicationError>;
 
     fn to_response(
         &self,
@@ -23,8 +23,8 @@ pub struct JwtApiClient {}
 
 #[async_trait]
 impl JwtApiInitialisation for JwtApiClient {
-    async fn validate_token(&self, raw_token: &str, public_key: &str) -> Result<Option<Claims>, ApplicationError> {
-        Jwt::validate_token(raw_token, public_key).await
+    async fn validate_token(&self, raw_token: &str) -> Result<Option<Claims>, ApplicationError> {
+        Jwt::validate_token(raw_token).await
     }
 
     fn to_response(

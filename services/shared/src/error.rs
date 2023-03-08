@@ -65,3 +65,16 @@ impl From<base64::DecodeError> for ApplicationError {
         ApplicationError::InternalError("Decode base64 to string failed".to_owned())
     }
 }
+
+impl From<reqwest::Error> for ApplicationError {
+    fn from(e: reqwest::Error) -> ApplicationError {
+        if e.is_timeout() {
+            return ApplicationError::ClientError(
+                "TIMEOUT: The request timed out while trying to connect to the remote server"
+                    .to_string(),
+            );
+        }
+
+        ApplicationError::SdkError(format!("reqwest sdk error {e:?}"))
+    }
+}

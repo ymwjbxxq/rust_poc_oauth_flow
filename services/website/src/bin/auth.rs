@@ -74,6 +74,7 @@ pub async fn handler(
                         ("code", request.code.as_ref()),
                         ("code_verifier", request.code_challenge.as_ref()),
                         ("redirect_uri", request.redirect_uri.as_ref()),
+                        ("audience", "my-app"),
                     ]),
                 );
 

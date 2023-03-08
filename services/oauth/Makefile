@@ -1,4 +1,4 @@
-FUNCTIONS := oauth-consent-post oauth-login-post oauth-optin-post oauth-signup-post oauth-get-page oauth-token oauth-authorize
+FUNCTIONS := oauth-consent-post oauth-login-post oauth-optin-post oauth-signup-post oauth-get-page oauth-token oauth-authorize oauth-jwks
 
 ARCH := aarch64-unknown-linux-gnu
 ARCH_SPLIT = $(subst -, ,$(ARCH))

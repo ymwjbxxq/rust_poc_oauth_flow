@@ -45,7 +45,11 @@ path = "src/bin/authorize.rs"
 
 [[bin]]
 name = "oauth-token"
-path = "src/bin/token.rs"
+path = "src/bin/token/token.rs"
+
+[[bin]]
+name = "oauth-jwks"
+path = "src/bin/token/jwks.rs"
 
 [profile.release]
 strip = true  # Automatically strip symbols from the binary.
