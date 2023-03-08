@@ -78,6 +78,11 @@ Resources:
       CodeUri: ../../build/website/app-lambda-jwt
       Policies:
         - AWSLambdaBasicExecutionRole
+      Environment:
+        Variables:
+          AUDIENCE: my-app
+          TOKEN_ISSUER: https://f977ec729e094141b6c1d01f50cba6ce.authservice.com/
+          JSKS_URI: !Sub ['${domain}/f977ec729e094141b6c1d01f50cba6ce/.well-known/jwks.json', domain: !ImportValue oauth-AuthUrl]
       Tags:
         Name: jwt-authorizer
         env: !Ref StageName

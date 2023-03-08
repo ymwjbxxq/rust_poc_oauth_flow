@@ -1,7 +1,7 @@
 use typed_builder::TypedBuilder as Builder;
 
 #[derive(Debug, Builder)]
-pub struct GetPrivateKeyRequest {
+pub struct GetKeyRequest {
     #[builder(setter(into))]
     pub client_id: String,
 

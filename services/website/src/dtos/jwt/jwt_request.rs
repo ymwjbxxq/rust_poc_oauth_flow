@@ -14,7 +14,7 @@ pub struct JwtRequest {
 impl JwtRequest {
     pub fn validate(event: &ApiGatewayCustomAuthorizerRequestTypeRequest) -> Option<JwtRequest> {
         let method_arn = &event.method_arn;
-        let authorization = event.headers.get("Authorization");
+        let authorization = event.headers.get("authorization");
 
         if let (Some(method_arn), Some(authorization)) = (method_arn, authorization) {
             return Some(
@@ -24,6 +24,8 @@ impl JwtRequest {
                     .build(),
             );
         }
+
+        println!("request not valid");
         None
     }
 }

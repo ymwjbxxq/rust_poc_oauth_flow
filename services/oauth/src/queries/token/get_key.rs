@@ -1,28 +1,28 @@
-use crate::dtos::token::get_private_key_request::GetPrivateKeyRequest;
+use crate::dtos::token::get_key_request::GetKeyRequest;
 use async_trait::async_trait;
 use aws_sdk_ssm::Client;
 use shared::error::ApplicationError;
 use typed_builder::TypedBuilder as Builder;
 
 #[derive(Debug, Builder)]
-pub struct GetPrivateKey {
+pub struct GetKey {
     #[builder(setter(into))]
     client: Client,
 }
 
 #[async_trait]
-pub trait GetPrivateKeyQuery {
+pub trait GetKeyQuery {
     async fn execute(
         &self,
-        request: &GetPrivateKeyRequest,
+        request: &GetKeyRequest,
     ) -> Result<Option<String>, ApplicationError>;
 }
 
 #[async_trait]
-impl GetPrivateKeyQuery for GetPrivateKey {
+impl GetKeyQuery for GetKey {
     async fn execute(
         &self,
-        request: &GetPrivateKeyRequest,
+        request: &GetKeyRequest,
     ) -> Result<Option<String>, ApplicationError> {
         let res = self
             .client

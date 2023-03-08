@@ -19,6 +19,9 @@ pub struct Claims {
     pub azp: String, //my_client_id
 
     #[builder(setter(into))]
+    pub aud: String, //my_app
+
+    #[builder(setter(into))]
     pub exp: i64,
 }
 
@@ -32,10 +35,7 @@ impl Jwt {
         token.map(str::to_string)
     }
 
-    pub fn encode(
-        claims: &Claims,
-        private_key: &str,
-    ) -> Result<Option<String>, ApplicationError> {
+    pub fn encode(claims: &Claims, private_key: &str) -> Result<Option<String>, ApplicationError> {
         let token = jsonwebtoken::encode(
             &jsonwebtoken::Header::new(Algorithm::RS256),
             claims,
@@ -69,11 +69,9 @@ impl Jwt {
         }
     }
 
-    pub async fn validate_token(
-        raw_token: &str,
-        public_key: &str,
-    ) -> Result<Option<Claims>, ApplicationError> {
+    pub async fn validate_token(raw_token: &str) -> Result<Option<Claims>, ApplicationError> {
         if let Some(token) = Jwt::get_token(raw_token) {
+            let public_key = Jwt::get_public_key().await?;
             let token_data = decode::<Value>(
                 &token,
                 &DecodingKey::from_rsa_pem(public_key.as_bytes()).expect("invalid public key"),
@@ -87,4 +85,40 @@ impl Jwt {
         }
         Ok(None)
     }
+
+    async fn get_public_key() -> Result<String, ApplicationError> {
+        let json_key_set_url = std::env::var("JSKS_URI").expect("JSKS_URI must be set");
+        let res = reqwest::Client::new().get(json_key_set_url).send().await?;
+        let jwks = res.json::<JwtKeys>().await?;
+        
+        Ok(jwks.public_key.replace('\n', ""))
+    }
 }
+
+
+#[derive(Deserialize)]
+pub struct JwtKeys {
+    // pub keys: Vec<JwtKey>,
+    pub public_key: String,
+}
+
+// #[derive(Debug, Serialize, Deserialize)]
+// pub struct JwtKey {
+//     pub e: String,
+//     pub kty: String,
+//     pub alg: Option<String>,
+//     pub n: String,
+//     pub kid: String,
+// }
+
+// impl Clone for JwtKey {
+//     fn clone(&self) -> Self {
+//         JwtKey {
+//             e: self.e.clone(),
+//             kty: self.kty.clone(),
+//             alg: self.alg.clone(),
+//             n: self.n.clone(),
+//             kid: self.kid.clone(),
+//         }
+//     }
+// }

@@ -1,11 +1,11 @@
 use chrono::{Duration, Utc};
 use lambda_http::{run, service_fn, Error, IntoResponse, Request};
-use oauth::dtos::token::get_private_key_request::GetPrivateKeyRequest;
+use oauth::dtos::token::get_key_request::GetKeyRequest;
 use oauth::dtos::token::get_user_request::GetUserRequest;
 use oauth::dtos::token::token_request::TokenRequest;
 use oauth::queries::csrf::delete_csrf_query::{DeleteCSRF, DeleteCSRFRequest};
 use oauth::queries::csrf::get_csrf_query::{GetCSRF, GetCSRFRequest};
-use oauth::queries::token::get_private_key::GetPrivateKey;
+use oauth::queries::token::get_key::GetKey;
 use oauth::queries::user::get_user_query::GetUser;
 use oauth::setup_tracing;
 use oauth::utils::injections::token::token_di::{TokenAppClient, TokenAppInitialisation};
@@ -38,12 +38,12 @@ async fn main() -> Result<(), Error> {
         .client(dynamodb_client.clone())
         .build();
 
-    let get_private_key_query = GetPrivateKey::builder()
+    let get_key_query = GetKey::builder()
         .client(aws_sdk_ssm::Client::new(&config))
         .build();
 
     let app_client = TokenAppClient::builder()
-        .get_private_key_query(get_private_key_query)
+        .get_key_query(get_key_query)
         .get_user_query(get_user_query)
         .get_csrf_query(get_csrf_query)
         .delete_csrf_query(delete_csrf_query)
@@ -104,7 +104,7 @@ pub async fn handler<'a>(
                     .ok()
                     .and_then(|result| result);
                 if user.is_some() {
-                    let token = generate_token(&email, &request.client_id, app_client)
+                    let token = generate_token(&email, &request, app_client)
                         .await
                         .ok()
                         .and_then(|result| result);
@@ -140,14 +140,14 @@ pub async fn handler<'a>(
 
 async fn generate_token(
     email: &str,
-    client_id: &str,
+    request: &TokenRequest,
     app_client: &dyn TokenAppInitialisation,
 ) -> Result<Option<String>, ApplicationError> {
     let private_key = app_client
-        .get_private_key_query(
-            &GetPrivateKeyRequest::builder()
-                .client_id(client_id.to_lowercase())
-                .key_name(format!("/{}/private_key", client_id.to_lowercase()))
+        .get_key_query(
+            &GetKeyRequest::builder()
+                .client_id(request.client_id.to_lowercase())
+                .key_name(format!("/{}/private_key", request.client_id.to_lowercase()))
                 .build(),
         )
         .await
@@ -155,9 +155,10 @@ async fn generate_token(
         .and_then(|result| result);
     if let Some(private_key) = private_key {
         let claims = Claims::builder()
-            .iss(format!("https://{client_id}.authservice.com/"))
+            .iss(format!("https://{}.authservice.com/", request.client_id.to_lowercase()))
             .sub(format!("authservice|{email}"))
-            .azp(client_id)
+            .azp(request.client_id.to_lowercase())
+            .aud(request.audience.to_lowercase())
             .exp((Utc::now() + Duration::minutes(10)).timestamp())
             .build();
 

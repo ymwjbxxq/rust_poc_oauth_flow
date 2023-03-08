@@ -1,12 +1,10 @@
 use crate::{
-    dtos::token::{
-        get_private_key_request::GetPrivateKeyRequest, get_user_request::GetUserRequest,
-    },
+    dtos::token::{get_key_request::GetKeyRequest, get_user_request::GetUserRequest},
     models::{csrf::CSRF, user::User},
     queries::{
         csrf::delete_csrf_query::{DeleteCSRF, DeleteCSRFQuery, DeleteCSRFRequest},
         csrf::get_csrf_query::{GetCSRF, GetCSRFQuery, GetCSRFRequest},
-        token::get_private_key::{GetPrivateKey, GetPrivateKeyQuery},
+        token::get_key::{GetKey, GetKeyQuery},
         user::get_user_query::{GetUser, GetUserQuery},
     },
 };
@@ -28,9 +26,9 @@ pub trait TokenAppInitialisation: Send + Sync {
         request: &GetUserRequest,
     ) -> Result<Option<User>, ApplicationError>;
 
-    async fn get_private_key_query(
+    async fn get_key_query(
         &self,
-        request: &GetPrivateKeyRequest,
+        request: &GetKeyRequest,
     ) -> Result<Option<String>, ApplicationError>;
 }
 
@@ -46,7 +44,7 @@ pub struct TokenAppClient {
     pub get_user_query: GetUser,
 
     #[builder(setter(into))]
-    pub get_private_key_query: GetPrivateKey,
+    pub get_key_query: GetKey,
 }
 
 #[async_trait]
@@ -69,10 +67,10 @@ impl TokenAppInitialisation for TokenAppClient {
         self.get_user_query.execute(request).await
     }
 
-    async fn get_private_key_query(
+    async fn get_key_query(
         &self,
-        request: &GetPrivateKeyRequest,
+        request: &GetKeyRequest,
     ) -> Result<Option<String>, ApplicationError> {
-        self.get_private_key_query.execute(request).await
+        self.get_key_query.execute(request).await
     }
 }

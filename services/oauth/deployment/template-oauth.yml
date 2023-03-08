@@ -173,6 +173,36 @@ Resources:
     Properties:
       RetentionInDays: 1
       LogGroupName: !Sub "/aws/lambda/${OauthTokenFunction}"
+
+  OauthJwksFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ../../build/oauth/oauth-jwks
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - Version: "2012-10-17"
+          Statement:
+            - Effect: Allow
+              Action:
+                - "ssm:GetParameter"
+              Resource: "*"
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            Path: /{client_id}/.well-known/jwks.json
+            Method: GET
+            RestApiId: !Ref OAuthApi
+      Tags:
+        Name: jwks
+        env: !Ref StageName
+        service: oauth
+
+  OauthJwksFunctionLogs:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      RetentionInDays: 1
+      LogGroupName: !Sub "/aws/lambda/${OauthJwksFunction}"
   
 ##########################################################################
 # Lambda -  load UI                                                      #
