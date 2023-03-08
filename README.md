@@ -59,9 +59,70 @@ Each client will have a secret_key made of:
 - public_key - RSA public key to encrypt the values of the secret_key
 - private_key - RSA private key to decrypt the encrypted secret_key values
 
+### NOTE ABOUT JWKS: ###
+
+To validate the Token, I use the RSA Public key calling the URL:
+
+```
+https://[your-oauth-domain].execute-api.eu-central-1.amazonaws.com/{stage}/f977ec729e094141b6c1d01f50cba6ce/.well-known/jwks.json
+```
+
+I'm afraid that's not right because the jwks.json should look like this:
+
+```
+{
+  "keys": [
+    {
+      "alg": "RS256",
+      "kty": "RSA",
+      "use": "sig",
+      "x5c": [
+        "MIIDeDCCAmACCQDpLaiotXVa1zANBgkqhkiG9w0BAQsFADB+MQswCQYDVQQGEwJk ZTEQMA4GA1UECAwHYmF2YXJpYTEPMA0GA1UEBwwGbXVuaWNoMRAwDgYDVQQKDAdk YW5pZWxlMRAwDgYDVQQLDAdkYW5pZWxlMRAwDgYDVQQDDAdkYW5pZWxlMRYwFAYJ KoZIhvcNAQkBFgdhQGEuY29tMB4XDTIzMDMwODA5MDM0N1oXDTI0MDMwNzA5MDM0 N1owfjELMAkGA1UEBhMCZGUxEDAOBgNVBAgMB2JhdmFyaWExDzANBgNVBAcMBm11 bmljaDEQMA4GA1UECgwHZGFuaWVsZTEQMA4GA1UECwwHZGFuaWVsZTEQMA4GA1UE AwwHZGFuaWVsZTEWMBQGCSqGSIb3DQEJARYHYUBhLmNvbTCCASIwDQYJKoZIhvcN AQEBBQADggEPADCCAQoCggEBAKZdtxDtNNl5nMifs7W4Eq4bEfCMj4X7vlfVfOI5 XlEhGlQWET4aeVDZijoL5lintXy6mdzP24zHob1He9qCxQiAz1jH5q1OdftQoozS 1qfP1Z2ztKepG4cm2x9rriS4gVwmIk+qYzW4Hn/Z/QAZKk27gnaXVOZvHiXdJXvv CihFk2FW6rxsSFXC3eLlbciUbz1XtqCHXXKLaiuMHRGo4FOvDPa7ieCJa/PGlHM1 XEcT9ud6yPR2s2uD8HDbKJhywkidcpkXgPLHr2wO7c1j8JWDMADtjQJyDpqq1MJK E/eJQm7k3Ggdg9P2dC0GOwbFT2zGIecRZt4SNxY1/nJgrnsCAwEAATANBgkqhkiG 9w0BAQsFAAOCAQEAKs+5v+6FvWjWLKnZMXq8L7Yz8Z3jSqAsEcJys7ldrcMrCae2 DvGRHzvN2h/9jI9SWy529jAl5Hotft7RKiXj4w6qbaIYdw71fzZw2JqmCSqgGRy+ BwCZEsQQOHpAmEjT3RYKfBFVXBAr606K93vHfzI8pM9LLZn9Z7FHwgBv5Fg9sJLI yyYGVAR+6wBUnPLu+YaPjR89qR+n2CNin2jx4De7RwcbeyDTkN1zkOm2YGOWzH4q yc0CR4der7dhGlHsY2Sxkrr2CY4CRaf+JpXBKvHo/ygaT4ld7pBFmOtsDhzr19Jf lsfg+XEYXEWsdqoS5sjO1q6usW4TPu5OIsj1Zg=="
+      ],
+      "n": "Cmldb3JhV8c01Jl5ncyafO1uBIq4Ex+BjI+F+/5X1XzijlIRhaVD4aeVDCaOhtihp7V88NvMLXLXZ7O9uEe1B4DPWMfqtTnfvUKKM1qfNZe+G/fZ/QBkqTb4InaXUTrbPJn1U5m8eJdfRbvrCiRZjYVW6vGxIlXFyt5q1Od7tSihzS1qfPy1nbbQ6mR7PZbEMmJiUvpjNbiHn99/QBkqTZu4J2XlU5mbx4ld0le/sKKEWNYVatuwZxIVXL3iuVtsxElQyy3i5bdyJSvPXV7aoId1yo2iswh0aOFTrwz2uyngmi/PGlKHNVxHB9ufenyPdms2uD8HDbIoZywiSJ1ymR2F4DywvbsDvN1HY/GWDMAA7Y0AnIB6aq1MkkT3omQmbuTZoYNg9P2dLQY7BslPbMbHhq5xGbthI3FN/lxu51Ao57",
+      "e": "AQAB",
+      "kid": "6db235de4ee6ac9a5e1cc82bb00cbd7f3ddccc28",
+      "x5t": "6db235de4ee6ac9a5e1cc82bb00cbd7f3ddccc28"
+    }
+  ]
+}
+```
+
+I tried to generate it but could not make it, so I gave up on this part, but in theory, the flow is there.
+
+I have created it from my 'privatekey.pem' the x509 with the command:
+```
+openssl req -new -key privatekey.pem -out csr.pem
+```
+
+From there, I took the fingerprint (kid and x5t) using this website https://www.samltool.com/fingerprint.php
+
+and took the modulus and exponent for the RSA in this way
+
+```
+openssl rsa -pubin -in publickey.pem -text -noout
+```
+
+From here, I could not find the correct way to convert it for the jwks.
+
+Assuming the correct values from the endpoint '/.well-known/jwks.json', the validation of the token can be done like this:
+
+```
+let mut validation = Validation::new(Algorithm::RS256);
+    validation.set_audience(&[&self.audience]);
+    validation.set_issuer(&[&self.issuer]);
+
+let token_data = decode::<Value>(
+    &token,
+    &DecodingKey::from_rsa_components(&jwk.n, &jwk.e)?,
+    &validation,
+);
+```
+
+
 ### PAGE INJECTION: ###
 
-the old implementation is wrong
+The old implementation is wrong
 
 COMING SOON
 
