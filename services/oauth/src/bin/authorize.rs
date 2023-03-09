@@ -43,7 +43,7 @@ async fn main() -> Result<(), Error> {
 pub async fn handler(
     app_client: &dyn AuthorizeAppInitialisation,
     event: Request,
-) -> Result<impl IntoResponse, Error> {
+) -> anyhow::Result<impl IntoResponse> {
     println!("{event:?}");
     let query_params = event.query_string_parameters();
     let host = event

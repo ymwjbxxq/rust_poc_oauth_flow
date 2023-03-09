@@ -10,7 +10,6 @@ use oauth::queries::user::get_user_query::GetUser;
 use oauth::setup_tracing;
 use oauth::utils::injections::token::token_di::{TokenAppClient, TokenAppInitialisation};
 use serde_json::json;
-use shared::error::ApplicationError;
 use shared::utils::api_helper::{ApiResponseType, ContentType, IsCors};
 use shared::utils::jwt::{Claims, Jwt};
 
@@ -55,7 +54,7 @@ async fn main() -> Result<(), Error> {
 pub async fn handler<'a>(
     app_client: &dyn TokenAppInitialisation,
     event: Request,
-) -> Result<impl IntoResponse, Error> {
+) -> anyhow::Result<impl IntoResponse> {
     println!("{event:?}");
 
     let mut messages: Vec<String> = Vec::new();
@@ -142,7 +141,7 @@ async fn generate_token(
     email: &str,
     request: &TokenRequest,
     app_client: &dyn TokenAppInitialisation,
-) -> Result<Option<String>, ApplicationError> {
+) -> anyhow::Result<Option<String>> {
     let private_key = app_client
         .get_key_query(
             &GetKeyRequest::builder()
@@ -155,7 +154,10 @@ async fn generate_token(
         .and_then(|result| result);
     if let Some(private_key) = private_key {
         let claims = Claims::builder()
-            .iss(format!("https://{}.authservice.com/", request.client_id.to_lowercase()))
+            .iss(format!(
+                "https://{}.authservice.com/",
+                request.client_id.to_lowercase()
+            ))
             .sub(format!("authservice|{email}"))
             .azp(request.client_id.to_lowercase())
             .aud(request.audience.to_lowercase())

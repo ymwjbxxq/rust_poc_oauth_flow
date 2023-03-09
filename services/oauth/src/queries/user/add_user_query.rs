@@ -2,7 +2,6 @@ use crate::dtos::signup::singup_request::SignUpRequest;
 use async_trait::async_trait;
 use aws_sdk_dynamodb::model::AttributeValue;
 use aws_sdk_dynamodb::Client;
-use shared::error::ApplicationError;
 use typed_builder::TypedBuilder as Builder;
 
 #[derive(Debug, Builder)]
@@ -16,12 +15,12 @@ pub struct AddUser {
 
 #[async_trait]
 pub trait AddQuery {
-    async fn execute(&self, product: &SignUpRequest) -> Result<(), ApplicationError>;
+    async fn execute(&self, product: &SignUpRequest) -> anyhow::Result<()>;
 }
 
 #[async_trait]
 impl AddQuery for AddUser {
-    async fn execute(&self, request: &SignUpRequest) -> Result<(), ApplicationError> {
+    async fn execute(&self, request: &SignUpRequest) -> anyhow::Result<()> {
         println!("Adding user");
         let res = self
             .client

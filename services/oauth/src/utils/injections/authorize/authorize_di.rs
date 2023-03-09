@@ -3,15 +3,11 @@ use crate::{
     queries::csrf::get_csrf_query::{GetCSRF, GetCSRFQuery, GetCSRFRequest},
 };
 use async_trait::async_trait;
-use shared::error::ApplicationError;
 use typed_builder::TypedBuilder as Builder;
 
 #[async_trait]
 pub trait AuthorizeAppInitialisation: Send + Sync {
-    async fn get_csrf_query(
-        &self,
-        request: &GetCSRFRequest,
-    ) -> Result<Option<CSRF>, ApplicationError>;
+    async fn get_csrf_query(&self, request: &GetCSRFRequest) -> anyhow::Result<Option<CSRF>>;
     fn oauth_authorize_login_path(&self) -> &str;
 
     fn oauth_custom_optin_path(&self) -> &str;
@@ -36,10 +32,7 @@ pub struct AuthorizeAppClient {
 
 #[async_trait]
 impl AuthorizeAppInitialisation for AuthorizeAppClient {
-    async fn get_csrf_query(
-        &self,
-        request: &GetCSRFRequest,
-    ) -> Result<Option<CSRF>, ApplicationError> {
+    async fn get_csrf_query(&self, request: &GetCSRFRequest) -> anyhow::Result<Option<CSRF>> {
         self.get_csrf_query.execute(request).await
     }
 

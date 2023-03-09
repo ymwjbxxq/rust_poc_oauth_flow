@@ -1,2 +1,2 @@
-pub mod token_di;
 pub mod jwks_di;
+pub mod token_di;

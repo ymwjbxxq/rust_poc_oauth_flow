@@ -2,12 +2,11 @@ use crate::dtos::consent::update_consent_request::UpdateConsentRequest;
 use async_trait::async_trait;
 use aws_sdk_dynamodb::model::AttributeValue;
 use aws_sdk_dynamodb::Client;
-use shared::error::ApplicationError;
 use typed_builder::TypedBuilder as Builder;
 
 #[async_trait]
 pub trait UpdateConsentQuery {
-    async fn execute(&self, request: &UpdateConsentRequest) -> Result<(), ApplicationError>;
+    async fn execute(&self, request: &UpdateConsentRequest) -> anyhow::Result<()>;
 }
 
 #[derive(Debug, Builder)]
@@ -21,7 +20,7 @@ pub struct UpdateConsent {
 
 #[async_trait]
 impl UpdateConsentQuery for UpdateConsent {
-    async fn execute(&self, request: &UpdateConsentRequest) -> Result<(), ApplicationError> {
+    async fn execute(&self, request: &UpdateConsentRequest) -> anyhow::Result<()> {
         println!("Updating consent");
         self.client
             .update_item()

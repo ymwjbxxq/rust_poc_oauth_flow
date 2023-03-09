@@ -1,13 +1,12 @@
 use crate::queries::add_csrf_query::{AddCSRF, AddCSRFQuery, AddCSRFRequest};
 use async_trait::async_trait;
-use shared::error::ApplicationError;
 use typed_builder::TypedBuilder as Builder;
 
 #[async_trait]
 pub trait LoginAppInitialisation: Send + Sync {
     fn redirect_path(&self) -> &str;
     fn oauth_authorize_uri(&self) -> &str;
-    async fn add_csrf_query(&self, request: &AddCSRFRequest) -> Result<(), ApplicationError>;
+    async fn add_csrf_query(&self, request: &AddCSRFRequest) -> anyhow::Result<()>;
 }
 
 #[derive(Debug, Builder)]
@@ -32,7 +31,7 @@ impl LoginAppInitialisation for LoginAppClient {
         &self.oauth_authorize_uri
     }
 
-    async fn add_csrf_query(&self, request: &AddCSRFRequest) -> Result<(), ApplicationError> {
+    async fn add_csrf_query(&self, request: &AddCSRFRequest) -> anyhow::Result<()> {
         self.add_csrf_query.execute(request).await
     }
 }

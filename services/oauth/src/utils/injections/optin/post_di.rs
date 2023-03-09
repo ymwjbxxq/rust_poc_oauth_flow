@@ -3,12 +3,11 @@ use crate::{
     queries::update_optin_query::{UpdateOptIn, UpdateOptInQuery},
 };
 use async_trait::async_trait;
-use shared::error::ApplicationError;
 use typed_builder::TypedBuilder as Builder;
 
 #[async_trait]
 pub trait PostAppInitialisation: Send + Sync {
-    async fn query(&self, request: &UpdateOptInRequest) -> Result<(), ApplicationError>;
+    async fn query(&self, request: &UpdateOptInRequest) -> anyhow::Result<()>;
     fn redirect_path(&self) -> &str;
 }
 
@@ -23,7 +22,7 @@ pub struct PostAppClient {
 
 #[async_trait]
 impl PostAppInitialisation for PostAppClient {
-    async fn query(&self, request: &UpdateOptInRequest) -> Result<(), ApplicationError> {
+    async fn query(&self, request: &UpdateOptInRequest) -> anyhow::Result<()> {
         self.query.execute(request).await
     }
 

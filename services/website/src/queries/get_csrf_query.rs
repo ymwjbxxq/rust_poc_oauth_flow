@@ -2,7 +2,6 @@ use crate::models::csrf::CSRF;
 use async_trait::async_trait;
 use aws_sdk_dynamodb::model::AttributeValue;
 use aws_sdk_dynamodb::Client;
-use shared::error::ApplicationError;
 use typed_builder::TypedBuilder as Builder;
 
 #[derive(Debug, Default, Builder)]
@@ -25,12 +24,12 @@ pub struct GetCSRF {
 
 #[async_trait]
 pub trait GetCSRFQuery {
-    async fn execute(&self, request: &GetCSRFRequest) -> Result<Option<CSRF>, ApplicationError>;
+    async fn execute(&self, request: &GetCSRFRequest) -> anyhow::Result<Option<CSRF>>;
 }
 
 #[async_trait]
 impl GetCSRFQuery for GetCSRF {
-    async fn execute(&self, request: &GetCSRFRequest) -> Result<Option<CSRF>, ApplicationError> {
+    async fn execute(&self, request: &GetCSRFRequest) -> anyhow::Result<Option<CSRF>> {
         let res = self
             .client
             .get_item()

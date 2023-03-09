@@ -1,9 +1,8 @@
+use super::serde_helper::SerdeExt;
+use cookie::Cookie;
 use http::{HeaderMap, HeaderValue};
 use serde_json::{Map, Value};
 use std::collections::HashMap;
-use crate::error::ApplicationError;
-use cookie::Cookie;
-use super::serde_helper::SerdeExt;
 
 pub trait CookieExt {
     fn to_map(parsed_cookie: String) -> HashMap<String, String>;
@@ -36,21 +35,17 @@ pub struct CookieHelper;
 impl CookieHelper {
     pub fn from_http_header(
         headers: &HeaderMap<HeaderValue>,
-    ) -> Result<HashMap<String, String>, ApplicationError> {
+    ) -> anyhow::Result<HashMap<String, String>> {
         let cookie_header = match headers.get(http::header::COOKIE) {
             Some(result) => result,
             None => {
-                return Err(ApplicationError::InternalError(
-                    "Cannot find cookie in the header request".to_owned(),
-                ))
+                anyhow::bail!("Cookie not found in the header")
             }
         };
         if let Ok(cookie) = cookie_header.to_str() {
             Ok(Cookie::to_map(cookie.to_string()))
         } else {
-            Err(ApplicationError::InternalError(
-                "Something wrong with the cookie value".to_owned(),
-            ))
+            anyhow::bail!("Something wrong with the cookie value")
         }
     }
 }

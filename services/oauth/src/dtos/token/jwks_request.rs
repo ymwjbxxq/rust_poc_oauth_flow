@@ -18,4 +18,3 @@ impl JwksRequest {
         None
     }
 }
-

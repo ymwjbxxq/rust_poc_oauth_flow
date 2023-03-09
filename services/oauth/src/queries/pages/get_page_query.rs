@@ -2,12 +2,11 @@ use crate::dtos::load_page::page_request::PageRequest;
 use async_trait::async_trait;
 use aws_sdk_s3::Client;
 use serde::{Deserialize, Serialize};
-use shared::error::ApplicationError;
 use typed_builder::TypedBuilder as Builder;
 
 #[async_trait]
 pub trait PageQuery {
-    async fn execute(&self, request: &PageRequest) -> Result<Option<String>, ApplicationError>;
+    async fn execute(&self, request: &PageRequest) -> anyhow::Result<Option<String>>;
 }
 
 #[derive(Debug, Builder)]
@@ -24,12 +23,15 @@ pub struct Page {
 
 #[async_trait]
 impl PageQuery for Page {
-    async fn execute(&self, request: &PageRequest) -> Result<Option<String>, ApplicationError> {
+    async fn execute(&self, request: &PageRequest) -> anyhow::Result<Option<String>> {
         let result = self
             .client
             .get_object()
             .bucket(&self.bucket_name)
-            .key(format!("{}/pages/{}.json", request.client_id, &self.page_name))
+            .key(format!(
+                "{}/pages/{}.json",
+                request.client_id, &self.page_name
+            ))
             .response_content_type("application/json")
             .send()
             .await;

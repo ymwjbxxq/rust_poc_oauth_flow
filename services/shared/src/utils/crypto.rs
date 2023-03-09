@@ -1,8 +1,4 @@
-use crate::error::ApplicationError;
-use base64::{
-    engine::general_purpose,
-    Engine as _,
-};
+use base64::{engine::general_purpose, Engine as _};
 use base64_url;
 use openssl::rsa::{Padding, Rsa};
 use sha2::{Digest, Sha256};
@@ -11,7 +7,7 @@ use std::str;
 pub struct CriptoHelper;
 
 impl CriptoHelper {
-    pub fn from_base64(input: String) -> Result<String, ApplicationError> {
+    pub fn from_base64(input: String) -> anyhow::Result<String> {
         let bytes = general_purpose::STANDARD.decode(input)?;
         let result = str::from_utf8(&bytes)?;
         Ok(result.to_owned())
@@ -44,8 +40,7 @@ impl CriptoHelper {
 
         buf.truncate(size);
 
-        String::from_utf8(buf)
-            .unwrap()
+        String::from_utf8(buf).unwrap()
     }
 
     pub fn encrypt(data: &str, public_key_pem: &str) -> Vec<u8> {

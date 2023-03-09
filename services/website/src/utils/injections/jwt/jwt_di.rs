@@ -1,14 +1,11 @@
 use async_trait::async_trait;
 use aws_lambda_events::apigw::ApiGatewayCustomAuthorizerResponse;
-use shared::{
-    error::ApplicationError,
-    utils::jwt::{Claims, Jwt},
-};
+use shared::utils::jwt::{Claims, Jwt};
 use typed_builder::TypedBuilder as Builder;
 
 #[async_trait]
 pub trait JwtApiInitialisation: Send + Sync {
-    async fn validate_token(&self, raw_token: &str) -> Result<Option<Claims>, ApplicationError>;
+    async fn validate_token(&self, raw_token: &str) -> anyhow::Result<Option<Claims>>;
 
     fn to_response(
         &self,
@@ -23,7 +20,7 @@ pub struct JwtApiClient {}
 
 #[async_trait]
 impl JwtApiInitialisation for JwtApiClient {
-    async fn validate_token(&self, raw_token: &str) -> Result<Option<Claims>, ApplicationError> {
+    async fn validate_token(&self, raw_token: &str) -> anyhow::Result<Option<Claims>> {
         Jwt::validate_token(raw_token).await
     }
 

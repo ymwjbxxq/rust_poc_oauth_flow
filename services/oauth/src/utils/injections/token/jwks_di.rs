@@ -3,15 +3,11 @@ use crate::{
     queries::token::get_key::{GetKey, GetKeyQuery},
 };
 use async_trait::async_trait;
-use shared::error::ApplicationError;
 use typed_builder::TypedBuilder as Builder;
 
 #[async_trait]
 pub trait JwksAppInitialisation: Send + Sync {
-    async fn get_key_query(
-        &self,
-        request: &GetKeyRequest,
-    ) -> Result<Option<String>, ApplicationError>;
+    async fn get_key_query(&self, request: &GetKeyRequest) -> anyhow::Result<Option<String>>;
 }
 
 #[derive(Debug, Builder)]
@@ -22,10 +18,7 @@ pub struct JwksAppClient {
 
 #[async_trait]
 impl JwksAppInitialisation for JwksAppClient {
-    async fn get_key_query(
-        &self,
-        request: &GetKeyRequest,
-    ) -> Result<Option<String>, ApplicationError> {
+    async fn get_key_query(&self, request: &GetKeyRequest) -> anyhow::Result<Option<String>> {
         self.get_key_query.execute(request).await
     }
 }

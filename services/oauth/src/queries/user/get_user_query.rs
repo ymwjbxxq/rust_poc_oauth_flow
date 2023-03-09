@@ -3,7 +3,6 @@ use crate::models::user::User;
 use async_trait::async_trait;
 use aws_sdk_dynamodb::model::AttributeValue;
 use aws_sdk_dynamodb::Client;
-use shared::error::ApplicationError;
 use typed_builder::TypedBuilder as Builder;
 
 #[derive(Debug, Builder)]
@@ -17,12 +16,12 @@ pub struct GetUser {
 
 #[async_trait]
 pub trait GetUserQuery {
-    async fn execute(&self, request: &GetUserRequest) -> Result<Option<User>, ApplicationError>;
+    async fn execute(&self, request: &GetUserRequest) -> anyhow::Result<Option<User>>;
 }
 
 #[async_trait]
 impl GetUserQuery for GetUser {
-    async fn execute(&self, request: &GetUserRequest) -> Result<Option<User>, ApplicationError> {
+    async fn execute(&self, request: &GetUserRequest) -> anyhow::Result<Option<User>> {
         let res = self
             .client
             .get_item()
@@ -31,10 +30,7 @@ impl GetUserQuery for GetUser {
                 "client_id",
                 AttributeValue::S(request.client_id.to_lowercase()),
             )
-            .key(
-                "user",
-                AttributeValue::S(request.user.to_string()),
-            )
+            .key("user", AttributeValue::S(request.user.to_string()))
             .projection_expression("#user, is_consent, is_optin")
             .expression_attribute_names("#user", "user")
             .send()
