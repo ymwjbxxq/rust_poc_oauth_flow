@@ -22,6 +22,7 @@ uuid.workspace = true
 async-trait.workspace = true
 typed-builder.workspace = true
 chrono.workspace = true
+anyhow.workspace = true
 
 # APP
 [[bin]]

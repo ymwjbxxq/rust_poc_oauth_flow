@@ -10,3 +10,4 @@ deploy.sh
 build
 samconfig.toml
 *.js
+temp/

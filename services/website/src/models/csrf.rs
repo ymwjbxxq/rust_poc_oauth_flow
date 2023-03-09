@@ -1,6 +1,6 @@
 use aws_sdk_dynamodb::model::AttributeValue;
 use serde::{Deserialize, Serialize};
-use shared::{error::ApplicationError, utils::dynamodb::AttributeValuesExt};
+use shared::utils::dynamodb::AttributeValuesExt;
 use std::collections::HashMap;
 
 #[derive(Clone, Default, Debug, Deserialize, PartialEq, Serialize)]
@@ -13,7 +13,7 @@ pub struct CSRF {
 }
 
 impl CSRF {
-    pub fn from_dynamodb(value: HashMap<String, AttributeValue>) -> Result<CSRF, ApplicationError> {
+    pub fn from_dynamodb(value: HashMap<String, AttributeValue>) -> anyhow::Result<CSRF> {
         Ok(Self {
             client_id: value.get_string("client_id").unwrap(),
             sk: value.get_string("sk").unwrap(),

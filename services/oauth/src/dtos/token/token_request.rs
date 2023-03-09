@@ -9,7 +9,7 @@ pub struct TokenRequest {
     #[builder(setter(into))]
     pub client_id: String,
 
-     #[builder(setter(into))]
+    #[builder(setter(into))]
     pub audience: String,
 }
 
@@ -20,7 +20,9 @@ impl TokenRequest {
         let client_id = query_params.first("client_id");
         let audience = query_params.first("audience");
 
-        if let (Some(code_verifier), Some(client_id), Some(audience)) = (code_verifier, client_id, audience) {
+        if let (Some(code_verifier), Some(client_id), Some(audience)) =
+            (code_verifier, client_id, audience)
+        {
             return Some(
                 Self::builder()
                     .code_verifier(code_verifier)

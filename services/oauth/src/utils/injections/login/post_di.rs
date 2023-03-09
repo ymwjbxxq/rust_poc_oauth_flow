@@ -7,17 +7,13 @@ use crate::{
     },
 };
 use async_trait::async_trait;
-use shared::error::ApplicationError;
 use typed_builder::TypedBuilder as Builder;
 
 #[async_trait]
 pub trait PostAppInitialisation: Send + Sync {
-    async fn get_user_query(
-        &self,
-        request: &LoginUserRequest,
-    ) -> Result<Option<User>, ApplicationError>;
+    async fn get_user_query(&self, request: &LoginUserRequest) -> anyhow::Result<Option<User>>;
 
-    async fn add_csrf_query(&self, request: &AddCSRFRequest) -> Result<(), ApplicationError>;
+    async fn add_csrf_query(&self, request: &AddCSRFRequest) -> anyhow::Result<()>;
 
     fn redirect_path(&self) -> &str;
 }
@@ -36,14 +32,11 @@ pub struct PostAppClient {
 
 #[async_trait]
 impl PostAppInitialisation for PostAppClient {
-    async fn get_user_query(
-        &self,
-        request: &LoginUserRequest,
-    ) -> Result<Option<User>, ApplicationError> {
+    async fn get_user_query(&self, request: &LoginUserRequest) -> anyhow::Result<Option<User>> {
         self.get_user_query.execute(request).await
     }
 
-    async fn add_csrf_query(&self, request: &AddCSRFRequest) -> Result<(), ApplicationError> {
+    async fn add_csrf_query(&self, request: &AddCSRFRequest) -> anyhow::Result<()> {
         self.add_csrf_query.execute(request).await
     }
 

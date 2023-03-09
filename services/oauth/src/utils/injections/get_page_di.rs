@@ -3,12 +3,11 @@ use crate::{
     queries::pages::get_page_query::{Page, PageQuery},
 };
 use async_trait::async_trait;
-use shared::error::ApplicationError;
 use typed_builder::TypedBuilder as Builder;
 
 #[async_trait]
 pub trait GetPageAppInitialisation: Send + Sync {
-    async fn query(&self, request: &PageRequest) -> Result<Option<String>, ApplicationError>;
+    async fn query(&self, request: &PageRequest) -> anyhow::Result<Option<String>>;
 }
 
 #[derive(Debug, Builder)]
@@ -19,7 +18,7 @@ pub struct GetPageAppClient {
 
 #[async_trait]
 impl GetPageAppInitialisation for GetPageAppClient {
-    async fn query(&self, request: &PageRequest) -> Result<Option<String>, ApplicationError> {
+    async fn query(&self, request: &PageRequest) -> anyhow::Result<Option<String>> {
         self.query.execute(request).await
     }
 }

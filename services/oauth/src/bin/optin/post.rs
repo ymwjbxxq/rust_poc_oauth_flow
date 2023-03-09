@@ -34,7 +34,7 @@
 // pub async fn handler(
 //     app_client: &dyn PostAppInitialisation,
 //     event: Request,
-// ) -> Result<impl IntoResponse, Error> {
+// ) -> anyhow::Result<impl IntoResponse> {
 //     println!("{event:?}");
 
 //     let request = UpdateOptInRequest::validate(&event);

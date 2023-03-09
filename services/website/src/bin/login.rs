@@ -39,7 +39,7 @@ async fn main() -> Result<(), Error> {
 pub async fn handler(
     app_client: &dyn LoginAppInitialisation,
     event: Request,
-) -> Result<impl IntoResponse, Error> {
+) -> anyhow::Result<impl IntoResponse> {
     println!("{event:?}");
 
     let request = LoginRequest::validate(&event);

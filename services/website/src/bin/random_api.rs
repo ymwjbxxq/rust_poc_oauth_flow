@@ -10,7 +10,7 @@ async fn main() -> Result<(), Error> {
     run(service_fn(handler)).await
 }
 
-pub async fn handler(event: Request) -> Result<impl IntoResponse, Error> {
+pub async fn handler(event: Request) -> anyhow::Result<impl IntoResponse> {
     println!("{event:?}");
 
     Ok(ApiResponseType::Ok(

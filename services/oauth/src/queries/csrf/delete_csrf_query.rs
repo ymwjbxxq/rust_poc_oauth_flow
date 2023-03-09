@@ -1,7 +1,6 @@
 use async_trait::async_trait;
 use aws_sdk_dynamodb::model::AttributeValue;
 use aws_sdk_dynamodb::Client;
-use shared::error::ApplicationError;
 use typed_builder::TypedBuilder as Builder;
 
 #[derive(Debug, Default, Builder)]
@@ -24,12 +23,12 @@ pub struct DeleteCSRF {
 
 #[async_trait]
 pub trait DeleteCSRFQuery {
-    async fn execute(&self, request: &DeleteCSRFRequest) -> Result<(), ApplicationError>;
+    async fn execute(&self, request: &DeleteCSRFRequest) -> anyhow::Result<()>;
 }
 
 #[async_trait]
 impl DeleteCSRFQuery for DeleteCSRF {
-    async fn execute(&self, request: &DeleteCSRFRequest) -> Result<(), ApplicationError> {
+    async fn execute(&self, request: &DeleteCSRFRequest) -> anyhow::Result<()> {
         self.client
             .delete_item()
             .table_name(self.table_name.to_owned())

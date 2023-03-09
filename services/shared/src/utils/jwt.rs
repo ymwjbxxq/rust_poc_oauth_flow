@@ -1,4 +1,3 @@
-use crate::error::ApplicationError;
 use aws_lambda_events::apigw::{
     ApiGatewayCustomAuthorizerPolicy, ApiGatewayCustomAuthorizerResponse, IamPolicyStatement,
 };
@@ -35,7 +34,7 @@ impl Jwt {
         token.map(str::to_string)
     }
 
-    pub fn encode(claims: &Claims, private_key: &str) -> Result<Option<String>, ApplicationError> {
+    pub fn encode(claims: &Claims, private_key: &str) -> anyhow::Result<Option<String>> {
         let token = jsonwebtoken::encode(
             &jsonwebtoken::Header::new(Algorithm::RS256),
             claims,
@@ -69,7 +68,7 @@ impl Jwt {
         }
     }
 
-    pub async fn validate_token(raw_token: &str) -> Result<Option<Claims>, ApplicationError> {
+    pub async fn validate_token(raw_token: &str) -> anyhow::Result<Option<Claims>> {
         if let Some(token) = Jwt::get_token(raw_token) {
             let public_key = Jwt::get_public_key().await?;
             let token_data = decode::<Value>(
@@ -86,15 +85,14 @@ impl Jwt {
         Ok(None)
     }
 
-    async fn get_public_key() -> Result<String, ApplicationError> {
+    async fn get_public_key() -> anyhow::Result<String> {
         let json_key_set_url = std::env::var("JSKS_URI").expect("JSKS_URI must be set");
         let res = reqwest::Client::new().get(json_key_set_url).send().await?;
         let jwks = res.json::<JwtKeys>().await?;
-        
+
         Ok(jwks.public_key.replace('\n', ""))
     }
 }
-
 
 #[derive(Deserialize)]
 pub struct JwtKeys {

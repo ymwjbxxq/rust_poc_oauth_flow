@@ -2,7 +2,6 @@ use async_trait::async_trait;
 use aws_sdk_dynamodb::model::AttributeValue;
 use aws_sdk_dynamodb::Client;
 use chrono::{Duration, Utc};
-use shared::error::ApplicationError;
 use typed_builder::TypedBuilder as Builder;
 
 #[derive(Debug, Default, Builder)]
@@ -28,12 +27,12 @@ pub struct AddCSRF {
 
 #[async_trait]
 pub trait AddCSRFQuery {
-    async fn execute(&self, product: &AddCSRFRequest) -> Result<(), ApplicationError>;
+    async fn execute(&self, product: &AddCSRFRequest) -> anyhow::Result<()>;
 }
 
 #[async_trait]
 impl AddCSRFQuery for AddCSRF {
-    async fn execute(&self, request: &AddCSRFRequest) -> Result<(), ApplicationError> {
+    async fn execute(&self, request: &AddCSRFRequest) -> anyhow::Result<()> {
         let ttl = (Utc::now() + Duration::minutes(1)).timestamp();
         let mut query = self
             .client

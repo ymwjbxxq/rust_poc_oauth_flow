@@ -3,7 +3,6 @@ use crate::models::user::User;
 use async_trait::async_trait;
 use aws_sdk_dynamodb::model::AttributeValue;
 use aws_sdk_dynamodb::Client;
-use shared::error::ApplicationError;
 use typed_builder::TypedBuilder as Builder;
 
 #[derive(Debug, Builder)]
@@ -17,12 +16,12 @@ pub struct LoginUser {
 
 #[async_trait]
 pub trait LoginUserQuery {
-    async fn execute(&self, request: &LoginUserRequest) -> Result<Option<User>, ApplicationError>;
+    async fn execute(&self, request: &LoginUserRequest) -> anyhow::Result<Option<User>>;
 }
 
 #[async_trait]
 impl LoginUserQuery for LoginUser {
-    async fn execute(&self, request: &LoginUserRequest) -> Result<Option<User>, ApplicationError> {
+    async fn execute(&self, request: &LoginUserRequest) -> anyhow::Result<Option<User>> {
         let res = self
             .client
             .get_item()

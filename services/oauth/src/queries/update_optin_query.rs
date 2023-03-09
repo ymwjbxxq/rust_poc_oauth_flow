@@ -2,12 +2,11 @@ use crate::dtos::optin::update_optin_request::UpdateOptInRequest;
 use async_trait::async_trait;
 use aws_sdk_dynamodb::model::AttributeValue;
 use aws_sdk_dynamodb::Client;
-use shared::error::ApplicationError;
 use typed_builder::TypedBuilder as Builder;
 
 #[async_trait]
 pub trait UpdateOptInQuery {
-    async fn execute(&self, request: &UpdateOptInRequest) -> Result<(), ApplicationError>;
+    async fn execute(&self, request: &UpdateOptInRequest) -> anyhow::Result<()>;
 }
 
 #[derive(Debug, Builder)]
@@ -21,7 +20,7 @@ pub struct UpdateOptIn {
 
 #[async_trait]
 impl UpdateOptInQuery for UpdateOptIn {
-    async fn execute(&self, request: &UpdateOptInRequest) -> Result<(), ApplicationError> {
+    async fn execute(&self, request: &UpdateOptInRequest) -> anyhow::Result<()> {
         println!("Updating optin");
         self.client
             .update_item()

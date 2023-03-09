@@ -26,7 +26,7 @@ async fn main() -> Result<(), Error> {
 pub async fn handler(
     app_client: &dyn JwtApiInitialisation,
     event: LambdaEvent<ApiGatewayCustomAuthorizerRequestTypeRequest>,
-) -> Result<ApiGatewayCustomAuthorizerResponse, Error> {
+) -> anyhow::Result<ApiGatewayCustomAuthorizerResponse> {
     println!("EVENT {event:?}");
 
     let request = JwtRequest::validate(&event.payload);
