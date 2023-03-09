@@ -29,7 +29,9 @@ Authorization: eyJhbGciOiJIUzI1NiJ9.T0RBVUxDQVk0V0k1S1ZQU01DUkZCTExBOEs3QURNUEQz
 To reduce the exposure of sensitive data, I use AWS CloudFront with Lambda@Edge to:
 
 * Intercept data
-* Encrypt at the edge with the website RSA
+* Encrypt at the edge with the website secretes
+* * Password is hashed
+* * PII fields are encrypted with AES
 * Pass it through before the application can process it, reducing exposure.
 
 Lambda edge will load the client config from S3 and, from there, take the SSM key to load secrets to encrypt sensitive data.
@@ -156,6 +158,13 @@ The secret_key is a token made of:
 Once it is all done, we have something like
 
 **/f977ec729e094141b6c1d01f50cba6ce/public_key**
+
+
+**IMPROVEMENTS**:
+
+- The RSA certificate should be stored in Secret Manager and not in Parameter Store. In this way, it is possible to rotate them.
+- Config and Pages could be cached maybe with CloudFront, but it required invalidation in case of changes.
+- The RSA could be cached 
 
 ```
 -----BEGIN PUBLIC KEY-----
