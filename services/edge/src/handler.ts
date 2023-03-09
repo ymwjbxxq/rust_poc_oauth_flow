@@ -43,9 +43,12 @@ export const handler = async (event: any): Promise<any> => {
 
     const token = JWT.decrypt_token(ssm_secret_key);
     let secret: Secret = token.payload;
-    let hash_salt = Encryption.rsa_decrypt(secret.hash_salt, ssm_private_key);
-    let aes_securitykey = Encryption.rsa_decrypt(secret.aes_securitykey, ssm_private_key);
-    let aes_initVector = Encryption.rsa_decrypt(secret.aes_initVector, ssm_private_key);
+
+    let [hash_salt, aes_securitykey, aes_initVector] = await Promise.all([
+      Encryption.rsa_decrypt(secret.hash_salt, ssm_private_key),
+      Encryption.rsa_decrypt(secret.aes_securitykey, ssm_private_key),
+      Encryption.rsa_decrypt(secret.aes_initVector, ssm_private_key)
+    ]);
 
     // encrypt the PII fields based on the config loaded from S3
     config.PII_fields.forEach(prop => {
